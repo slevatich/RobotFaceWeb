@@ -10,6 +10,11 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var initialData = [["", "HAPPY", "SAD"], ['ON_STATE_ENTER', 'SET_TONE("cheerful")\nSAY("Hello old chum!")', 'SET_TONE("morose")'], ['DEFAULT', 'CONVERSE_WITH_TONE()', 'CONVERSE_WITH_TONE()'], ['"hello"', 'EXT("Hi hi! ...")', 'SAY("Im sad")'], ['"goodbye"', 'SAY("Goodbye old chum!")', 'TODO'], ['"be sad"', 'ACTIVATE(SAD)', 'TODO']];
 
+/* URGENT */
+// can I set up some defaults, and perhaps multiple sites with different defaults for saturday rehearsal?
+// when you go to view mode show on state enter for state one
+
+
 /* Current exciting Features */
 // EDIT
 // adding a new state/input will copy over state from previous inputs/states
@@ -20,10 +25,6 @@ var initialData = [["", "HAPPY", "SAD"], ['ON_STATE_ENTER', 'SET_TONE("cheerful"
 // GOTO is handled (but it needs to be one line)
 // there is a spotlight so the AI actor only needs to look one place
 // the spotlight includes a random number to play around with
-
-
-/* URGENT */
-// can I set up some defaults, and perhaps multiple sites with different defaults for saturday rehearsal?
 
 
 /* Fast Follows */
@@ -285,6 +286,8 @@ var Table = function (_React$Component5) {
         newData[i][j] = e.target.value;
         // NOTE: hacky to set table state here because it lives in table scope
         this.setState({ data: newData, selectedI: 0, selectedJ: 0, invalidState: cellInvalidStateForActivate(newData, i, j) });
+        // NOTE: extremely inefficient
+        this.props.onSpotlight(this.state.data[0][1], this.state.data[1][1]);
       } else {
         var state = this.state.data[0][j];
         var command = this.state.data[i][j];
@@ -421,9 +424,9 @@ var App = function (_React$Component6) {
   _createClass(App, [{
     key: "onToggle",
     value: function onToggle(e) {
-      if (!this.state.editing) {
-        this.setState({ currentCommand: "", currentRandom: "", currentState: "" });
-      }
+      // if (!this.state.editing) {
+      //   this.setState({currentCommand: "", currentRandom: "", currentState: ""});
+      // }
       this.setState({ editing: !this.state.editing });
     }
   }, {

@@ -8,13 +8,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var initialData = [["", "HAPPY", "SAD"], ['ON_STATE_ENTER', 'SET_TONE("cheerful")\nSAY("Hello old chum!")', 'SET_TONE("morose")'], ['"hello"', 'EXT("Hi hi! ...")', 'SAY("Im sad")'], ['"goodbye"', 'SAY("Goodbye old chum!")', 'TODO'], ['"be sad"', 'ACTIVATE(SAD)', 'TODO']];
-
-// Test deployment
-
-// CSS for making shit look better
-// table spacing
-// font
+var initialData = [["", "HAPPY", "SAD"], ['ON_STATE_ENTER', 'SET_TONE("cheerful")\nSAY("Hello old chum!")', 'SET_TONE("morose")'], ['DEFAULT', 'CONVERSE_WITH_TONE()', 'CONVERSE_WITH_TONE()'], ['"hello"', 'EXT("Hi hi! ...")', 'SAY("Im sad")'], ['"goodbye"', 'SAY("Goodbye old chum!")', 'TODO'], ['"be sad"', 'ACTIVATE(SAD)', 'TODO']];
 
 /* Current exciting Features */
 // EDIT
@@ -27,7 +21,13 @@ var initialData = [["", "HAPPY", "SAD"], ['ON_STATE_ENTER', 'SET_TONE("cheerful"
 // there is a spotlight so the AI actor only needs to look one place
 // the spotlight includes a random number to play around with
 
+
+/* URGENT */
+// can I set up some defaults, and perhaps multiple sites with different defaults for saturday rehearsal?
+
+
 /* Fast Follows */
+// Figure out how I can use github to push instead of copying and pasting into seperate commits
 // Improve the syntax correction. there are some easy ones
 // Marking what code fired for next time is a good way of maybe preserving select once it opens into editing mode again?
 // enable multi line goto
@@ -40,9 +40,6 @@ var initialData = [["", "HAPPY", "SAD"], ['ON_STATE_ENTER', 'SET_TONE("cheerful"
 // Improve input verification... if the state gets updated there should be more invalid spots!
 // Selecting from the different options of things (i.e. you pick ACTIVATE or SAY)
 // Having some instructions in the website
-
-
-// check in w/ the FAM
 
 
 // Save and load would be nice... could I get a csv upload working and a save to csv for simple save load to disk?
@@ -175,7 +172,7 @@ var ReadOnlyCell = function (_React$Component2) {
     value: function render() {
       return React.createElement(
         "span",
-        { style: this.props.isSelected ? { backgroundColor: "pink" } : { backgroundColor: "transparent" }, onClick: this.handleClick },
+        { style: this.props.isSelected ? { backgroundColor: "red" } : { backgroundColor: "transparent" }, onClick: this.handleClick },
         this.props.value
       );
     }
@@ -443,23 +440,25 @@ var App = function (_React$Component6) {
         null,
         React.createElement(
           "div",
-          { style: this.state.editing ? { display: "none", backgroundColor: "blue" } : { display: "block", backgroundColor: "blue" } },
+          { style: this.state.editing ? { display: "none" } : { display: "inline-block", padding: "10px 10px 10px 10px", backgroundColor: "gold" } },
           React.createElement(
             "h2",
-            null,
+            { style: { color: "black" } },
             this.state.currentState
           ),
           React.createElement(
             "h1",
-            { style: { whiteSpace: "pre-line" } },
+            { style: { color: "black", whiteSpace: "pre-line" } },
             this.state.currentCommand
           ),
           React.createElement(
             "h3",
-            null,
+            { style: { color: "black" } },
             this.state.currentRandom
           )
         ),
+        React.createElement("br", null),
+        React.createElement("br", null),
         React.createElement(
           "button",
           { onClick: this.onToggle },

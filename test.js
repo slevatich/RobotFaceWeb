@@ -244,7 +244,7 @@ var Row = function (_React$Component4) {
     value: function render() {
       var arr = [];
       for (var j = 0; j < this.props.width; j++) {
-        var isOnEdge = j == 0 && this.props.i == 1 || this.props.i == 0 && j == 1 || this.props.i == 0 && j == 0; // editable in edit mode
+        var isOnEdge = j == 0 && this.props.i == 1 || this.props.i == 2 && j == 0 || this.props.i == 0 && j == 0; // editable in edit mode
         var isHeader = j == 0 || this.props.i == 0 || this.props.i == 1; // non clickable in view mode, and bolder text
         arr.push(React.createElement(Cell, { isHeader: isHeader, isInteractable: !isOnEdge, isSelected: j == this.props.selectedJ, editingMode: this.props.editing, text: this.props.data[this.props.i][j], onCellChange: this.onCellChange, i: this.props.i, j: j }));
       }

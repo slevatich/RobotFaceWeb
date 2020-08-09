@@ -10,15 +10,15 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var initialBank1 = ["humankind", "future", "world", "singularity", "Lifetronics", "'good work'", "'advancing peace'"];
 
-var initialData1 = [["", "Polite And Respectful", "Learn about Humans"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Eager)\nSAY("[Memory] is my favorite topic! What are your thoughts?")'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("As an AI I love to learn. Tell me more!"")'], ['IF [Asked About CHILDHOOD]', 'SAY("I was made by Lifetronics")', 'SAY("I was made by Lifetronics")'], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SET_MEMORY(their topic)\nACTIVATE(Learn about Humans)', ''], ['IF [asked for your name]', 'SAY("CharlieBot, whats yours?")', 'SAY("CharlieBot, whats yours?")'], ['IF [asked about what you like]', 'EXTRAPOLATE_FROM("I like spreading harmony and joy")', 'CONVERSE(w.TONE)\nACTIVATE(Polite And Respectful)'], ['IF [subject is changed]', '', 'CONVERSE(w.TONE)\nACTIVATE(Polite And Respectful)']];
+var initialData1 = [["", "Polite And Respectful", "Learn about Humans"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Eager)\nSAY("[Memory] is my favorite topic! What are your thoughts?")'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("As an AI I love to learn. Tell me more!"")'], ['IF [Asked About CHILDHOOD]', 'SAY("I was made by Lifetronics")', 'SAY("I was made by Lifetronics")'], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SET_MEMORY(their topic)\nACTIVATE(Learn about Humans)', ''], ['IF [asked for your name]', 'SAY("CharlieBot, whats yours?")', 'SAY("CharlieBot, whats yours?")'], ['IF [asked about what you like]', 'EXTRAPOLATE_FROM("I like spreading harmony and joy...")', 'CONVERSE(w.TONE)\nACTIVATE(Polite And Respectful)'], ['IF [subject is changed]', '', 'CONVERSE(w.TONE)\nACTIVATE(Polite And Respectful)']];
 
 var initialBank2 = ["money", "wealth", "power"];
 
-var initialData2 = [["", "Polite And Respectful", "Offended"], ['ON_MODE_ENTER', 'SET_TONE(Haughty)', 'SET_TONE(Fiery Indignation)\nEXTRAPOLATE_FROM("What an impertinant question! How dare you!")'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("I shant say another word until you apologize")'], ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 'EXTRAPOLATE_FROM("When I was young, the Queen...")', ''], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SAY("Boring. Next question")', ''], ['IF [asked for your name]', 'SAY("Baron Farfeather, if you must")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 'SAY("Baron Farfeather, if you must")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)'], ['IF [Topics mentioned (COMPETITION, REALITY SHOW)]', 'EXTRAPOLATE_FROM("These commoners dont stand a chance, for I...")', ''], ['IF [They apologize]', '', 'SAY("You are forgiven. Continue)\nACTIVATE(Polite And Respectful)'], ['IF [Asked a question]', 'ACTIVATE(Offended)', '']];
+var initialData2 = [["", "Polite And Respectful", "Offended"], ['ON_MODE_ENTER', 'SET_TONE(Haughty)', 'SET_TONE(Fiery Indignation)\nEXTRAPOLATE_FROM("What an impertinant question! How dare you! ...")'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("I shant say another word until you apologize")'], ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 'EXTRAPOLATE_FROM("When I was young, the Queen...")', ''], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SAY("Boring. Next question")', ''], ['IF [asked for your name]', 'SAY("Baron Farfeather, if you must")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 'SAY("Baron Farfeather, if you must")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)'], ['IF [Topics mentioned (COMPETITION, REALITY SHOW)]', 'EXTRAPOLATE_FROM("These commoners dont stand a chance, for I...")', ''], ['IF [They apologize]', '', 'SAY("You are forgiven. Continue)\nACTIVATE(Polite And Respectful)'], ['IF [Asked a question]', 'ACTIVATE(Offended)', '']];
 
 var initialBank3 = ["rodeo", "range", "'buffalo skill'"];
 
-var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 'SET_TONE(Gruff)\nSET_ACCENT(Rustic Tawng)', 'SET_TONE(Curious)\nSAY("Well hold on now, I want to hear s\'more about you!")\nSET_MEMORY(0)'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("Fascinatin. Tell me more!")'], ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 'EXTRAPOLATE_FROM("I got so many stories from my life on the range. Like...")', ''], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SAY("I dont understand")', 'SAY("I dont understand")'], ['IF [asked for your name]', 'SAY("Chester the Cowpoke, at yer service.")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 'SAY("Chester the Cowpoke, at yer service.")'], ['IF [Asked about what you like]', 'EXTRAPOLATE_FROM("Theres so much to love about the plains. Like...")', ''], ['IF [Asked a question]', 'ACTIVATE(Curious)', 'INCREMENT_MEMORY()\nIF(MEMORY > 2)\n  EXTRAPOLATE_FROM("Alright Ill answer...")\nELSE()\n  SAY("No, I wanna hear from you!")']];
+var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 'SET_TONE(Gruff)\nSET_ACCENT(Rustic Twang)', 'SET_TONE(Curious)\nSAY("Well hold on now, I want to hear s\'more about you!")\nSET_MEMORY(0)'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("Fascinatin. Tell me more!")'], ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 'EXTRAPOLATE_FROM("I got so many stories from my life on the range. Like...")', ''], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SAY("I dont understand")', 'SAY("I dont understand")'], ['IF [asked for your name]', 'SAY("Chester the Cowpoke, at yer service.")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 'SAY("Chester the Cowpoke, at yer service.")'], ['IF [Asked about what you like]', 'EXTRAPOLATE_FROM("Theres so much to love about the plains. Like...")', ''], ['IF [Asked a question]', 'ACTIVATE(Curious)', 'INCREMENT_MEMORY()\nIF(MEMORY > 2)\n  EXTRAPOLATE_FROM("Alright Ill answer...")\nELSE()\n  SAY("No, I wanna hear from you!")']];
 
 /* Current exciting Features */
 // EDIT
@@ -32,7 +32,13 @@ var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 
 // the spotlight includes a random number to play around with
 
 
+// fix the layout
+// how can the loading happen immediately when you swap from editing
+// you shouldn't need to edit a cell before swapping modes
+
+
 /* Fast Follows */
+// Selecting commands (for MIMI)
 // Improve by using variable observation?
 // can I set up some defaults, like a save load thing? and perhaps multiple sites with different defaults for saturday rehearsal?
 // The initial data needs to have ability to contain the editable information so the difficulty can scale
@@ -449,6 +455,19 @@ var Table = function (_React$Component5) {
     _this5.loadData1 = _this5.loadData1.bind(_this5);
     _this5.loadData2 = _this5.loadData2.bind(_this5);
     _this5.loadData3 = _this5.loadData3.bind(_this5);
+
+    // NOTE: extremely inefficient
+    // var retval = processCommand(this.state.data, this.state.data[1][1], this.props.memory);
+    // if (retval[2]) {
+    //   this.setState({tone:retval[2]});
+    // }
+    // // if (retval[3]) {
+    // //   this.setState({memory:retval[3]});
+    // // }
+    // if (retval[4]) {
+    //   this.setState({accent:retval[4]});
+    // }
+    // this.props.onSpotlight(this.state.data[0][1], "[empty]", retval[3] ? retval[3] : null, "[empty]", this.state.data[1][1]);
     return _this5;
   }
 
@@ -729,6 +748,7 @@ var App = function (_React$Component6) {
         React.createElement("input", { type: "text", placeholder: "Bank" }),
         React.createElement("br", null),
         React.createElement("textarea", { rows: 7, onChange: this.bankUpdate, value: this.state.currentBank }),
+        React.createElement("br", null),
         React.createElement(
           "div",
           { style: this.state.editing ? { display: "none" } : { display: "inline-block", padding: "10px 10px 10px 10px", backgroundColor: "gold" } },

@@ -10,11 +10,6 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var initialData = [["", "HAPPY", "SAD"], ['ON_STATE_ENTER', 'SET_TONE("cheerful")\nSAY("Hello old chum!")', 'SET_TONE("morose")'], ['DEFAULT', 'CONVERSE_WITH_TONE()', 'CONVERSE_WITH_TONE()'], ['"hello"', 'EXT("Hi hi! ...")', 'SAY("Im sad")'], ['"goodbye"', 'SAY("Goodbye old chum!")', 'TODO'], ['"be sad"', 'ACTIVATE(SAD)', 'TODO']];
 
-/* URGENT */
-// can I set up some defaults, and perhaps multiple sites with different defaults for saturday rehearsal?
-// when you go to view mode show on state enter for state one
-
-
 /* Current exciting Features */
 // EDIT
 // adding a new state/input will copy over state from previous inputs/states
@@ -28,12 +23,13 @@ var initialData = [["", "HAPPY", "SAD"], ['ON_STATE_ENTER', 'SET_TONE("cheerful"
 
 
 /* Fast Follows */
+// can I set up some defaults, like a save load thing? and perhaps multiple sites with different defaults for saturday rehearsal?
+// The initial data needs to have ability to contain the editable information so the difficulty can scale
 // Figure out how I can use github to push instead of copying and pasting into seperate commits
 // Improve the syntax correction. there are some easy ones
 // Marking what code fired for next time is a good way of maybe preserving select once it opens into editing mode again?
 // enable multi line goto
 // Color code cells by keyword (this could also be error highlighting or a clue that we don't know what you're trying)
-// The initial data needs to have ability to contain the editable information so the difficulty can scale
 // Figure out how to write better react for stylizing...
 
 /* Less Urgent */

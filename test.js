@@ -656,7 +656,9 @@ var App = function (_React$Component6) {
 
     var _this6 = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
-    _this6.state = { currentBank: initialBank1.join('\n'), editing: true, currentCommand: "", currentRandom: "", currentState: "", currentTone: "", currentAccent: "", currentMemory: "[empty]" };
+    var bank = localStorage.getItem('robotFaceStoredData1') || initialBank1.join('\n');
+    _this6.state = { currentBank: bank, editing: true, currentCommand: "", currentRandom: "", currentState: "", currentTone: "", currentAccent: "", currentMemory: "[empty]" };
+    localStorage.setItem('robotFaceStoredData1', _this6.state.currentBank);
 
     _this6.onToggle = _this6.onToggle.bind(_this6);
     _this6.onSpotlight = _this6.onSpotlight.bind(_this6);
@@ -686,6 +688,7 @@ var App = function (_React$Component6) {
     key: "clearStorage",
     value: function clearStorage(e) {
       localStorage.setItem('robotFaceStoredData', null);
+      localStorage.setItem('robotFaceStoredData1', null);
     }
   }, {
     key: "memoryUpdate",
@@ -696,21 +699,25 @@ var App = function (_React$Component6) {
     key: "bankUpdate",
     value: function bankUpdate(e) {
       this.setState({ currentBank: e.target.value });
+      localStorage.setItem('robotFaceStoredData1', this.state.currentBank);
     }
   }, {
     key: "loadData1",
     value: function loadData1() {
       this.setState({ currentBank: initialBank1.join('\n') });
+      localStorage.setItem('robotFaceStoredData1', this.state.currentBank);
     }
   }, {
     key: "loadData2",
     value: function loadData2() {
       this.setState({ currentBank: initialBank2.join('\n') });
+      localStorage.setItem('robotFaceStoredData1', this.state.currentBank);
     }
   }, {
     key: "loadData3",
     value: function loadData3() {
       this.setState({ currentBank: initialBank3.join('\n') });
+      localStorage.setItem('robotFaceStoredData1', this.state.currentBank);
     }
   }, {
     key: "render",

@@ -8,7 +8,11 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var initialData = [["", "HAPPY", "SAD"], ['ON_STATE_ENTER', 'SET_TONE("cheerful")\nSAY("Hello old chum!")', 'SET_TONE("morose")'], ['DEFAULT', 'CONVERSE_WITH_TONE()', 'CONVERSE_WITH_TONE()'], ['"hello"', 'EXT("Hi hi! ...")', 'SAY("Im sad")'], ['"goodbye"', 'SAY("Goodbye old chum!")', 'TODO'], ['"be sad"', 'ACTIVATE(SAD)', 'TODO']];
+var initialData1 = [["", "HAPPY", "SAD"], ['ON_STATE_ENTER', 'SET_TONE("cheerful")\nSAY("Hello old chum!")', 'SET_TONE("morose")'], ['DEFAULT', 'CONVERSE_WITH_TONE()', 'CONVERSE_WITH_TONE()'], ['"hello"', 'EXT("Hi hi! ...")', 'SAY("Im sad")'], ['"goodbye"', 'SAY("Goodbye old chum!")', 'TODO'], ['"be sad"', 'ACTIVATE(SAD)', 'TODO']];
+
+var initialData2 = [["", "SKIPPING", "SAD"], ['ON_STATE_ENTER', 'SET_TONE("cheerful")\nSAY("Hello old chum!")', 'SET_TONE("morose")'], ['DEFAULT', 'CONVERSE_WITH_TONE()', 'CONVERSE_WITH_TONE()'], ['"hello"', 'EXT("Hi hi! ...")', 'SAY("Im sad")'], ['"goodbye"', 'SAY("Goodbye old chum!")', 'TODO'], ['"be sad"', 'ACTIVATE(SAD)', 'TODO']];
+
+var initialData3 = [["", "YIPPEE", "SAD"], ['ON_STATE_ENTER', 'SET_TONE("cheerful")\nSAY("Hello old chum!")', 'SET_TONE("morose")'], ['DEFAULT', 'CONVERSE_WITH_TONE()', 'CONVERSE_WITH_TONE()'], ['"hello"', 'EXT("Hi hi! ...")', 'SAY("Im sad")'], ['"goodbye"', 'SAY("Goodbye old chum!")', 'TODO'], ['"be sad"', 'ACTIVATE(SAD)', 'TODO']];
 
 /* Current exciting Features */
 // EDIT
@@ -22,10 +26,14 @@ var initialData = [["", "HAPPY", "SAD"], ['ON_STATE_ENTER', 'SET_TONE("cheerful"
 // the spotlight includes a random number to play around with
 
 
+// Multi line split
+// also check for tone setting
+
+
 /* Fast Follows */
+// Improve by using variable observation?
 // can I set up some defaults, like a save load thing? and perhaps multiple sites with different defaults for saturday rehearsal?
 // The initial data needs to have ability to contain the editable information so the difficulty can scale
-// Figure out how I can use github to push instead of copying and pasting into seperate commits
 // Improve the syntax correction. there are some easy ones
 // Marking what code fired for next time is a good way of maybe preserving select once it opens into editing mode again?
 // enable multi line goto
@@ -135,6 +143,8 @@ var InputCell = function (_React$Component) {
     value: function render() {
       return React.createElement("textarea", { style: !this.state.modified ? this.props.i == 0 || this.props.j == 0 ? { color: "red", backgroundColor: "white" } : textIsValidCommand(this.props.value) ? { color: "red", backgroundColor: "aquamarine" } : { color: "red", backgroundColor: "pink" } : this.props.i == 0 || this.props.j == 0 ? { color: "black", backgroundColor: "white" } : textIsValidCommand(this.props.value) ? { color: "black", backgroundColor: "aquamarine" } : { color: "black", backgroundColor: "pink" },
         value: this.props.value,
+        rows: 5,
+        cols: 30,
         onChange: this.handleChange
       });
     }
@@ -264,13 +274,17 @@ var Table = function (_React$Component5) {
     // TODO: I need a copy method that will properly make sure this array is not copied by ref if I want to preserve default valuing
     var _this5 = _possibleConstructorReturn(this, (Table.__proto__ || Object.getPrototypeOf(Table)).call(this, props));
 
-    _this5.state = { data: initialData, selectedI: 0, selectedJ: 0, invalidState: null };
+    var data = JSON.parse(localStorage.getItem('robotFaceStoredData')) || initialData1;
+    _this5.state = { data: data, selectedI: 0, selectedJ: 0, invalidState: null, modeRemoveWarning: false, inputRemoveWarning: false };
 
     _this5.onCellChange = _this5.onCellChange.bind(_this5);
     _this5.onRowAdd = _this5.onRowAdd.bind(_this5);
     _this5.onColumnAdd = _this5.onColumnAdd.bind(_this5);
     _this5.onRowRemove = _this5.onRowRemove.bind(_this5);
     _this5.onColumnRemove = _this5.onColumnRemove.bind(_this5);
+    _this5.loadData1 = _this5.loadData1.bind(_this5);
+    _this5.loadData2 = _this5.loadData2.bind(_this5);
+    _this5.loadData3 = _this5.loadData3.bind(_this5);
     return _this5;
   }
 
@@ -282,6 +296,7 @@ var Table = function (_React$Component5) {
         newData[i][j] = e.target.value;
         // NOTE: hacky to set table state here because it lives in table scope
         this.setState({ data: newData, selectedI: 0, selectedJ: 0, invalidState: cellInvalidStateForActivate(newData, i, j) });
+        localStorage.setItem('robotFaceStoredData', JSON.stringify(newData));
         // NOTE: extremely inefficient
         this.props.onSpotlight(this.state.data[0][1], this.state.data[1][1]);
       } else {
@@ -316,13 +331,18 @@ var Table = function (_React$Component5) {
       lastRow[0] = "NEW INPUT";
       newData.push(lastRow);
       this.setState({ data: newData });
+      localStorage.setItem('robotFaceStoredData', JSON.stringify(newData));
     }
   }, {
     key: "onRowRemove",
     value: function onRowRemove(e) {
-      var oldData = this.state.data;
-      var newData = oldData.slice(0, -1);
-      this.setState({ data: newData });
+      if (this.state.inputRemoveWarning) {
+        var oldData = this.state.data;
+        var newData = oldData.slice(0, -1);
+        this.setState({ data: newData });
+        localStorage.setItem('robotFaceStoredData', JSON.stringify(newData));
+      }
+      this.setState({ inputRemoveWarning: !this.state.inputRemoveWarning });
     }
   }, {
     key: "onColumnAdd",
@@ -336,15 +356,38 @@ var Table = function (_React$Component5) {
         }
       }
       this.setState({ data: newData });
+      localStorage.setItem('robotFaceStoredData', JSON.stringify(newData));
     }
   }, {
     key: "onColumnRemove",
     value: function onColumnRemove(e) {
-      var newData = this.state.data;
-      for (var i = 0; i < newData.length; i++) {
-        newData[i] = newData[i].slice(0, -1);
+      if (this.state.modeRemoveWarning) {
+        var newData = this.state.data;
+        for (var i = 0; i < newData.length; i++) {
+          newData[i] = newData[i].slice(0, -1);
+        }
+        this.setState({ data: newData });
+        localStorage.setItem('robotFaceStoredData', JSON.stringify(newData));
       }
-      this.setState({ data: newData });
+      this.setState({ modeRemoveWarning: !this.state.modeRemoveWarning });
+    }
+  }, {
+    key: "loadData1",
+    value: function loadData1(e) {
+      this.setState({ data: initialData1 });
+      localStorage.setItem('robotFaceStoredData', JSON.stringify(initialData1));
+    }
+  }, {
+    key: "loadData2",
+    value: function loadData2(e) {
+      this.setState({ data: initialData2 });
+      localStorage.setItem('robotFaceStoredData', JSON.stringify(initialData2));
+    }
+  }, {
+    key: "loadData3",
+    value: function loadData3(e) {
+      this.setState({ data: initialData3 });
+      localStorage.setItem('robotFaceStoredData', JSON.stringify(initialData3));
     }
   }, {
     key: "render",
@@ -370,31 +413,58 @@ var Table = function (_React$Component5) {
             React.createElement(
               "button",
               { style: this.props.editing ? { display: "block" } : { display: "none" }, onClick: this.onColumnAdd },
-              "Add State"
+              React.createElement(
+                "h1",
+                { style: { color: "black" } },
+                "Add Mode"
+              )
             ),
+            React.createElement("br", null),
             React.createElement(
               "button",
               { style: this.props.editing ? { display: "block" } : { display: "none" }, onClick: this.onColumnRemove },
-              "Remove State"
+              this.state.modeRemoveWarning ? "ARE YOU SURE? CAN'T UNDO THIS ACTION" : "Remove Last Mode"
             )
           )
         ),
         React.createElement(
           "button",
           { style: this.props.editing ? { display: "inline" } : { display: "none" }, onClick: this.onRowAdd },
-          "Add Input"
+          React.createElement(
+            "h1",
+            { style: { color: "black" } },
+            "Add Input"
+          )
         ),
         React.createElement(
           "button",
-          { style: this.props.editing ? { display: "inline" } : { display: "none" }, onClick: this.onRowRemove },
-          "Remove Last Input"
+          { style: this.props.editing ? { display: "inline", marginLeft: "70px" } : { display: "none" }, onClick: this.onRowRemove },
+          this.state.inputRemoveWarning ? "ARE YOU SURE? CAN'T UNDO THIS ACTION" : "Remove Last Input"
         ),
         React.createElement(
           "div",
           { style: this.state.invalidState ? { display: "block", backgroundColor: "red" } : { display: "none", backgroundColor: "red" } },
           "WARNING: invalid state: ",
           this.state.invalidState
-        )
+        ),
+        React.createElement("br", null),
+        React.createElement("br", null),
+        React.createElement(
+          "button",
+          { onClick: this.loadData1 },
+          "Load Data 1"
+        ),
+        React.createElement(
+          "button",
+          { onClick: this.loadData2 },
+          "Load Data 2"
+        ),
+        React.createElement(
+          "button",
+          { onClick: this.loadData3 },
+          "Load Data 3"
+        ),
+        React.createElement("br", null)
       );
     }
   }]);
@@ -428,8 +498,13 @@ var App = function (_React$Component6) {
   }, {
     key: "onSpotlight",
     value: function onSpotlight(state, action) {
-      var randNum = "" + (Math.floor(Math.random() * 5) + 1);
+      var randNum = "" + (Math.floor(Math.random() * 4) + 1);
       this.setState({ currentRandom: randNum, currentState: "CurrentState: " + state, currentCommand: action });
+    }
+  }, {
+    key: "clearStorage",
+    value: function clearStorage(e) {
+      localStorage.setItem('robotFaceStoredData', null);
     }
   }, {
     key: "render",
@@ -461,9 +536,14 @@ var App = function (_React$Component6) {
         React.createElement(
           "button",
           { onClick: this.onToggle },
-          this.state.editing ? 'Go To Execute Mode' : 'Go To Edit Mode'
+          this.state.editing ? 'Go To Viewing' : 'Go To Editing'
         ),
-        React.createElement(Table, { editing: this.state.editing, onSpotlight: this.onSpotlight })
+        React.createElement(Table, { editing: this.state.editing, onSpotlight: this.onSpotlight }),
+        React.createElement(
+          "button",
+          { onClick: this.clearStorage },
+          "Clear Saved Code (refresh after clicking)"
+        )
       );
     }
   }]);

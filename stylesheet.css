@@ -2,14 +2,16 @@ body {
   background-color: purple;
 }
 
-h1, h2, h3, p, span, td {
+* {
+  font-family: "Lucida Console", Courier, monospace;
+}
+
+h1, h2, h3, p, span, td, th {
   color: white;
 }
 
-th {
-  color: white;
-  font-weight: normal;
-  background-color: blue;
+p, span, div, th, td {
+	font-size: 30;
 }
 
 td, th {
@@ -17,6 +19,12 @@ td, th {
   border: 1px solid gold;
 }
 
-* {
-  font-family: "Lucida Console", Courier, monospace;
+th {
+  font-weight: normal;
+  background-color: blue;
 }
+
+/*textarea {
+   font-size: 20
+}*/
+

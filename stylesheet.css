@@ -10,9 +10,9 @@ h1, h2, h3, p, span, td, th {
   color: white;
 }
 
-p, span, div, th, td {
+/*p, span, div, th, td {
 	font-size: 30;
-}
+}*/
 
 td, th {
   padding: 10px 10px 10px 10px;

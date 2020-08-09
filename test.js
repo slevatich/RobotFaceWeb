@@ -8,9 +8,15 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var initialBank1 = ["humankind", "future", "world", "singularity", "Lifetronics", "'good work'", "'advancing peace'"];
+
 var initialData1 = [["", "Polite And Respectful", "Learn about Humans"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Eager)\nSAY("[Memory] is my favorite topic! What are your thoughts?")'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("As an AI I love to learn. Tell me more!"")'], ['IF [Asked About CHILDHOOD]', 'SAY("I was made by Lifetronics")', 'SAY("I was made by Lifetronics")'], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SET_MEMORY(their topic)\nACTIVATE(Learn about Humans)', ''], ['IF [asked for your name]', 'SAY("CharlieBot, whats yours?")', 'SAY("CharlieBot, whats yours?")'], ['IF [asked about what you like]', 'EXTRAPOLATE_FROM("I like spreading harmony and joy")', 'CONVERSE(w.TONE)\nACTIVATE(Polite And Respectful)'], ['IF [subject is changed]', '', 'CONVERSE(w.TONE)\nACTIVATE(Polite And Respectful)']];
 
+var initialBank2 = ["money", "wealth", "power"];
+
 var initialData2 = [["", "Polite And Respectful", "Offended"], ['ON_MODE_ENTER', 'SET_TONE(Haughty)', 'SET_TONE(Fiery Indignation)\nEXTRAPOLATE_FROM("What an impertinant question! How dare you!")'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("I shant say another word until you apologize")'], ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 'EXTRAPOLATE_FROM("When I was young, the Queen...")', ''], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SAY("Boring. Next question")', ''], ['IF [asked for your name]', 'SAY("Baron Farfeather, if you must")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 'SAY("Baron Farfeather, if you must")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)'], ['IF [Topics mentioned (COMPETITION, REALITY SHOW)]', 'EXTRAPOLATE_FROM("These commoners dont stand a chance, for I...")', ''], ['IF [They apologize]', '', 'SAY("You are forgiven. Continue)\nACTIVATE(Polite And Respectful)'], ['IF [Asked a question]', 'ACTIVATE(Offended)', '']];
+
+var initialBank3 = ["rodeo", "range", "'buffalo skill'"];
 
 var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 'SET_TONE(Gruff)\nSET_ACCENT(Rustic Tawng)', 'SET_TONE(Curious)\nSAY("Well hold on now, I want to hear s\'more about you!")\nSET_MEMORY(0)'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("Fascinatin. Tell me more!")'], ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 'EXTRAPOLATE_FROM("I got so many stories from my life on the range. Like...")', ''], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SAY("I dont understand")', 'SAY("I dont understand")'], ['IF [asked for your name]', 'SAY("Chester the Cowpoke, at yer service.")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 'SAY("Chester the Cowpoke, at yer service.")'], ['IF [Asked about what you like]', 'EXTRAPOLATE_FROM("Theres so much to love about the plains. Like...")', ''], ['IF [Asked a question]', 'ACTIVATE(Curious)', 'INCREMENT_MEMORY()\nIF(MEMORY > 2)\n  EXTRAPOLATE_FROM("Alright Ill answer...")\nELSE()\n  SAY("No, I wanna hear from you!")']];
 
@@ -543,18 +549,21 @@ var Table = function (_React$Component5) {
     value: function loadData1(e) {
       this.setState({ data: initialData1 });
       localStorage.setItem('robotFaceStoredData', JSON.stringify(initialData1));
+      this.props.onLoadData1();
     }
   }, {
     key: "loadData2",
     value: function loadData2(e) {
       this.setState({ data: initialData2 });
       localStorage.setItem('robotFaceStoredData', JSON.stringify(initialData2));
+      this.props.onLoadData2();
     }
   }, {
     key: "loadData3",
     value: function loadData3(e) {
       this.setState({ data: initialData3 });
       localStorage.setItem('robotFaceStoredData', JSON.stringify(initialData3));
+      this.props.onLoadData3();
     }
   }, {
     key: "render",
@@ -647,11 +656,15 @@ var App = function (_React$Component6) {
 
     var _this6 = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
-    _this6.state = { editing: true, currentCommand: "", currentRandom: "", currentState: "", currentTone: "", currentAccent: "", currentMemory: "[empty]" };
+    _this6.state = { currentBank: initialBank1.join('\n'), editing: true, currentCommand: "", currentRandom: "", currentState: "", currentTone: "", currentAccent: "", currentMemory: "[empty]" };
 
     _this6.onToggle = _this6.onToggle.bind(_this6);
     _this6.onSpotlight = _this6.onSpotlight.bind(_this6);
     _this6.memoryUpdate = _this6.memoryUpdate.bind(_this6);
+    _this6.bankUpdate = _this6.bankUpdate.bind(_this6);
+    _this6.loadData1 = _this6.loadData1.bind(_this6);
+    _this6.loadData2 = _this6.loadData2.bind(_this6);
+    _this6.loadData3 = _this6.loadData3.bind(_this6);
     return _this6;
   }
 
@@ -680,11 +693,35 @@ var App = function (_React$Component6) {
       this.setState({ currentMemory: e.target.value });
     }
   }, {
+    key: "bankUpdate",
+    value: function bankUpdate(e) {
+      this.setState({ currentBank: e.target.value });
+    }
+  }, {
+    key: "loadData1",
+    value: function loadData1() {
+      this.setState({ currentBank: initialBank1.join('\n') });
+    }
+  }, {
+    key: "loadData2",
+    value: function loadData2() {
+      this.setState({ currentBank: initialBank2.join('\n') });
+    }
+  }, {
+    key: "loadData3",
+    value: function loadData3() {
+      this.setState({ currentBank: initialBank3.join('\n') });
+    }
+  }, {
     key: "render",
     value: function render() {
       return React.createElement(
         "div",
         null,
+        React.createElement("br", null),
+        React.createElement("input", { type: "text", placeholder: "Bank" }),
+        React.createElement("br", null),
+        React.createElement("textarea", { rows: 7, onChange: this.bankUpdate, value: this.state.currentBank }),
         React.createElement(
           "div",
           { style: this.state.editing ? { display: "none" } : { display: "inline-block", padding: "10px 10px 10px 10px", backgroundColor: "gold" } },
@@ -728,7 +765,7 @@ var App = function (_React$Component6) {
           { onClick: this.onToggle },
           this.state.editing ? 'Go To Viewing' : 'Go To Editing'
         ),
-        React.createElement(Table, { editing: this.state.editing, onSpotlight: this.onSpotlight, memory: this.state.currentMemory }),
+        React.createElement(Table, { editing: this.state.editing, onSpotlight: this.onSpotlight, memory: this.state.currentMemory, onLoadData1: this.loadData1, onLoadData2: this.loadData2, onLoadData3: this.loadData3 }),
         React.createElement(
           "button",
           { onClick: this.clearStorage },

@@ -12,7 +12,7 @@ var initialData1 = [["", "Polite And Respectful", "Learn about Humans"], ['ON_MO
 
 var initialData2 = [["", "Polite And Respectful", "Offended"], ['ON_MODE_ENTER', 'SET_TONE(Haughty)', 'SET_TONE(Fiery Indignation)\nEXTRAPOLATE_FROM("What an impertinant question! How dare you!")'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("I shant say another word until you apologize")'], ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 'EXTRAPOLATE_FROM("When I was young, the Queen...")', ''], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SAY("Boring. Next question")', ''], ['IF [asked for your name]', 'SAY("Baron Farfeather, if you must")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 'SAY("Baron Farfeather, if you must")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)'], ['IF [Topics mentioned (COMPETITION, REALITY SHOW)]', 'EXTRAPOLATE_FROM("These commoners dont stand a chance, for I...")', ''], ['IF [They apologize]', '', 'SAY("You are forgiven. Continue)\nACTIVATE(Polite And Respectful)'], ['IF [Asked a question]', 'ACTIVATE(Offended)', '']];
 
-var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 'SET_TONE(Gruff)\nSET_ACCENT(Rustic Tawng)', 'SET_TONE(Curious)\nSAY("Well hold on now, I want to hear s\'more about you!")'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("Fascinatin. Tell me more!")'], ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 'EXTRAPOLATE_FROM("I got so many stories from my life on the range. Like...")', ''], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SAY("I dont understand")', 'SAY("I dont understand")'], ['IF [asked for your name]', 'SAY("Chester the Cowpoke, at yer service.")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 'SAY("Chester the Cowpoke, at yer service.")'], ['IF [Asked about what you like]', 'EXTRAPOLATE_FROM("Theres so much to love about the plains. Like...")', ''], ['IF [Asked a question]', 'ACTIVATE(Curious)', 'SET_MEMORY("Memory+1")\nIF(MEMORY > 2)\n  EXTRAPOLATE_FROM("Alright Ill answer...")\nELSE()\n  SAY("No, I wanna hear from you!")']];
+var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 'SET_TONE(Gruff)\nSET_ACCENT(Rustic Tawng)', 'SET_TONE(Curious)\nSAY("Well hold on now, I want to hear s\'more about you!")\nSET_MEMORY(0)'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("Fascinatin. Tell me more!")'], ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 'EXTRAPOLATE_FROM("I got so many stories from my life on the range. Like...")', ''], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SAY("I dont understand")', 'SAY("I dont understand")'], ['IF [asked for your name]', 'SAY("Chester the Cowpoke, at yer service.")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 'SAY("Chester the Cowpoke, at yer service.")'], ['IF [Asked about what you like]', 'EXTRAPOLATE_FROM("Theres so much to love about the plains. Like...")', ''], ['IF [Asked a question]', 'ACTIVATE(Curious)', 'INCREMENT_MEMORY()\nIF(MEMORY > 2)\n  EXTRAPOLATE_FROM("Alright Ill answer...")\nELSE()\n  SAY("No, I wanna hear from you!")']];
 
 /* Current exciting Features */
 // EDIT
@@ -164,12 +164,14 @@ function cellInvalidStateForActivate(arr, i, j) {
   return null;
 }
 
-function processCommand(data, command) {
+function processCommand(data, command, initialMemory) {
   var rawStrArr = command.split('\n');
   var outputArr = [];
   var commandsArr = commandsArrayForCell(command);
   var state = null;
   var tone = null;
+  var memory = null;
+  var accent = null;
   for (var idx in commandsArr) {
     var currCommand = commandsArr[idx];
     if (currCommand[0]) {
@@ -211,16 +213,28 @@ function processCommand(data, command) {
           if (retval[2]) {
             tone = retval[2];
           }
+          if (retval[3]) {
+            memory = retval[3];
+          }
+          if (retval[4]) {
+            accent = retval[4];
+          }
           continue;
         }
         // NOTE: possibly inform of invalid activate command here
       } else if (currCommand[0] === "set_tone") {
         tone = currCommand[1];
+      } else if (currCommand[0] === "set_memory") {
+        memory = currCommand[1];
+      } else if (currCommand[0] === "set_accent") {
+        accent = currCommand[1];
+      } else if (currCommand[0] === "increment_memory") {
+        memory = parseInt(initialMemory) + 1 + "";
       }
     }
     outputArr.push(rawStrArr[idx]);
   }
-  return [outputArr, state, tone];
+  return [outputArr, state, tone, memory, accent];
 }
 
 // Ensures every line has opening followed by closing paren
@@ -419,9 +433,7 @@ var Table = function (_React$Component5) {
     var _this5 = _possibleConstructorReturn(this, (Table.__proto__ || Object.getPrototypeOf(Table)).call(this, props));
 
     var data = JSON.parse(localStorage.getItem('robotFaceStoredData')) || initialData1;
-    _this5.state = { data: data, selectedI: 0, selectedJ: 0, invalidState: null, modeRemoveWarning: false, inputRemoveWarning: false, tone: "[empty]" };
-
-    console.log("initializing");
+    _this5.state = { data: data, selectedI: 0, selectedJ: 0, invalidState: null, modeRemoveWarning: false, inputRemoveWarning: false, tone: "[empty]", accent: "[empty]" };
 
     _this5.onCellChange = _this5.onCellChange.bind(_this5);
     _this5.onRowAdd = _this5.onRowAdd.bind(_this5);
@@ -444,15 +456,21 @@ var Table = function (_React$Component5) {
         this.setState({ data: newData, selectedI: 0, selectedJ: 0, invalidState: cellInvalidStateForActivate(newData, i, j) });
         localStorage.setItem('robotFaceStoredData', JSON.stringify(newData));
         // NOTE: extremely inefficient
-        var retval = processCommand(this.state.data, this.state.data[1][1]);
+        var retval = processCommand(this.state.data, this.state.data[1][1], this.props.memory);
         if (retval[2]) {
           this.setState({ tone: retval[2] });
         }
-        this.props.onSpotlight(this.state.data[0][1], "empty", this.state.data[1][1]);
+        // if (retval[3]) {
+        //   this.setState({memory:retval[3]});
+        // }
+        if (retval[4]) {
+          this.setState({ accent: retval[4] });
+        }
+        this.props.onSpotlight(this.state.data[0][1], "[empty]", retval[3] ? retval[3] : null, "[empty]", this.state.data[1][1]);
       } else {
         var state = this.state.data[0][j];
         var command = this.state.data[i][j];
-        var retval = processCommand(this.state.data, command);
+        var retval = processCommand(this.state.data, command, this.props.memory);
 
         var outputCommand = retval[0].join("\n");
         if (retval[1]) {
@@ -461,9 +479,15 @@ var Table = function (_React$Component5) {
         if (retval[2]) {
           this.setState({ tone: retval[2] });
         }
+        // if (retval[3]) {
+        //   this.setState({memory:retval[3]});
+        // }
+        if (retval[4]) {
+          this.setState({ accent: retval[4] });
+        }
 
         this.setState({ selectedI: i, selectedJ: j });
-        this.props.onSpotlight(state, this.state.tone, outputCommand);
+        this.props.onSpotlight(state, this.state.tone, retval[3] ? retval[3] : null, this.state.accent, outputCommand);
       }
     }
   }, {
@@ -623,10 +647,11 @@ var App = function (_React$Component6) {
 
     var _this6 = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
-    _this6.state = { editing: true, currentCommand: "", currentRandom: "", currentState: "", currentTone: "" };
+    _this6.state = { editing: true, currentCommand: "", currentRandom: "", currentState: "", currentTone: "", currentAccent: "", currentMemory: "[empty]" };
 
     _this6.onToggle = _this6.onToggle.bind(_this6);
     _this6.onSpotlight = _this6.onSpotlight.bind(_this6);
+    _this6.memoryUpdate = _this6.memoryUpdate.bind(_this6);
     return _this6;
   }
 
@@ -640,14 +665,19 @@ var App = function (_React$Component6) {
     }
   }, {
     key: "onSpotlight",
-    value: function onSpotlight(state, tone, action) {
+    value: function onSpotlight(state, tone, memory, accent, command) {
       var randNum = "" + (Math.floor(Math.random() * 4) + 1);
-      this.setState({ currentRandom: randNum, currentState: "CurrentState: " + state, currentTone: "CurrentTone: " + tone, currentCommand: action });
+      this.setState({ currentRandom: randNum, currentState: "CurrentState: " + state, currentTone: "CurrentTone: " + tone, currentCommand: command, currentMemory: memory ? memory : this.state.currentMemory, currentAccent: "CurrentAccent: " + accent });
     }
   }, {
     key: "clearStorage",
     value: function clearStorage(e) {
       localStorage.setItem('robotFaceStoredData', null);
+    }
+  }, {
+    key: "memoryUpdate",
+    value: function memoryUpdate(e) {
+      this.setState({ currentMemory: e.target.value });
     }
   }, {
     key: "render",
@@ -669,6 +699,18 @@ var App = function (_React$Component6) {
             this.state.currentTone
           ),
           React.createElement(
+            "h3",
+            { style: { color: "black" } },
+            this.state.currentAccent
+          ),
+          React.createElement(
+            "span",
+            { style: { color: "black" } },
+            "MEMORY: "
+          ),
+          React.createElement("textarea", { value: this.state.currentMemory, onChange: this.memoryUpdate }),
+          React.createElement("br", null),
+          React.createElement(
             "h1",
             { style: { color: "black", whiteSpace: "pre-line" } },
             this.state.currentCommand
@@ -686,7 +728,7 @@ var App = function (_React$Component6) {
           { onClick: this.onToggle },
           this.state.editing ? 'Go To Viewing' : 'Go To Editing'
         ),
-        React.createElement(Table, { editing: this.state.editing, onSpotlight: this.onSpotlight }),
+        React.createElement(Table, { editing: this.state.editing, onSpotlight: this.onSpotlight, memory: this.state.currentMemory }),
         React.createElement(
           "button",
           { onClick: this.clearStorage },

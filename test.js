@@ -26,10 +26,6 @@ var initialData3 = [["", "YIPPEE", "SAD"], ['ON_STATE_ENTER', 'SET_TONE("cheerfu
 // the spotlight includes a random number to play around with
 
 
-// Multi line split
-// also check for tone setting
-
-
 /* Fast Follows */
 // Improve by using variable observation?
 // can I set up some defaults, like a save load thing? and perhaps multiple sites with different defaults for saturday rehearsal?
@@ -61,9 +57,6 @@ function widthFromDoubleArray(arr) {
   return arr[0].length;
 }
 
-// there can be validation at the cell level
-// with maybe hint text?
-
 function prefixForCommand(str) {
   var idx = str.indexOf('(');
   return str.substr(0, idx);
@@ -75,43 +68,194 @@ function subjectForCommand(str) {
   return str.substr(idx + 1, idx2 - idx - 1);
 }
 
-function cellInvalidStateForActivate(arr, i, j) {
-  var text = arr[i][j];
-  // we only want to bother here if the text is a valid command
-  // NOTE: could simplify all this
-  var prefix = prefixForCommand(text).toLowerCase();
-  if (prefix) {
-    if (prefix === "activate") {
-      var subj = subjectForCommand(text).toLowerCase();
-      if (subj) {
-        for (var j = 0; j < arr[0].length; j++) {
-          if (arr[0][j].toLowerCase() === subj) {
-            return null;
-          }
-        }
-        return subj;
-      } else {
-        return "You haven't provided a state!";
+function commandsArrayForCell(text) {
+  var strArr = text.split("\n");
+  var commandArr = [];
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = strArr[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var str = _step.value;
+
+      if (str) {
+        var commandList = [];
+        var prefix = prefixForCommand(str).toLowerCase();
+        var subject = subjectForCommand(str).toLowerCase();
+        // could get a set of two empty arrays but thats fine
+        commandList.push(prefix);
+        commandList.push(subject);
+        commandArr.push(commandList);
+      }
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
       }
     }
   }
-  // if its not valid or 'activate' the cell is not invalid
+
+  return commandArr;
+}
+
+function activateCommandFromCommandArray(commandsArr) {
+  var _iteratorNormalCompletion2 = true;
+  var _didIteratorError2 = false;
+  var _iteratorError2 = undefined;
+
+  try {
+    for (var _iterator2 = commandsArr[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+      var func = _step2.value;
+
+      if (func[0] === "activate") {
+        return func;
+      }
+    }
+  } catch (err) {
+    _didIteratorError2 = true;
+    _iteratorError2 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion2 && _iterator2.return) {
+        _iterator2.return();
+      }
+    } finally {
+      if (_didIteratorError2) {
+        throw _iteratorError2;
+      }
+    }
+  }
+
   return null;
 }
 
-function textIsValidCommand(text) {
-  // TODO: split the strings and and them all
-  // TODO: also check for a closing paren after the opening
-  var commandType = prefixForCommand(text).toLowerCase();
-  if (commandType) {
-    // check from valid list
-    // TODO: activate needs to be checked at a higher level
-    // if (commandType === "activate") {
-    //   return false;
-    // }
-    return true;
+function indexOfValidMode(arr, activateMode) {
+  for (var idx = 1; idx < arr[0].length; idx++) {
+    if (arr[0][idx].toLowerCase() === activateMode) {
+      return idx;
+    }
   }
-  return false;
+  return -1;
+}
+
+function cellInvalidStateForActivate(arr, i, j) {
+  var text = arr[i][j];
+  var commandsArr = commandsArrayForCell(text);
+  var activateCommand = activateCommandFromCommandArray(commandsArr);
+  if (activateCommand) {
+    if (indexOfValidMode(arr, activateCommand[1]) > 0) {
+      return null;
+    }
+    // return the invalid state for textual display, with special text for empty
+    if (activateCommand[1] === "") {
+      return "[empty]";
+    }
+    return activateCommand[1];
+  }
+  return null;
+}
+
+function processCommand(data, command) {
+  var rawStrArr = command.split('\n');
+  var outputArr = [];
+  var commandsArr = commandsArrayForCell(command);
+  var state = null;
+  var tone = null;
+  for (var idx in commandsArr) {
+    var currCommand = commandsArr[idx];
+    if (currCommand[0]) {
+      // this is a valid command, see if it needs to be evaluated
+      if (currCommand[0] === "activate") {
+        var modeJ = indexOfValidMode(data, currCommand[1]);
+        if (modeJ > 0) {
+          state = data[0][modeJ];
+          // recursively evaluate outputArr[1]
+          var retval = processCommand(data, data[1][modeJ]);
+          var _iteratorNormalCompletion3 = true;
+          var _didIteratorError3 = false;
+          var _iteratorError3 = undefined;
+
+          try {
+            for (var _iterator3 = retval[0][Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+              command = _step3.value;
+
+              outputArr.push(command);
+            }
+          } catch (err) {
+            _didIteratorError3 = true;
+            _iteratorError3 = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                _iterator3.return();
+              }
+            } finally {
+              if (_didIteratorError3) {
+                throw _iteratorError3;
+              }
+            }
+          }
+
+          if (retval[1]) {
+            state = retval[1];
+          }
+          if (retval[2]) {
+            tone = retval[2];
+          }
+          continue;
+        }
+        // NOTE: possibly inform of invalid activate command here
+      } else if (currCommand[0] === "set_tone") {
+        tone = currCommand[1];
+      }
+    }
+    outputArr.push(rawStrArr[idx]);
+  }
+  return [outputArr, state, tone];
+}
+
+// Ensures every line has opening followed by closing paren
+function textIsValidCommand(text) {
+  var strArr = text.split("\n");
+  var _iteratorNormalCompletion4 = true;
+  var _didIteratorError4 = false;
+  var _iteratorError4 = undefined;
+
+  try {
+    for (var _iterator4 = strArr[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+      var str = _step4.value;
+
+      var idx = str.indexOf('(');
+      var idx2 = str.indexOf(')');
+      if (!(idx > 0 && idx2 > idx)) {
+        return false;
+      }
+    }
+  } catch (err) {
+    _didIteratorError4 = true;
+    _iteratorError4 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion4 && _iterator4.return) {
+        _iterator4.return();
+      }
+    } finally {
+      if (_didIteratorError4) {
+        throw _iteratorError4;
+      }
+    }
+  }
+
+  return true;
 }
 
 /* core classes functions */
@@ -275,7 +419,9 @@ var Table = function (_React$Component5) {
     var _this5 = _possibleConstructorReturn(this, (Table.__proto__ || Object.getPrototypeOf(Table)).call(this, props));
 
     var data = JSON.parse(localStorage.getItem('robotFaceStoredData')) || initialData1;
-    _this5.state = { data: data, selectedI: 0, selectedJ: 0, invalidState: null, modeRemoveWarning: false, inputRemoveWarning: false };
+    _this5.state = { data: data, selectedI: 0, selectedJ: 0, invalidState: null, modeRemoveWarning: false, inputRemoveWarning: false, tone: "[empty]" };
+
+    console.log("initializing");
 
     _this5.onCellChange = _this5.onCellChange.bind(_this5);
     _this5.onRowAdd = _this5.onRowAdd.bind(_this5);
@@ -298,29 +444,26 @@ var Table = function (_React$Component5) {
         this.setState({ data: newData, selectedI: 0, selectedJ: 0, invalidState: cellInvalidStateForActivate(newData, i, j) });
         localStorage.setItem('robotFaceStoredData', JSON.stringify(newData));
         // NOTE: extremely inefficient
-        this.props.onSpotlight(this.state.data[0][1], this.state.data[1][1]);
+        var retval = processCommand(this.state.data, this.state.data[1][1]);
+        if (retval[2]) {
+          this.setState({ tone: retval[2] });
+        }
+        this.props.onSpotlight(this.state.data[0][1], "empty", this.state.data[1][1]);
       } else {
         var state = this.state.data[0][j];
         var command = this.state.data[i][j];
-        // we only want to bother here if the text is a valid command
-        // NOTE: could simplify all this
-        var prefix = prefixForCommand(command).toLowerCase();
-        if (prefix) {
-          if (prefix === "activate") {
-            var subj = subjectForCommand(command).toLowerCase();
-            if (subj) {
-              for (var newJ = 0; newJ < this.state.data[0].length; newJ++) {
-                if (this.state.data[0][newJ].toLowerCase() === subj) {
-                  command = this.state.data[1][newJ];
-                  state = this.state.data[0][newJ];
-                }
-              }
-            }
-            // TODO: possibly notate at this point that its a broken activate?
-          }
+        var retval = processCommand(this.state.data, command);
+
+        var outputCommand = retval[0].join("\n");
+        if (retval[1]) {
+          state = retval[1];
         }
+        if (retval[2]) {
+          this.setState({ tone: retval[2] });
+        }
+
         this.setState({ selectedI: i, selectedJ: j });
-        this.props.onSpotlight(state, command);
+        this.props.onSpotlight(state, this.state.tone, outputCommand);
       }
     }
   }, {
@@ -480,7 +623,7 @@ var App = function (_React$Component6) {
 
     var _this6 = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
-    _this6.state = { editing: true, currentCommand: "", currentRandom: "", currentState: "" };
+    _this6.state = { editing: true, currentCommand: "", currentRandom: "", currentState: "", currentTone: "" };
 
     _this6.onToggle = _this6.onToggle.bind(_this6);
     _this6.onSpotlight = _this6.onSpotlight.bind(_this6);
@@ -497,9 +640,9 @@ var App = function (_React$Component6) {
     }
   }, {
     key: "onSpotlight",
-    value: function onSpotlight(state, action) {
+    value: function onSpotlight(state, tone, action) {
       var randNum = "" + (Math.floor(Math.random() * 4) + 1);
-      this.setState({ currentRandom: randNum, currentState: "CurrentState: " + state, currentCommand: action });
+      this.setState({ currentRandom: randNum, currentState: "CurrentState: " + state, currentTone: "CurrentTone: " + tone, currentCommand: action });
     }
   }, {
     key: "clearStorage",
@@ -519,6 +662,11 @@ var App = function (_React$Component6) {
             "h2",
             { style: { color: "black" } },
             this.state.currentState
+          ),
+          React.createElement(
+            "h2",
+            { style: { color: "black" } },
+            this.state.currentTone
           ),
           React.createElement(
             "h1",

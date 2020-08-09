@@ -91,6 +91,7 @@ function commandsArrayForCell(text) {
     for (var _iterator = strArr[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
       var str = _step.value;
 
+      str = str.trim();
       if (str) {
         var commandList = [];
         var prefix = prefixForCommand(str).toLowerCase();
@@ -381,14 +382,14 @@ var Cell = function (_React$Component3) {
       if (this.props.isHeader) {
         return React.createElement(
           "th",
-          { style: { whiteSpace: "pre-line" } },
+          { style: { whiteSpace: "pre-wrap" } },
           !this.props.isInteractable ? this.props.text : !this.props.editingMode ? this.props.text //<ReadOnlyCell value={this.props.text} onCellClick={this.onCellChange} i={this.props.i} j={this.props.j} isSelected={this.props.isSelected} />
           : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellChange, i: this.props.i, j: this.props.j })
         );
       } else {
         return React.createElement(
           "td",
-          { style: { whiteSpace: "pre-line" } },
+          { style: { whiteSpace: "pre-wrap" } },
           !this.props.isInteractable ? this.props.text : !this.props.editingMode ? React.createElement(ReadOnlyCell, { value: this.props.text, onCellClick: this.onCellChange, i: this.props.i, j: this.props.j, isSelected: this.props.isSelected }) : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellChange, i: this.props.i, j: this.props.j })
         );
       }
@@ -445,7 +446,15 @@ var Table = function (_React$Component5) {
     var _this5 = _possibleConstructorReturn(this, (Table.__proto__ || Object.getPrototypeOf(Table)).call(this, props));
 
     var data = JSON.parse(localStorage.getItem('robotFaceStoredData')) || initialData1;
-    _this5.state = { data: data, selectedI: 0, selectedJ: 0, invalidState: null, modeRemoveWarning: false, inputRemoveWarning: false, tone: "[empty]", accent: "[empty]" };
+
+    // NOTE: extremely inefficient
+    var retval = processCommand(data, data[1][1], "[empty]");
+    var tone = retval[2] ? retval[2] : "[empty]";
+    var memory = retval[3] ? retval[3] : "[empty]";
+    var accent = retval[4] ? retval[4] : "[empty]";
+    _this5.props.onSpotlight(data[0][1], tone, memory, accent, data[1][1]);
+
+    _this5.state = { data: data, selectedI: 0, selectedJ: 0, invalidState: null, modeRemoveWarning: false, inputRemoveWarning: false, tone: tone, accent: accent };
 
     _this5.onCellChange = _this5.onCellChange.bind(_this5);
     _this5.onRowAdd = _this5.onRowAdd.bind(_this5);
@@ -456,18 +465,6 @@ var Table = function (_React$Component5) {
     _this5.loadData2 = _this5.loadData2.bind(_this5);
     _this5.loadData3 = _this5.loadData3.bind(_this5);
 
-    // NOTE: extremely inefficient
-    // var retval = processCommand(this.state.data, this.state.data[1][1], this.props.memory);
-    // if (retval[2]) {
-    //   this.setState({tone:retval[2]});
-    // }
-    // // if (retval[3]) {
-    // //   this.setState({memory:retval[3]});
-    // // }
-    // if (retval[4]) {
-    //   this.setState({accent:retval[4]});
-    // }
-    // this.props.onSpotlight(this.state.data[0][1], "[empty]", retval[3] ? retval[3] : null, "[empty]", this.state.data[1][1]);
     return _this5;
   }
 
@@ -481,27 +478,30 @@ var Table = function (_React$Component5) {
         this.setState({ data: newData, selectedI: 0, selectedJ: 0, invalidState: cellInvalidStateForActivate(newData, i, j) });
         localStorage.setItem('robotFaceStoredData', JSON.stringify(newData));
         // NOTE: extremely inefficient
-        var retval = processCommand(this.state.data, this.state.data[1][1], this.props.memory);
+        var retval = processCommand(newData, newData[1][1], this.props.memory);
+        var tone = retval[2] ? retval[2] : this.state.tone;
+        var memory = retval[3] ? retval[3] : null;
+        var accent = retval[4] ? retval[4] : this.state.accent;
+        this.props.onSpotlight(newData[0][1], tone, memory, accent, newData[1][1]);
+
         if (retval[2]) {
           this.setState({ tone: retval[2] });
         }
-        // if (retval[3]) {
-        //   this.setState({memory:retval[3]});
-        // }
         if (retval[4]) {
           this.setState({ accent: retval[4] });
         }
-        this.props.onSpotlight(this.state.data[0][1], "[empty]", retval[3] ? retval[3] : null, "[empty]", this.state.data[1][1]);
       } else {
         var state = this.state.data[0][j];
         var command = this.state.data[i][j];
         var retval = processCommand(this.state.data, command, this.props.memory);
 
         var outputCommand = retval[0].join("\n");
+        console.log(this.props.memory + " " + retval);
         if (retval[1]) {
           state = retval[1];
         }
         if (retval[2]) {
+          console.log("should't be firing");
           this.setState({ tone: retval[2] });
         }
         // if (retval[3]) {
@@ -776,7 +776,7 @@ var App = function (_React$Component6) {
           React.createElement("br", null),
           React.createElement(
             "h1",
-            { style: { color: "black", whiteSpace: "pre-line" } },
+            { style: { color: "black", backgroundColor: "yellow", whiteSpace: "pre-wrap" } },
             this.state.currentCommand
           ),
           React.createElement(

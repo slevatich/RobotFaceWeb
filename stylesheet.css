@@ -17,6 +17,7 @@ h1, h2, h3, p, span, td, th {
 td, th {
   padding: 10px 10px 10px 10px;
   border: 1px solid gold;
+  white-space: pre-wrap;
 }
 
 th {

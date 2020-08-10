@@ -20,46 +20,46 @@ var initialBank3 = ["rodeo", "range", "'buffalo skill'"];
 
 var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 'SET_TONE(Gruff)\nSET_ACCENT(Rustic Twang)', 'SET_TONE(Curious)\nSAY("Well hold on now, I want to hear s\'more about you!")\nSET_MEMORY(0)'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("Fascinatin. Tell me more!")'], ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 'EXTRAPOLATE_FROM("I got so many stories from my life on the range. Like...")', ''], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SAY("I dont understand")', 'SAY("I dont understand")'], ['IF [asked for your name]', 'SAY("Chester the Cowpoke, at yer service.")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 'SAY("Chester the Cowpoke, at yer service.")'], ['IF [Asked about what you like]', 'EXTRAPOLATE_FROM("Theres so much to love about the plains. Like...")', ''], ['IF [Asked a question]', 'ACTIVATE(Curious)', 'INCREMENT_MEMORY()\nIF(MEMORY > 2)\n  EXTRAPOLATE_FROM("Alright Ill answer...")\nELSE()\n  SAY("No, I wanna hear from you!")']];
 
-/* Current exciting Features */
-// EDIT
-// adding a new state/input will copy over state from previous inputs/states
-// there are THREE sliders
-// text is color coded based on whether it has been edited
-// input background for intersection cells is color coded based on whether it has correct syntax (very basic)
-// VIEW
-// GOTO is handled (but it needs to be one line)
-// there is a spotlight so the AI actor only needs to look one place
-// the spotlight includes a random number to play around with
+/* Cool, what do I know we need */
+// [BIG] CODE state flow should be better encapsulated. No more errors around tone setting, etc. maybe improve my react styling too
+// [MEDIUM] fill in memory if we come across that keyword in brackets
+// [MEDIUM] syntax correction needs to be accompanied by a locally scoped error system. could have full context as props?
+// [MEDIUM] color coding for proper syntax of things like ACTIVATE. color the parens and the word too
+// [SMALL] random number gen for converse should skew lower
 
+// [MEDIUM] layout for the finite state machine which you can get maybe on the click of a button
+// [MEDIUM] also a validation step view where it will run a pass on stuff possibly? How can I set up these in between views
 
-// fix the layout
-// how can the loading happen immediately when you swap from editing
-// you shouldn't need to edit a cell before swapping modes
+/* Midpri */
+// [BIG] LAYOUT is a general big question mark. 
+//   How can I give an easy way to make this visible for the people selecting commands. 8 as a good max for inputs?
+// [MEDIUM] modes should be able to be numbers, or autofill or something
+// [MEDIUM] INPUT could be buttons that add text fields with pre-filled commands. 
+//   Or you can choose to do a custom command! Maybe color the commands. Instructions could be an easy version of this
+// [MEDIUM] marking what code fired last round in some way. depends on a better linear state flow, which depends on encapsulation
+// [MEDIUM] INPUT set as a prefix could dynamically generate things in the text box 
+//   (process could return an arbitrary dictionary of variables)
+// [MEDIUM] handle if statements in processing
+// [MEDIUM] moving rows around with up and down arrows
 
-
-/* Fast Follows */
-// Selecting commands (for MIMI)
-// Improve by using variable observation?
-// can I set up some defaults, like a save load thing? and perhaps multiple sites with different defaults for saturday rehearsal?
-// The initial data needs to have ability to contain the editable information so the difficulty can scale
-// Improve the syntax correction. there are some easy ones
-// Marking what code fired for next time is a good way of maybe preserving select once it opens into editing mode again?
-// enable multi line goto
-// Color code cells by keyword (this could also be error highlighting or a clue that we don't know what you're trying)
-// Figure out how to write better react for stylizing...
+/* Big media questions / Prod meetings */
+// Would livelab make it possible to share a portion of my screen as a programmer. 
+//   this would be N people and you'd need to toggle
+// Can I overlap these screens? (for choosing whether to share the random number). 
+//   Could also solve this by generating multiple versions of the spotlight
+// Can you share just a screen portion on zoom?
+// If not, then I'm dealing with broadcasting to some other website basically a POST request. 
+//   I could choose which inputID to accept receiving from maybe on the receiver side?
+// This has been a big time commitment
 
 /* Less Urgent */
+// is editable a concern? doesn't seem like it but I'd need to encode that in the defaults
 // get official colors and fonts eventually
-// Improve input verification... if the state gets updated there should be more invalid spots!
-// Selecting from the different options of things (i.e. you pick ACTIVATE or SAY)
-// Having some instructions in the website
 
 
-// Save and load would be nice... could I get a csv upload working and a save to csv for simple save load to disk?
-
-// Moving the labels for load library and the sliders into react would make them able to be non editable for the purposes of view mode
-
-/* helper functions */
+/*
+Helper Functions
+*/
 
 function heightFromDoubleArray(arr) {
   return arr.length;
@@ -71,13 +71,13 @@ function widthFromDoubleArray(arr) {
 
 function prefixForCommand(str) {
   var idx = str.indexOf('(');
-  return str.substr(0, idx);
+  return str.substr(0, idx).trim();
 }
 
 function subjectForCommand(str) {
   var idx = str.indexOf('(');
   var idx2 = str.indexOf(')');
-  return str.substr(idx + 1, idx2 - idx - 1);
+  return str.substr(idx + 1, idx2 - idx - 1).trim();
 }
 
 function commandsArrayForCell(text) {
@@ -96,7 +96,7 @@ function commandsArrayForCell(text) {
         var commandList = [];
         var prefix = prefixForCommand(str).toLowerCase();
         var subject = subjectForCommand(str).toLowerCase();
-        // could get a set of two empty arrays but thats fine
+        // NOTE: could get a set of two empty arrays but thats fine
         commandList.push(prefix);
         commandList.push(subject);
         commandArr.push(commandList);
@@ -285,9 +285,9 @@ function textIsValidCommand(text) {
   return true;
 }
 
-/* core classes functions */
-
-// controller component for input
+/*
+Core classes functions 
+*/
 
 var InputCell = function (_React$Component) {
   _inherits(InputCell, _React$Component);
@@ -295,6 +295,7 @@ var InputCell = function (_React$Component) {
   function InputCell(props) {
     _classCallCheck(this, InputCell);
 
+    // value, onChange, i, j
     var _this = _possibleConstructorReturn(this, (InputCell.__proto__ || Object.getPrototypeOf(InputCell)).call(this, props));
 
     _this.state = { modified: false };
@@ -312,7 +313,10 @@ var InputCell = function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      return React.createElement("textarea", { style: !this.state.modified ? this.props.i == 0 || this.props.j == 0 ? { color: "red", backgroundColor: "white" } : textIsValidCommand(this.props.value) ? { color: "red", backgroundColor: "aquamarine" } : { color: "red", backgroundColor: "pink" } : this.props.i == 0 || this.props.j == 0 ? { color: "black", backgroundColor: "white" } : textIsValidCommand(this.props.value) ? { color: "black", backgroundColor: "aquamarine" } : { color: "black", backgroundColor: "pink" },
+      var color = !this.state.modified ? "red" : "black";
+      // white on edges, else we do green or red based on validity
+      var backgroundColor = this.props.i == 0 || this.props.j == 0 ? "white" : textIsValidCommand(this.props.value) ? "aquamarine" : "pink";
+      return React.createElement("textarea", { style: { color: color, backgroundColor: backgroundColor },
         value: this.props.value,
         rows: 5,
         cols: 30,
@@ -325,7 +329,6 @@ var InputCell = function (_React$Component) {
 }(React.Component);
 
 // TODO: we need global knowledge of the selected cell to pepper down to inform this guy so they can be properly highlighted
-// NOTE: the name of onCellChange is a little inaccurate. could be fully peppered up as OnCellEvent
 
 
 var ReadOnlyCell = function (_React$Component2) {
@@ -348,9 +351,10 @@ var ReadOnlyCell = function (_React$Component2) {
   }, {
     key: "render",
     value: function render() {
+      var backgroundColor = this.props.isSelected ? "red" : "transparent";
       return React.createElement(
         "span",
-        { style: this.props.isSelected ? { backgroundColor: "red" } : { backgroundColor: "transparent" }, onClick: this.handleClick },
+        { style: { backgroundColor: backgroundColor }, onClick: this.handleClick },
         this.props.value
       );
     }
@@ -367,30 +371,30 @@ var Cell = function (_React$Component3) {
 
     var _this3 = _possibleConstructorReturn(this, (Cell.__proto__ || Object.getPrototypeOf(Cell)).call(this, props));
 
-    _this3.onCellChange = _this3.onCellChange.bind(_this3);
+    _this3.onCellEvent = _this3.onCellEvent.bind(_this3);
     return _this3;
   }
 
   _createClass(Cell, [{
-    key: "onCellChange",
-    value: function onCellChange(e, i, j) {
-      this.props.onCellChange(e, i, j);
+    key: "onCellEvent",
+    value: function onCellEvent(e, i, j) {
+      this.props.onCellEvent(e, i, j);
     }
   }, {
     key: "render",
     value: function render() {
       if (this.props.isHeader) {
+        var allowInput = this.props.isInteractable && this.props.editingMode;
         return React.createElement(
           "th",
-          { style: { whiteSpace: "pre-wrap" } },
-          !this.props.isInteractable ? this.props.text : !this.props.editingMode ? this.props.text //<ReadOnlyCell value={this.props.text} onCellClick={this.onCellChange} i={this.props.i} j={this.props.j} isSelected={this.props.isSelected} />
-          : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellChange, i: this.props.i, j: this.props.j })
+          null,
+          !allowInput ? this.props.text : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellEvent, i: this.props.i, j: this.props.j })
         );
       } else {
         return React.createElement(
           "td",
-          { style: { whiteSpace: "pre-wrap" } },
-          !this.props.isInteractable ? this.props.text : !this.props.editingMode ? React.createElement(ReadOnlyCell, { value: this.props.text, onCellClick: this.onCellChange, i: this.props.i, j: this.props.j, isSelected: this.props.isSelected }) : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellChange, i: this.props.i, j: this.props.j })
+          null,
+          !this.props.isInteractable ? this.props.text : !this.props.editingMode ? React.createElement(ReadOnlyCell, { value: this.props.text, onCellClick: this.onCellEvent, i: this.props.i, j: this.props.j, isSelected: this.props.isSelected }) : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellEvent, i: this.props.i, j: this.props.j })
         );
       }
     }
@@ -407,23 +411,23 @@ var Row = function (_React$Component4) {
 
     var _this4 = _possibleConstructorReturn(this, (Row.__proto__ || Object.getPrototypeOf(Row)).call(this, props));
 
-    _this4.onCellChange = _this4.onCellChange.bind(_this4);
+    _this4.onCellEvent = _this4.onCellEvent.bind(_this4);
     return _this4;
   }
 
   _createClass(Row, [{
-    key: "onCellChange",
-    value: function onCellChange(e, i, j) {
-      this.props.onCellChange(e, i, j);
+    key: "onCellEvent",
+    value: function onCellEvent(e, i, j) {
+      this.props.onCellEvent(e, i, j);
     }
   }, {
     key: "render",
     value: function render() {
       var arr = [];
       for (var j = 0; j < this.props.width; j++) {
-        var isOnEdge = j == 0 && this.props.i == 1 || this.props.i == 2 && j == 0 || this.props.i == 0 && j == 0; // editable in edit mode
+        var uninteractable = j == 0 && this.props.i == 1 || this.props.i == 2 && j == 0 || this.props.i == 0 && j == 0; // not interactable
         var isHeader = j == 0 || this.props.i == 0 || this.props.i == 1; // non clickable in view mode, and bolder text
-        arr.push(React.createElement(Cell, { isHeader: isHeader, isInteractable: !isOnEdge, isSelected: j == this.props.selectedJ, editingMode: this.props.editing, text: this.props.data[this.props.i][j], onCellChange: this.onCellChange, i: this.props.i, j: j }));
+        arr.push(React.createElement(Cell, { isHeader: isHeader, isInteractable: !uninteractable, isSelected: j == this.props.selectedJ, editingMode: this.props.editing, text: this.props.data[this.props.i][j], onCellEvent: this.onCellEvent, i: this.props.i, j: j }));
       }
       return React.createElement(
         "tr",
@@ -456,7 +460,7 @@ var Table = function (_React$Component5) {
 
     _this5.state = { data: data, selectedI: 0, selectedJ: 0, invalidState: null, modeRemoveWarning: false, inputRemoveWarning: false, tone: tone, accent: accent };
 
-    _this5.onCellChange = _this5.onCellChange.bind(_this5);
+    _this5.onCellEvent = _this5.onCellEvent.bind(_this5);
     _this5.onRowAdd = _this5.onRowAdd.bind(_this5);
     _this5.onColumnAdd = _this5.onColumnAdd.bind(_this5);
     _this5.onRowRemove = _this5.onRowRemove.bind(_this5);
@@ -464,13 +468,12 @@ var Table = function (_React$Component5) {
     _this5.loadData1 = _this5.loadData1.bind(_this5);
     _this5.loadData2 = _this5.loadData2.bind(_this5);
     _this5.loadData3 = _this5.loadData3.bind(_this5);
-
     return _this5;
   }
 
   _createClass(Table, [{
-    key: "onCellChange",
-    value: function onCellChange(e, i, j) {
+    key: "onCellEvent",
+    value: function onCellEvent(e, i, j) {
       if (this.props.editing) {
         var newData = this.state.data;
         newData[i][j] = e.target.value;
@@ -501,9 +504,9 @@ var Table = function (_React$Component5) {
           state = retval[1];
         }
         if (retval[2]) {
-          console.log("should't be firing");
           this.setState({ tone: retval[2] });
         }
+        // TODO: move other stuff out like memory
         // if (retval[3]) {
         //   this.setState({memory:retval[3]});
         // }
@@ -589,7 +592,7 @@ var Table = function (_React$Component5) {
     value: function render() {
       var arr = [];
       for (var i = 0; i < heightFromDoubleArray(this.state.data); i++) {
-        arr.push(React.createElement(Row, { editing: this.props.editing, width: widthFromDoubleArray(this.state.data), i: i, selectedJ: i == this.state.selectedI ? this.state.selectedJ : -1, onCellChange: this.onCellChange, data: this.state.data }));
+        arr.push(React.createElement(Row, { editing: this.props.editing, width: widthFromDoubleArray(this.state.data), i: i, selectedJ: i == this.state.selectedI ? this.state.selectedJ : -1, onCellEvent: this.onCellEvent, data: this.state.data }));
       }
       return React.createElement(
         "div",
@@ -692,9 +695,6 @@ var App = function (_React$Component6) {
   _createClass(App, [{
     key: "onToggle",
     value: function onToggle(e) {
-      // if (!this.state.editing) {
-      //   this.setState({currentCommand: "", currentRandom: "", currentState: ""});
-      // }
       this.setState({ editing: !this.state.editing });
     }
   }, {
@@ -741,6 +741,8 @@ var App = function (_React$Component6) {
   }, {
     key: "render",
     value: function render() {
+      var spotlightDisplayStyle = this.state.editing ? "none" : "inline-block";
+      var toggleButtonText = this.state.editing ? 'Go To Viewing' : 'Go To Editing';
       return React.createElement(
         "div",
         null,
@@ -751,7 +753,7 @@ var App = function (_React$Component6) {
         React.createElement("br", null),
         React.createElement(
           "div",
-          { style: this.state.editing ? { display: "none" } : { display: "inline-block", padding: "10px 10px 10px 10px", backgroundColor: "gold" } },
+          { style: { display: spotlightDisplayStyle, padding: "10px 10px 10px 10px", backgroundColor: "gold" } },
           React.createElement(
             "h2",
             { style: { color: "black" } },
@@ -790,7 +792,7 @@ var App = function (_React$Component6) {
         React.createElement(
           "button",
           { onClick: this.onToggle },
-          this.state.editing ? 'Go To Viewing' : 'Go To Editing'
+          toggleButtonText
         ),
         React.createElement(Table, { editing: this.state.editing, onSpotlight: this.onSpotlight, memory: this.state.currentMemory, onLoadData1: this.loadData1, onLoadData2: this.loadData2, onLoadData3: this.loadData3 }),
         React.createElement(

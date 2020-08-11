@@ -20,19 +20,29 @@ var initialBank3 = ["rodeo", "range", "'buffalo skill'"];
 
 var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 'SET_TONE(Gruff)\nSET_ACCENT(Rustic Twang)', 'SET_TONE(Curious)\nSAY("Well hold on now, I want to hear s\'more about you!")\nSET_MEMORY(0)'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("Fascinatin. Tell me more!")'], ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 'EXTRAPOLATE_FROM("I got so many stories from my life on the range. Like...")', ''], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SAY("I dont understand")', 'SAY("I dont understand")'], ['IF [asked for your name]', 'SAY("Chester the Cowpoke, at yer service.")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 'SAY("Chester the Cowpoke, at yer service.")'], ['IF [Asked about what you like]', 'EXTRAPOLATE_FROM("Theres so much to love about the plains. Like...")', ''], ['IF [Asked a question]', 'ACTIVATE(Curious)', 'INCREMENT_MEMORY()\nIF(MEMORY > 2)\n  EXTRAPOLATE_FROM("Alright Ill answer...")\nELSE()\n  SAY("No, I wanna hear from you!")']];
 
-/* Cool, what do I know we need */
-// [BIG] CODE state flow should be better encapsulated. No more errors around tone setting, etc. maybe improve my react styling too
-// [MEDIUM] fill in memory if we come across that keyword in brackets
-// [MEDIUM] syntax correction needs to be accompanied by a locally scoped error system. could have full context as props?
-// [MEDIUM] color coding for proper syntax of things like ACTIVATE. color the parens and the word too
-// [SMALL] random number gen for converse should skew lower
+// [SMALLISH] random number gen for converse should skew lower. move random num generate into process command
+// [SMALLISH] also highlight unused cells when we come back from editing view
+// [MEDIUM] finite state machine.
+//    use canvas and draw modes as circles
+//    go down mode list and find activate statements. draw an array to modes that work
 
-// [MEDIUM] layout for the finite state machine which you can get maybe on the click of a button
-// [MEDIUM] also a validation step view where it will run a pass on stuff possibly? How can I set up these in between views
+// changelog
+//   fixed state inconsistency. shouldn't be any more weird bugs
+//   up and down arrows for rows
+//   memory will replace in spotlight
+//   live error updating on cell by cell level
 
-/* Midpri */
+
 // [BIG] LAYOUT is a general big question mark. 
 //   How can I give an easy way to make this visible for the people selecting commands. 8 as a good max for inputs?
+
+
+/* Seek Feedback? */
+// [SMALL] toggle errors on and off as part of validation?
+
+/* Midpri */
+// [MEDIUM] highlight syntax in textareas
+// [MEDIUM] highlight MEMORY in spotlight
 // [MEDIUM] modes should be able to be numbers, or autofill or something
 // [MEDIUM] INPUT could be buttons that add text fields with pre-filled commands. 
 //   Or you can choose to do a custom command! Maybe color the commands. Instructions could be an easy version of this
@@ -40,7 +50,6 @@ var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 
 // [MEDIUM] INPUT set as a prefix could dynamically generate things in the text box 
 //   (process could return an arbitrary dictionary of variables)
 // [MEDIUM] handle if statements in processing
-// [MEDIUM] moving rows around with up and down arrows
 
 /* Big media questions / Prod meetings */
 // Would livelab make it possible to share a portion of my screen as a programmer. 
@@ -56,6 +65,13 @@ var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 
 // is editable a concern? doesn't seem like it but I'd need to encode that in the defaults
 // get official colors and fonts eventually
 
+
+/*
+Consts
+*/
+
+var localStorageProgramKey = 'robotFaceStoredData';
+var localStorageBankKey = 'robotFaceStoredData1';
 
 /*
 Helper Functions
@@ -160,8 +176,7 @@ function indexOfValidMode(arr, activateMode) {
   return -1;
 }
 
-function cellInvalidStateForActivate(arr, i, j) {
-  var text = arr[i][j];
+function cellInvalidStateForActivate(arr, text) {
   var commandsArr = commandsArrayForCell(text);
   var activateCommand = activateCommandFromCommandArray(commandsArr);
   if (activateCommand) {
@@ -177,13 +192,25 @@ function cellInvalidStateForActivate(arr, i, j) {
   return null;
 }
 
+function replaceMemoryZones(str, memory) {
+  var idx = str.toLowerCase().indexOf("[memory]");
+  var output = str;
+  if (idx > -1) {
+    var str1 = str.substr(0, idx);
+    var str2 = str.substr(idx + 8, str.length - (idx + 8));
+    var refinedStr2 = replaceMemoryZones(str2, memory);
+    output = str1 + '[' + memory + ']' + refinedStr2;
+  }
+  return output;
+}
+
 function processCommand(data, command, initialMemory) {
   var rawStrArr = command.split('\n');
   var outputArr = [];
   var commandsArr = commandsArrayForCell(command);
   var state = null;
   var tone = null;
-  var memory = null;
+  var memory = initialMemory;
   var accent = null;
   for (var idx in commandsArr) {
     var currCommand = commandsArr[idx];
@@ -245,7 +272,7 @@ function processCommand(data, command, initialMemory) {
         memory = parseInt(initialMemory) + 1 + "";
       }
     }
-    outputArr.push(rawStrArr[idx]);
+    outputArr.push(replaceMemoryZones(rawStrArr[idx], memory));
   }
   return [outputArr, state, tone, memory, accent];
 }
@@ -285,6 +312,146 @@ function textIsValidCommand(text) {
   return true;
 }
 
+function textOnlyHasOneOfEachBracketPerLine(text) {
+  var strArr = text.split("\n");
+  var _iteratorNormalCompletion5 = true;
+  var _didIteratorError5 = false;
+  var _iteratorError5 = undefined;
+
+  try {
+    for (var _iterator5 = strArr[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+      var str = _step5.value;
+
+      var idx = str.indexOf('[');
+      if (idx > 0) {
+        var subidx = str.substr(idx + 1, str.length - idx - 1).indexOf('[');
+        if (subidx >= 0) {
+          return false;
+        }
+      }
+      var idx2 = str.indexOf(']');
+      if (idx2 > 0) {
+        var subidx2 = str.substr(idx2 + 1, str.length - idx2 - 1).indexOf(']');
+        if (subidx2 >= 0) {
+          return false;
+        }
+      }
+    }
+  } catch (err) {
+    _didIteratorError5 = true;
+    _iteratorError5 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion5 && _iterator5.return) {
+        _iterator5.return();
+      }
+    } finally {
+      if (_didIteratorError5) {
+        throw _iteratorError5;
+      }
+    }
+  }
+
+  return true;
+}
+
+function textHasValidSubCommand(text) {
+  var strArr = text.split("\n");
+  var _iteratorNormalCompletion6 = true;
+  var _didIteratorError6 = false;
+  var _iteratorError6 = undefined;
+
+  try {
+    for (var _iterator6 = strArr[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+      var str = _step6.value;
+
+      var idx = str.indexOf('[');
+      var idx2 = str.indexOf(']');
+      if (idx > 0 && idx2 < idx || idx2 > 0 && idx < 0) {
+        return false;
+      }
+    }
+  } catch (err) {
+    _didIteratorError6 = true;
+    _iteratorError6 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion6 && _iterator6.return) {
+        _iterator6.return();
+      }
+    } finally {
+      if (_didIteratorError6) {
+        throw _iteratorError6;
+      }
+    }
+  }
+
+  return true;
+}
+
+function textHasMemoryBetweenBrackets(text) {
+  var strArr = text.split("\n");
+  var _iteratorNormalCompletion7 = true;
+  var _didIteratorError7 = false;
+  var _iteratorError7 = undefined;
+
+  try {
+    for (var _iterator7 = strArr[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+      var str = _step7.value;
+
+      var idx = str.indexOf('[');
+      var idx2 = str.indexOf(']');
+      if (idx >= 0) {
+        var betweenBrackets = str.substr(idx, idx2 - idx);
+        var betweenBrackets2 = betweenBrackets.substr(1, betweenBrackets.length - 1);
+        if (betweenBrackets2.toLowerCase() !== "memory") {
+          return betweenBrackets2 ? betweenBrackets2 : "[empty]";
+        }
+      }
+    }
+  } catch (err) {
+    _didIteratorError7 = true;
+    _iteratorError7 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion7 && _iterator7.return) {
+        _iterator7.return();
+      }
+    } finally {
+      if (_didIteratorError7) {
+        throw _iteratorError7;
+      }
+    }
+  }
+
+  return null;
+}
+
+function errorStringForCellText(text, data) {
+  if (text.length == 0) {
+    return null;
+  }
+  if (!textIsValidCommand(text)) {
+    return "! Every line needs ()";
+  }
+  var badMode = cellInvalidStateForActivate(data, text);
+  if (badMode) {
+    return "! Typo in mode: " + badMode;
+  }
+  if (!textOnlyHasOneOfEachBracketPerLine(text)) {
+    return "! Only one of [ and ] per line";
+  }
+  if (!textHasValidSubCommand(text)) {
+    return "! Brackets need to be in proper order";
+  }
+  var between = textHasMemoryBetweenBrackets(text);
+  if (between) {
+    return "! " + between + " is invalid bracket command. only MEMORY valid";
+  }
+
+  return null;
+}
+
 /*
 Core classes functions 
 */
@@ -313,15 +480,23 @@ var InputCell = function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
+
+      // method that returns a string of whats wrong based on data and this.props.value
+      var error = errorStringForCellText(this.props.value, this.props.data);
+      var errorComp = !(this.props.i == 0 || this.props.j == 0) && error ? React.createElement(
+        "div",
+        { style: { backgroundColor: "red" } },
+        error
+      ) : null;
       var color = !this.state.modified ? "red" : "black";
       // white on edges, else we do green or red based on validity
       var backgroundColor = this.props.i == 0 || this.props.j == 0 ? "white" : textIsValidCommand(this.props.value) ? "aquamarine" : "pink";
-      return React.createElement("textarea", { style: { color: color, backgroundColor: backgroundColor },
+      return [React.createElement("textarea", { style: { color: color, backgroundColor: backgroundColor },
         value: this.props.value,
         rows: 5,
         cols: 30,
         onChange: this.handleChange
-      });
+      }), errorComp];
     }
   }]);
 
@@ -388,13 +563,13 @@ var Cell = function (_React$Component3) {
         return React.createElement(
           "th",
           null,
-          !allowInput ? this.props.text : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellEvent, i: this.props.i, j: this.props.j })
+          !allowInput ? this.props.text : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellEvent, i: this.props.i, j: this.props.j, data: this.props.data })
         );
       } else {
         return React.createElement(
           "td",
           null,
-          !this.props.isInteractable ? this.props.text : !this.props.editingMode ? React.createElement(ReadOnlyCell, { value: this.props.text, onCellClick: this.onCellEvent, i: this.props.i, j: this.props.j, isSelected: this.props.isSelected }) : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellEvent, i: this.props.i, j: this.props.j })
+          !this.props.isInteractable ? this.props.text : !this.props.editingMode ? React.createElement(ReadOnlyCell, { value: this.props.text, onCellClick: this.onCellEvent, i: this.props.i, j: this.props.j, isSelected: this.props.isSelected }) : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellEvent, i: this.props.i, j: this.props.j, data: this.props.data })
         );
       }
     }
@@ -412,6 +587,8 @@ var Row = function (_React$Component4) {
     var _this4 = _possibleConstructorReturn(this, (Row.__proto__ || Object.getPrototypeOf(Row)).call(this, props));
 
     _this4.onCellEvent = _this4.onCellEvent.bind(_this4);
+    _this4.moveup = _this4.moveup.bind(_this4);
+    _this4.movedown = _this4.movedown.bind(_this4);
     return _this4;
   }
 
@@ -421,13 +598,41 @@ var Row = function (_React$Component4) {
       this.props.onCellEvent(e, i, j);
     }
   }, {
+    key: "moveup",
+    value: function moveup() {
+      this.props.moveup(this.props.i);
+    }
+  }, {
+    key: "movedown",
+    value: function movedown() {
+      this.props.movedown(this.props.i);
+    }
+  }, {
     key: "render",
     value: function render() {
-      var arr = [];
+      // add a cell with two buttons
+      var upButton = this.props.i > 3 ? React.createElement(
+        "button",
+        { onClick: this.moveup },
+        "^"
+      ) : null;
+      var downButton = this.props.i >= 3 && this.props.i < this.props.data.length - 1 ? React.createElement(
+        "button",
+        { onClick: this.movedown },
+        "v"
+      ) : null;
+      var buttonCell = React.createElement(
+        "td",
+        null,
+        upButton,
+        React.createElement("br", null),
+        downButton
+      );
+      var arr = [buttonCell];
       for (var j = 0; j < this.props.width; j++) {
         var uninteractable = j == 0 && this.props.i == 1 || this.props.i == 2 && j == 0 || this.props.i == 0 && j == 0; // not interactable
         var isHeader = j == 0 || this.props.i == 0 || this.props.i == 1; // non clickable in view mode, and bolder text
-        arr.push(React.createElement(Cell, { isHeader: isHeader, isInteractable: !uninteractable, isSelected: j == this.props.selectedJ, editingMode: this.props.editing, text: this.props.data[this.props.i][j], onCellEvent: this.onCellEvent, i: this.props.i, j: j }));
+        arr.push(React.createElement(Cell, { isHeader: isHeader, isInteractable: !uninteractable, isSelected: j == this.props.selectedJ, editingMode: this.props.editing, text: this.props.data[this.props.i][j], onCellEvent: this.onCellEvent, i: this.props.i, j: j, data: this.props.data }));
       }
       return React.createElement(
         "tr",
@@ -446,77 +651,291 @@ var Table = function (_React$Component5) {
   function Table(props) {
     _classCallCheck(this, Table);
 
-    // TODO: I need a copy method that will properly make sure this array is not copied by ref if I want to preserve default valuing
     var _this5 = _possibleConstructorReturn(this, (Table.__proto__ || Object.getPrototypeOf(Table)).call(this, props));
 
-    var data = JSON.parse(localStorage.getItem('robotFaceStoredData')) || initialData1;
-
-    // NOTE: extremely inefficient
-    var retval = processCommand(data, data[1][1], "[empty]");
-    var tone = retval[2] ? retval[2] : "[empty]";
-    var memory = retval[3] ? retval[3] : "[empty]";
-    var accent = retval[4] ? retval[4] : "[empty]";
-    _this5.props.onSpotlight(data[0][1], tone, memory, accent, data[1][1]);
-
-    _this5.state = { data: data, selectedI: 0, selectedJ: 0, invalidState: null, modeRemoveWarning: false, inputRemoveWarning: false, tone: tone, accent: accent };
+    _this5.state = { invalidState: null, modeRemoveWarning: false, inputRemoveWarning: false };
 
     _this5.onCellEvent = _this5.onCellEvent.bind(_this5);
-    _this5.onRowAdd = _this5.onRowAdd.bind(_this5);
-    _this5.onColumnAdd = _this5.onColumnAdd.bind(_this5);
-    _this5.onRowRemove = _this5.onRowRemove.bind(_this5);
-    _this5.onColumnRemove = _this5.onColumnRemove.bind(_this5);
-    _this5.loadData1 = _this5.loadData1.bind(_this5);
-    _this5.loadData2 = _this5.loadData2.bind(_this5);
-    _this5.loadData3 = _this5.loadData3.bind(_this5);
+    _this5.moveup = _this5.moveup.bind(_this5);
+    _this5.movedown = _this5.movedown.bind(_this5);
     return _this5;
   }
 
   _createClass(Table, [{
     key: "onCellEvent",
     value: function onCellEvent(e, i, j) {
-      if (this.props.editing) {
-        var newData = this.state.data;
-        newData[i][j] = e.target.value;
-        // NOTE: hacky to set table state here because it lives in table scope
-        this.setState({ data: newData, selectedI: 0, selectedJ: 0, invalidState: cellInvalidStateForActivate(newData, i, j) });
-        localStorage.setItem('robotFaceStoredData', JSON.stringify(newData));
-        // NOTE: extremely inefficient
-        var retval = processCommand(newData, newData[1][1], this.props.memory);
-        var tone = retval[2] ? retval[2] : this.state.tone;
-        var memory = retval[3] ? retval[3] : null;
-        var accent = retval[4] ? retval[4] : this.state.accent;
-        this.props.onSpotlight(newData[0][1], tone, memory, accent, newData[1][1]);
-
-        if (retval[2]) {
-          this.setState({ tone: retval[2] });
-        }
-        if (retval[4]) {
-          this.setState({ accent: retval[4] });
-        }
-      } else {
-        var state = this.state.data[0][j];
-        var command = this.state.data[i][j];
-        var retval = processCommand(this.state.data, command, this.props.memory);
-
-        var outputCommand = retval[0].join("\n");
-        console.log(this.props.memory + " " + retval);
-        if (retval[1]) {
-          state = retval[1];
-        }
-        if (retval[2]) {
-          this.setState({ tone: retval[2] });
-        }
-        // TODO: move other stuff out like memory
-        // if (retval[3]) {
-        //   this.setState({memory:retval[3]});
-        // }
-        if (retval[4]) {
-          this.setState({ accent: retval[4] });
-        }
-
-        this.setState({ selectedI: i, selectedJ: j });
-        this.props.onSpotlight(state, this.state.tone, retval[3] ? retval[3] : null, this.state.accent, outputCommand);
+      this.props.onCellEvent(e, i, j);
+    }
+  }, {
+    key: "moveup",
+    value: function moveup(i) {
+      this.props.moveup(i);
+    }
+  }, {
+    key: "movedown",
+    value: function movedown(i) {
+      this.props.movedown(i);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var arr = [];
+      for (var i = 0; i < heightFromDoubleArray(this.props.data); i++) {
+        arr.push(React.createElement(Row, { moveup: this.moveup, movedown: this.movedown, editing: this.props.editing, width: widthFromDoubleArray(this.props.data), i: i, selectedJ: i == this.props.selectedI ? this.props.selectedJ : -1, onCellEvent: this.onCellEvent, data: this.props.data }));
       }
+      return React.createElement(
+        "table",
+        { style: { display: "inline-block" } },
+        arr
+      );
+    }
+  }]);
+
+  return Table;
+}(React.Component);
+
+var MemoryUnit = function (_React$Component6) {
+  _inherits(MemoryUnit, _React$Component6);
+
+  function MemoryUnit(props) {
+    _classCallCheck(this, MemoryUnit);
+
+    var _this6 = _possibleConstructorReturn(this, (MemoryUnit.__proto__ || Object.getPrototypeOf(MemoryUnit)).call(this, props));
+
+    _this6.memoryUpdate = _this6.memoryUpdate.bind(_this6);
+    return _this6;
+  }
+
+  _createClass(MemoryUnit, [{
+    key: "memoryUpdate",
+    value: function memoryUpdate(e) {
+      this.props.onChange(e);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return React.createElement(
+        "div",
+        null,
+        React.createElement(
+          "span",
+          { style: { color: "black" } },
+          "MEMORY: "
+        ),
+        React.createElement("textarea", { value: this.props.memory, onChange: this.memoryUpdate })
+      );
+    }
+  }]);
+
+  return MemoryUnit;
+}(React.Component);
+
+var Spotlight = function (_React$Component7) {
+  _inherits(Spotlight, _React$Component7);
+
+  function Spotlight(props) {
+    _classCallCheck(this, Spotlight);
+
+    var _this7 = _possibleConstructorReturn(this, (Spotlight.__proto__ || Object.getPrototypeOf(Spotlight)).call(this, props));
+
+    _this7.onChange = _this7.onChange.bind(_this7);
+    return _this7;
+  }
+
+  _createClass(Spotlight, [{
+    key: "onChange",
+    value: function onChange(e) {
+      this.props.onChange(e);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      if (this.props.editing) {
+        return null;
+      }
+
+      var currentRandom = "" + (Math.floor(Math.random() * 4) + 1);
+
+      return React.createElement(
+        "div",
+        { style: { display: "inline-block", padding: "10px 10px 10px 10px", backgroundColor: "gold" } },
+        React.createElement(
+          "h2",
+          { style: { color: "black" } },
+          "MODE: ",
+          this.props.mode
+        ),
+        React.createElement(
+          "h2",
+          { style: { color: "black" } },
+          "TONE: ",
+          this.props.tone
+        ),
+        React.createElement(
+          "h2",
+          { style: { color: "black" } },
+          "ACCENT: ",
+          this.props.accent
+        ),
+        React.createElement(MemoryUnit, { memory: this.props.memory, onChange: this.onChange }),
+        React.createElement("br", null),
+        React.createElement(
+          "h1",
+          { style: { color: "black", backgroundColor: "yellow", whiteSpace: "pre-wrap" } },
+          this.props.command
+        ),
+        React.createElement(
+          "h3",
+          { style: { color: "black" } },
+          "RAND: ",
+          currentRandom
+        )
+      );
+    }
+  }]);
+
+  return Spotlight;
+}(React.Component);
+
+var App = function (_React$Component8) {
+  _inherits(App, _React$Component8);
+
+  function App(props) {
+    _classCallCheck(this, App);
+
+    var _this8 = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
+
+    var bank = localStorage.getItem(localStorageBankKey) || initialBank1.join('\n');
+    var data = JSON.parse(localStorage.getItem(localStorageProgramKey)) || initialData1;
+
+    _this8.state = {
+      editing: true,
+      bank: bank,
+      data: data,
+      selectedI: 0,
+      selectedJ: 0,
+      command: "[empty]",
+      mode: "[empty]",
+      memory: "",
+      tone: "[empty]",
+      accent: "[empty]",
+      nextTone: "[empty]",
+      nextAccent: "[empty]"
+    };
+
+    localStorage.setItem(localStorageProgramKey, JSON.stringify(data));
+    localStorage.setItem(localStorageBankKey, bank);
+
+    _this8.onToggle = _this8.onToggle.bind(_this8);
+    _this8.onCellEvent = _this8.onCellEvent.bind(_this8);
+    _this8.bankUpdate = _this8.bankUpdate.bind(_this8);
+    _this8.loadData1 = _this8.loadData1.bind(_this8);
+    _this8.loadData2 = _this8.loadData2.bind(_this8);
+    _this8.loadData3 = _this8.loadData3.bind(_this8);
+    _this8.onRowAdd = _this8.onRowAdd.bind(_this8);
+    _this8.onRowRemove = _this8.onRowRemove.bind(_this8);
+    _this8.onColumnAdd = _this8.onColumnAdd.bind(_this8);
+    _this8.onColumnRemove = _this8.onColumnRemove.bind(_this8);
+    _this8.memoryUpdate = _this8.memoryUpdate.bind(_this8);
+    _this8.updateSpotlight = _this8.updateSpotlight.bind(_this8);
+    _this8.moveup = _this8.moveup.bind(_this8);
+    _this8.movedown = _this8.movedown.bind(_this8);
+    return _this8;
+  }
+
+  _createClass(App, [{
+    key: "onToggle",
+    value: function onToggle(e) {
+      if (this.state.editing) {
+        // we are transitioning to new state
+        this.updateSpotlight(1, 1);
+      } else {
+        this.setState({
+          command: "[empty]",
+          mode: "[empty]",
+          memory: "",
+          tone: "[empty]",
+          accent: "[empty]",
+          nextTone: "[empty]",
+          nextAccent: "[empty]"
+        });
+      }
+      this.setState({ editing: !this.state.editing });
+    }
+  }, {
+    key: "memoryUpdate",
+    value: function memoryUpdate(e) {
+      this.setState({ memory: e.target.value });
+    }
+  }, {
+    key: "updateSpotlight",
+    value: function updateSpotlight(i, j) {
+      var unprocessedCommand = this.state.data[i][j];
+      var retval = processCommand(this.state.data, unprocessedCommand, this.state.memory);
+
+      // fields that are updated immediately based on selected command
+      var command = retval[0].join("\n");
+      var mode = retval[1] ? retval[1] : this.state.data[0][j];
+      var memory = retval[3] ? retval[3] : this.state.memory;
+
+      // fields that are updated the next tick
+      var tone = this.state.nextTone ? this.state.nextTone : this.state.tone;
+      var accent = this.state.nextAccent ? this.state.nextAccent : this.state.accent;
+      this.setState({ tone: tone, accent: accent });
+      if (retval[2]) {
+        this.setState({ nextTone: retval[2] });
+      }
+      if (retval[4]) {
+        this.setState({ nextAccent: retval[4] });
+      }
+
+      this.setState({
+        selectedI: i,
+        selectedJ: j,
+        command: command,
+        mode: mode,
+        memory: memory,
+        tone: tone,
+        accent: accent
+      });
+    }
+  }, {
+    key: "onCellEvent",
+    value: function onCellEvent(e, i, j) {
+      if (this.state.editing) {
+        var data = this.state.data;
+        data[i][j] = e.target.value;
+        this.setState({ data: data, invalidState: cellInvalidStateForActivate(data, e.target.value) });
+        localStorage.setItem(localStorageProgramKey, JSON.stringify(data));
+      } else {
+        this.updateSpotlight(i, j);
+      }
+    }
+  }, {
+    key: "bankUpdate",
+    value: function bankUpdate(e) {
+      this.setState({ bank: e.target.value });
+      localStorage.setItem(localStorageBankKey, e.target.value);
+    }
+  }, {
+    key: "moveup",
+    value: function moveup(i) {
+      var oldData = this.state.data;
+      var lineToMove = oldData[i];
+      var lineToSwap = oldData[i - 1];
+      oldData[i - 1] = lineToMove;
+      oldData[i] = lineToSwap;
+      this.setState({ data: oldData });
+    }
+  }, {
+    key: "movedown",
+    value: function movedown(i) {
+      var oldData = this.state.data;
+      var lineToMove = oldData[i];
+      var lineToSwap = oldData[i + 1];
+      oldData[i + 1] = lineToMove;
+      oldData[i] = lineToSwap;
+      this.setState({ data: oldData });
     }
   }, {
     key: "onRowAdd",
@@ -526,7 +945,7 @@ var Table = function (_React$Component5) {
       lastRow[0] = "NEW INPUT";
       newData.push(lastRow);
       this.setState({ data: newData });
-      localStorage.setItem('robotFaceStoredData', JSON.stringify(newData));
+      localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
     }
   }, {
     key: "onRowRemove",
@@ -535,7 +954,7 @@ var Table = function (_React$Component5) {
         var oldData = this.state.data;
         var newData = oldData.slice(0, -1);
         this.setState({ data: newData });
-        localStorage.setItem('robotFaceStoredData', JSON.stringify(newData));
+        localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
       }
       this.setState({ inputRemoveWarning: !this.state.inputRemoveWarning });
     }
@@ -551,7 +970,7 @@ var Table = function (_React$Component5) {
         }
       }
       this.setState({ data: newData });
-      localStorage.setItem('robotFaceStoredData', JSON.stringify(newData));
+      localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
     }
   }, {
     key: "onColumnRemove",
@@ -562,186 +981,42 @@ var Table = function (_React$Component5) {
           newData[i] = newData[i].slice(0, -1);
         }
         this.setState({ data: newData });
-        localStorage.setItem('robotFaceStoredData', JSON.stringify(newData));
+        localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
       }
       this.setState({ modeRemoveWarning: !this.state.modeRemoveWarning });
     }
   }, {
     key: "loadData1",
-    value: function loadData1(e) {
-      this.setState({ data: initialData1 });
-      localStorage.setItem('robotFaceStoredData', JSON.stringify(initialData1));
-      this.props.onLoadData1();
-    }
-  }, {
-    key: "loadData2",
-    value: function loadData2(e) {
-      this.setState({ data: initialData2 });
-      localStorage.setItem('robotFaceStoredData', JSON.stringify(initialData2));
-      this.props.onLoadData2();
-    }
-  }, {
-    key: "loadData3",
-    value: function loadData3(e) {
-      this.setState({ data: initialData3 });
-      localStorage.setItem('robotFaceStoredData', JSON.stringify(initialData3));
-      this.props.onLoadData3();
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var arr = [];
-      for (var i = 0; i < heightFromDoubleArray(this.state.data); i++) {
-        arr.push(React.createElement(Row, { editing: this.props.editing, width: widthFromDoubleArray(this.state.data), i: i, selectedJ: i == this.state.selectedI ? this.state.selectedJ : -1, onCellEvent: this.onCellEvent, data: this.state.data }));
-      }
-      return React.createElement(
-        "div",
-        null,
-        React.createElement(
-          "div",
-          null,
-          React.createElement(
-            "table",
-            { style: { display: "inline-block" } },
-            arr
-          ),
-          React.createElement(
-            "div",
-            { style: { display: "inline-block" } },
-            React.createElement(
-              "button",
-              { style: this.props.editing ? { display: "block" } : { display: "none" }, onClick: this.onColumnAdd },
-              React.createElement(
-                "h1",
-                { style: { color: "black" } },
-                "Add Mode"
-              )
-            ),
-            React.createElement("br", null),
-            React.createElement(
-              "button",
-              { style: this.props.editing ? { display: "block" } : { display: "none" }, onClick: this.onColumnRemove },
-              this.state.modeRemoveWarning ? "ARE YOU SURE? CAN'T UNDO THIS ACTION" : "Remove Last Mode"
-            )
-          )
-        ),
-        React.createElement(
-          "button",
-          { style: this.props.editing ? { display: "inline" } : { display: "none" }, onClick: this.onRowAdd },
-          React.createElement(
-            "h1",
-            { style: { color: "black" } },
-            "Add Input"
-          )
-        ),
-        React.createElement(
-          "button",
-          { style: this.props.editing ? { display: "inline", marginLeft: "70px" } : { display: "none" }, onClick: this.onRowRemove },
-          this.state.inputRemoveWarning ? "ARE YOU SURE? CAN'T UNDO THIS ACTION" : "Remove Last Input"
-        ),
-        React.createElement(
-          "div",
-          { style: this.state.invalidState ? { display: "block", backgroundColor: "red" } : { display: "none", backgroundColor: "red" } },
-          "WARNING: invalid state: ",
-          this.state.invalidState
-        ),
-        React.createElement("br", null),
-        React.createElement("br", null),
-        React.createElement(
-          "button",
-          { onClick: this.loadData1 },
-          "Load LIFETRONICS"
-        ),
-        React.createElement(
-          "button",
-          { onClick: this.loadData2 },
-          "Load UPPER_CRUST"
-        ),
-        React.createElement(
-          "button",
-          { onClick: this.loadData3 },
-          "Load COWPOKE"
-        ),
-        React.createElement("br", null)
-      );
-    }
-  }]);
-
-  return Table;
-}(React.Component);
-
-var App = function (_React$Component6) {
-  _inherits(App, _React$Component6);
-
-  function App(props) {
-    _classCallCheck(this, App);
-
-    var _this6 = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
-
-    var bank = localStorage.getItem('robotFaceStoredData1') || initialBank1.join('\n');
-    _this6.state = { currentBank: bank, editing: true, currentCommand: "", currentRandom: "", currentState: "", currentTone: "", currentAccent: "", currentMemory: "[empty]" };
-    localStorage.setItem('robotFaceStoredData1', _this6.state.currentBank);
-
-    _this6.onToggle = _this6.onToggle.bind(_this6);
-    _this6.onSpotlight = _this6.onSpotlight.bind(_this6);
-    _this6.memoryUpdate = _this6.memoryUpdate.bind(_this6);
-    _this6.bankUpdate = _this6.bankUpdate.bind(_this6);
-    _this6.loadData1 = _this6.loadData1.bind(_this6);
-    _this6.loadData2 = _this6.loadData2.bind(_this6);
-    _this6.loadData3 = _this6.loadData3.bind(_this6);
-    return _this6;
-  }
-
-  _createClass(App, [{
-    key: "onToggle",
-    value: function onToggle(e) {
-      this.setState({ editing: !this.state.editing });
-    }
-  }, {
-    key: "onSpotlight",
-    value: function onSpotlight(state, tone, memory, accent, command) {
-      var randNum = "" + (Math.floor(Math.random() * 4) + 1);
-      this.setState({ currentRandom: randNum, currentState: "CurrentState: " + state, currentTone: "CurrentTone: " + tone, currentCommand: command, currentMemory: memory ? memory : this.state.currentMemory, currentAccent: "CurrentAccent: " + accent });
-    }
-  }, {
-    key: "clearStorage",
-    value: function clearStorage(e) {
-      localStorage.setItem('robotFaceStoredData', null);
-      localStorage.setItem('robotFaceStoredData1', null);
-    }
-  }, {
-    key: "memoryUpdate",
-    value: function memoryUpdate(e) {
-      this.setState({ currentMemory: e.target.value });
-    }
-  }, {
-    key: "bankUpdate",
-    value: function bankUpdate(e) {
-      this.setState({ currentBank: e.target.value });
-      localStorage.setItem('robotFaceStoredData1', this.state.currentBank);
-    }
-  }, {
-    key: "loadData1",
     value: function loadData1() {
-      this.setState({ currentBank: initialBank1.join('\n') });
-      localStorage.setItem('robotFaceStoredData1', this.state.currentBank);
+      this.setState({ bank: initialBank1.join('\n'), data: initialData1, selectedI: 0, selectedJ: 0 });
+      localStorage.setItem(localStorageProgramKey, JSON.stringify(initialData1));
+      localStorage.setItem(localStorageBankKey, initialBank1.join('\n'));
     }
   }, {
     key: "loadData2",
     value: function loadData2() {
-      this.setState({ currentBank: initialBank2.join('\n') });
-      localStorage.setItem('robotFaceStoredData1', this.state.currentBank);
+      this.setState({ bank: initialBank2.join('\n'), data: initialData2, selectedI: 0, selectedJ: 0 });
+      localStorage.setItem(localStorageProgramKey, JSON.stringify(initialData2));
+      localStorage.setItem(localStorageBankKey, initialBank2.join('\n'));
     }
   }, {
     key: "loadData3",
     value: function loadData3() {
-      this.setState({ currentBank: initialBank3.join('\n') });
-      localStorage.setItem('robotFaceStoredData1', this.state.currentBank);
+      this.setState({ bank: initialBank3.join('\n'), data: initialData3, selectedI: 0, selectedJ: 0 });
+      localStorage.setItem(localStorageProgramKey, JSON.stringify(initialData3));
+      localStorage.setItem(localStorageBankKey, initialBank3.join('\n'));
+    }
+  }, {
+    key: "clearStorage",
+    value: function clearStorage(e) {
+      localStorage.setItem(localStorageProgramKey, null);
+      localStorage.setItem(localStorageBankKey, "");
+      // TODO: can I just trigger a refresh here? think through this more...
     }
   }, {
     key: "render",
     value: function render() {
-      var spotlightDisplayStyle = this.state.editing ? "none" : "inline-block";
+      var buttonDisplayStyle = !this.state.editing ? "none" : "inline-block";
       var toggleButtonText = this.state.editing ? 'Go To Viewing' : 'Go To Editing';
       return React.createElement(
         "div",
@@ -749,44 +1024,9 @@ var App = function (_React$Component6) {
         React.createElement("br", null),
         React.createElement("input", { type: "text", placeholder: "Bank" }),
         React.createElement("br", null),
-        React.createElement("textarea", { rows: 7, onChange: this.bankUpdate, value: this.state.currentBank }),
+        React.createElement("textarea", { rows: 7, onChange: this.bankUpdate, value: this.state.bank }),
         React.createElement("br", null),
-        React.createElement(
-          "div",
-          { style: { display: spotlightDisplayStyle, padding: "10px 10px 10px 10px", backgroundColor: "gold" } },
-          React.createElement(
-            "h2",
-            { style: { color: "black" } },
-            this.state.currentState
-          ),
-          React.createElement(
-            "h2",
-            { style: { color: "black" } },
-            this.state.currentTone
-          ),
-          React.createElement(
-            "h3",
-            { style: { color: "black" } },
-            this.state.currentAccent
-          ),
-          React.createElement(
-            "span",
-            { style: { color: "black" } },
-            "MEMORY: "
-          ),
-          React.createElement("textarea", { value: this.state.currentMemory, onChange: this.memoryUpdate }),
-          React.createElement("br", null),
-          React.createElement(
-            "h1",
-            { style: { color: "black", backgroundColor: "yellow", whiteSpace: "pre-wrap" } },
-            this.state.currentCommand
-          ),
-          React.createElement(
-            "h3",
-            { style: { color: "black" } },
-            this.state.currentRandom
-          )
-        ),
+        React.createElement(Spotlight, { editing: this.state.editing, command: this.state.command, mode: this.state.mode, accent: this.state.accent, tone: this.state.tone, memory: this.state.memory, onChange: this.memoryUpdate }),
         React.createElement("br", null),
         React.createElement("br", null),
         React.createElement(
@@ -794,10 +1034,75 @@ var App = function (_React$Component6) {
           { onClick: this.onToggle },
           toggleButtonText
         ),
-        React.createElement(Table, { editing: this.state.editing, onSpotlight: this.onSpotlight, memory: this.state.currentMemory, onLoadData1: this.loadData1, onLoadData2: this.loadData2, onLoadData3: this.loadData3 }),
+        React.createElement(
+          "div",
+          null,
+          React.createElement(
+            "div",
+            null,
+            React.createElement(Table, { moveup: this.moveup, movedown: this.movedown, editing: this.state.editing, onCellEvent: this.onCellEvent, data: this.state.data, selectedI: this.state.selectedI, selectedJ: this.state.selectedJ }),
+            React.createElement(
+              "div",
+              { style: { display: "inline-block" } },
+              React.createElement(
+                "button",
+                { style: this.state.editing ? { display: "block" } : { display: "none" }, onClick: this.onColumnAdd },
+                React.createElement(
+                  "h1",
+                  { style: { color: "black" } },
+                  "Add Mode"
+                )
+              ),
+              React.createElement("br", null),
+              React.createElement(
+                "button",
+                { style: this.state.editing ? { display: "block" } : { display: "none" }, onClick: this.onColumnRemove },
+                this.state.modeRemoveWarning ? "ARE YOU SURE? CAN'T UNDO THIS ACTION" : "Remove Last Mode"
+              )
+            )
+          ),
+          React.createElement(
+            "button",
+            { style: this.state.editing ? { display: "inline" } : { display: "none" }, onClick: this.onRowAdd },
+            React.createElement(
+              "h1",
+              { style: { color: "black" } },
+              "Add Input"
+            )
+          ),
+          React.createElement(
+            "button",
+            { style: this.state.editing ? { display: "inline", marginLeft: "70px" } : { display: "none" }, onClick: this.onRowRemove },
+            this.state.inputRemoveWarning ? "ARE YOU SURE? CAN'T UNDO THIS ACTION" : "Remove Last Input"
+          ),
+          React.createElement(
+            "div",
+            { style: this.state.invalidState ? { display: "block", backgroundColor: "red" } : { display: "none", backgroundColor: "red" } },
+            "WARNING: invalid state: ",
+            this.state.invalidState
+          ),
+          React.createElement("br", null)
+        ),
+        React.createElement("br", null),
         React.createElement(
           "button",
-          { onClick: this.clearStorage },
+          { style: { display: buttonDisplayStyle }, onClick: this.loadData1 },
+          "Load LIFETRONICS"
+        ),
+        React.createElement(
+          "button",
+          { style: { display: buttonDisplayStyle }, onClick: this.loadData2 },
+          "Load UPPER_CRUST"
+        ),
+        React.createElement(
+          "button",
+          { style: { display: buttonDisplayStyle }, onClick: this.loadData3 },
+          "Load COWPOKE"
+        ),
+        React.createElement("br", null),
+        React.createElement(
+          "button",
+          { style: { display: buttonDisplayStyle }, onClick: this.clearStorage },
           "Clear Saved Code (refresh after clicking)"
         )
       );

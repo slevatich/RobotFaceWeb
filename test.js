@@ -20,27 +20,285 @@ var initialBank3 = ["rodeo", "range", "'buffalo skill'"];
 
 var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 'SET_TONE(Gruff)\nSET_ACCENT(Rustic Twang)', 'SET_TONE(Curious)\nSAY("Well hold on now, I want to hear s\'more about you!")\nSET_MEMORY(0)'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("Fascinatin. Tell me more!")'], ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 'EXTRAPOLATE_FROM("I got so many stories from my life on the range. Like...")', ''], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SAY("I dont understand")', 'SAY("I dont understand")'], ['IF [asked for your name]', 'SAY("Chester the Cowpoke, at yer service.")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 'SAY("Chester the Cowpoke, at yer service.")'], ['IF [Asked about what you like]', 'EXTRAPOLATE_FROM("Theres so much to love about the plains. Like...")', ''], ['IF [Asked a question]', 'ACTIVATE(Curious)', 'INCREMENT_MEMORY()\nIF(MEMORY > 2)\n  EXTRAPOLATE_FROM("Alright Ill answer...")\nELSE()\n  SAY("No, I wanna hear from you!")']];
 
-// [SMALLISH] random number gen for converse should skew lower. move random num generate into process command
-// [SMALLISH] also highlight unused cells when we come back from editing view
-// [MEDIUM] finite state machine.
-//    use canvas and draw modes as circles
-//    go down mode list and find activate statements. draw an array to modes that work
+// [BIG] LAYOUT is a general big question mark. 
+//   How can I give an easy way to make this visible for the people selecting commands. 8 as a good max for inputs?
+// in view mode, I could force set the width of cells, and truncate clickable cells (edge cells cannot be truncated)
+//   improve UI experience more generally (canvas could be much better)
+//  improve graph code and UI
 
 // changelog
 //   fixed state inconsistency. shouldn't be any more weird bugs
 //   up and down arrows for rows
 //   memory will replace in spotlight
 //   live error updating on cell by cell level
+//   highlighting of utilized cells when you come back from editing
+//   converse random numbers skew lower
+//   graph display (bad)
 
 
-// [BIG] LAYOUT is a general big question mark. 
-//   How can I give an easy way to make this visible for the people selecting commands. 8 as a good max for inputs?
+function arrayEQ(arr1, arr2) {
+  if (arr1.length === arr2.length) {
+    return arr1[0] === arr2[0] && arr1[1] === arr2[1];
+  }
+  return false;
+}
 
+function arrayThing(arr, objcToAdd) {
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = arr[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var tracking = _step.value;
+
+      if (arrayEQ(tracking, objcToAdd)) {
+        return;
+      }
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
+  }
+
+  arr.push(objcToAdd);
+}
+
+function drawGraph(ctx, modesArr, arrowsArr) {
+  // draw everything
+
+  // clear
+  ctx.beginPath();
+  ctx.rect(0, 0, 400, 400);
+  ctx.fillStyle = "white";
+  ctx.fill();
+
+  // circles
+  var angleStep = 360.0 / modesArr.length;
+  var angle = 90;
+
+  var coordsArr = [];
+  var _iteratorNormalCompletion2 = true;
+  var _didIteratorError2 = false;
+  var _iteratorError2 = undefined;
+
+  try {
+    for (var _iterator2 = modesArr[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+      var mode = _step2.value;
+
+      var xcord = Math.cos(angle * 3.14 / 180.0);
+      var ycord = Math.sin(angle * 3.14 / 180.0);
+      xcord = 200 + 120 * xcord;
+      ycord = 200 + 120 * ycord;
+      coordsArr.push([xcord, ycord]);
+
+      // draw circle
+      ctx.beginPath();
+      ctx.arc(xcord, ycord, 30, 0, 2 * Math.PI);
+      ctx.stroke();
+
+      // draw text
+      ctx.font = "10px Arial";
+      ctx.fillStyle = "red";
+      ctx.fillText(mode, xcord - 25, ycord);
+
+      angle += angleStep;
+    }
+
+    // arrows
+
+    // Go through the arrows array. add if the sorted pair is new
+  } catch (err) {
+    _didIteratorError2 = true;
+    _iteratorError2 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion2 && _iterator2.return) {
+        _iterator2.return();
+      }
+    } finally {
+      if (_didIteratorError2) {
+        throw _iteratorError2;
+      }
+    }
+  }
+
+  var trackingArrowArr = [];
+  var _iteratorNormalCompletion3 = true;
+  var _didIteratorError3 = false;
+  var _iteratorError3 = undefined;
+
+  try {
+    for (var _iterator3 = arrowsArr[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+      var arrow = _step3.value;
+
+      var sortedArrow = arrow.slice(0, arrow.length).sort();
+      arrayThing(trackingArrowArr, sortedArrow);
+    }
+  } catch (err) {
+    _didIteratorError3 = true;
+    _iteratorError3 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion3 && _iterator3.return) {
+        _iterator3.return();
+      }
+    } finally {
+      if (_didIteratorError3) {
+        throw _iteratorError3;
+      }
+    }
+  }
+
+  console.log(trackingArrowArr);
+
+  var trackingArrowCoordsArr = [];
+  for (var i = 0; i < trackingArrowArr.length; i++) {
+    trackingArrowCoordsArr.push(0); // how do I identify?
+  }
+
+  console.log("hi");
+  console.log(arrowsArr);
+  var _iteratorNormalCompletion4 = true;
+  var _didIteratorError4 = false;
+  var _iteratorError4 = undefined;
+
+  try {
+    for (var _iterator4 = arrowsArr[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+      var arrow = _step4.value;
+
+      var startingMode = arrow[0];
+      var endingMode = arrow[1];
+
+      // whats our index of possible arrows
+      var idx = 0;
+      for (var tracking in trackingArrowArr) {
+        if (arrayEQ(trackingArrowArr[tracking], arrow.slice(0, arrow.length).sort())) {
+          idx = tracking;
+          break;
+        }
+      }
+
+      // check our possible arrow coords for idx
+      var numberOfThisArrowPrevious = trackingArrowCoordsArr[idx];
+      console.log(numberOfThisArrowPrevious);
+      trackingArrowCoordsArr[idx] = trackingArrowCoordsArr[idx] + 1;
+
+      var startX = coordsArr[startingMode][0];
+      var startY = coordsArr[startingMode][1];
+      var endX = coordsArr[endingMode][0];
+      var endY = coordsArr[endingMode][1];
+
+      var endDelta = endX - startX ? endX - startX : 0.001;
+      var slope = (endY - startY) / endDelta;
+      var radians = Math.atan(slope);
+
+      var xD = 0;
+      var yD = 0;
+      if (radians < 0) {
+        // sinc is -, cos is +
+        if (endY > startY) {
+          // up and right  
+          yD = -1 * -1;
+          xD = 1;
+        } else {
+          // down and left 
+          yD = 1 * -1;
+          xD = -1;
+        }
+      } else {
+        // both trigs are +
+        if (endY > startY) {
+          // up and left
+          yD = -1;
+          xD = -1;
+        } else {
+          // down and right
+          yD = 1;
+          xD = 1;
+        }
+      }
+
+      startX -= 40 * xD * Math.cos(radians);
+      startY -= 40 * yD * Math.sin(radians);
+      endX += 40 * xD * Math.cos(radians);
+      endY += 40 * yD * Math.sin(radians);
+
+      if (numberOfThisArrowPrevious > 0) {
+        if (radians < 0) {
+          startX += 10 * numberOfThisArrowPrevious * Math.cos(radians - Math.PI / 2);
+          startY += 10 * numberOfThisArrowPrevious * Math.sin(radians - Math.PI / 2);
+          endX += 10 * numberOfThisArrowPrevious * Math.cos(radians - Math.PI / 2);
+          endY += 10 * numberOfThisArrowPrevious * Math.sin(radians - Math.PI / 2);
+        } else {
+          startX += 10 * numberOfThisArrowPrevious * Math.cos(radians + Math.PI / 2);
+          startY += 10 * numberOfThisArrowPrevious * Math.sin(radians + Math.PI / 2);
+          endX += 10 * numberOfThisArrowPrevious * Math.cos(radians + Math.PI / 2);
+          endY += 10 * numberOfThisArrowPrevious * Math.sin(radians + Math.PI / 2);
+        }
+      }
+
+      var endCircleX = endX + 5 * xD * Math.cos(radians);
+      var endCircleY = endY + 5 * yD * Math.sin(radians);
+
+      // DRAW a circle at endX
+
+      // console.log("logs");
+      // console.log(arrow);
+      // console.log(radians);
+      // console.log(Math.cos(radians));
+      // console.log(Math.sin(radians));
+
+      // asin acos
+      // whats the angle of this line?
+
+      // TODO: shift perpendicular if we have numberOfThisArrowPrevious
+      var absRadians = xD < 0 ? radians : radians + Math.PI;
+
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(endX, endY);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(endCircleX, endCircleY, 5, absRadians - Math.PI / 4, absRadians + Math.PI / 4);
+      ctx.stroke();
+      // ctx.font = "20px Arial";
+      // ctx.fillStyle = "red";
+      // ctx.fillText(Math.floor(radians * 100), endCircleX, endCircleY);
+    }
+  } catch (err) {
+    _didIteratorError4 = true;
+    _iteratorError4 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion4 && _iterator4.return) {
+        _iterator4.return();
+      }
+    } finally {
+      if (_didIteratorError4) {
+        throw _iteratorError4;
+      }
+    }
+  }
+}
 
 /* Seek Feedback? */
 // [SMALL] toggle errors on and off as part of validation?
 
 /* Midpri */
+// [SMALLISH] validate you can't have multiple modes with same name
+// [SMALLISH] validate you can't activate the state you are currently in
+// [SMALLISH] Only show the finite state machine button if there are no red warnings (will need to bubble this up)
+// [SMALLISH] No activate commands allowed in header cells
 // [MEDIUM] highlight syntax in textareas
 // [MEDIUM] highlight MEMORY in spotlight
 // [MEDIUM] modes should be able to be numbers, or autofill or something
@@ -99,13 +357,13 @@ function subjectForCommand(str) {
 function commandsArrayForCell(text) {
   var strArr = text.split("\n");
   var commandArr = [];
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
+  var _iteratorNormalCompletion5 = true;
+  var _didIteratorError5 = false;
+  var _iteratorError5 = undefined;
 
   try {
-    for (var _iterator = strArr[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var str = _step.value;
+    for (var _iterator5 = strArr[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+      var str = _step5.value;
 
       str = str.trim();
       if (str) {
@@ -119,16 +377,16 @@ function commandsArrayForCell(text) {
       }
     }
   } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
+    _didIteratorError5 = true;
+    _iteratorError5 = err;
   } finally {
     try {
-      if (!_iteratorNormalCompletion && _iterator.return) {
-        _iterator.return();
+      if (!_iteratorNormalCompletion5 && _iterator5.return) {
+        _iterator5.return();
       }
     } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
+      if (_didIteratorError5) {
+        throw _iteratorError5;
       }
     }
   }
@@ -137,29 +395,29 @@ function commandsArrayForCell(text) {
 }
 
 function activateCommandFromCommandArray(commandsArr) {
-  var _iteratorNormalCompletion2 = true;
-  var _didIteratorError2 = false;
-  var _iteratorError2 = undefined;
+  var _iteratorNormalCompletion6 = true;
+  var _didIteratorError6 = false;
+  var _iteratorError6 = undefined;
 
   try {
-    for (var _iterator2 = commandsArr[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-      var func = _step2.value;
+    for (var _iterator6 = commandsArr[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+      var func = _step6.value;
 
       if (func[0] === "activate") {
         return func;
       }
     }
   } catch (err) {
-    _didIteratorError2 = true;
-    _iteratorError2 = err;
+    _didIteratorError6 = true;
+    _iteratorError6 = err;
   } finally {
     try {
-      if (!_iteratorNormalCompletion2 && _iterator2.return) {
-        _iterator2.return();
+      if (!_iteratorNormalCompletion6 && _iterator6.return) {
+        _iterator6.return();
       }
     } finally {
-      if (_didIteratorError2) {
-        throw _iteratorError2;
+      if (_didIteratorError6) {
+        throw _iteratorError6;
       }
     }
   }
@@ -204,7 +462,7 @@ function replaceMemoryZones(str, memory) {
   return output;
 }
 
-function processCommand(data, command, initialMemory) {
+function processCommand(data, command, initialMemory, selectedArr) {
   var rawStrArr = command.split('\n');
   var outputArr = [];
   var commandsArr = commandsArrayForCell(command);
@@ -212,6 +470,7 @@ function processCommand(data, command, initialMemory) {
   var tone = null;
   var memory = initialMemory;
   var accent = null;
+  var random = null;
   for (var idx in commandsArr) {
     var currCommand = commandsArr[idx];
     if (currCommand[0]) {
@@ -220,29 +479,30 @@ function processCommand(data, command, initialMemory) {
         var modeJ = indexOfValidMode(data, currCommand[1]);
         if (modeJ > 0) {
           state = data[0][modeJ];
+          selectedArr[1][modeJ] = true;
           // recursively evaluate outputArr[1]
-          var retval = processCommand(data, data[1][modeJ]);
-          var _iteratorNormalCompletion3 = true;
-          var _didIteratorError3 = false;
-          var _iteratorError3 = undefined;
+          var retval = processCommand(data, data[1][modeJ], memory);
+          var _iteratorNormalCompletion7 = true;
+          var _didIteratorError7 = false;
+          var _iteratorError7 = undefined;
 
           try {
-            for (var _iterator3 = retval[0][Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-              command = _step3.value;
+            for (var _iterator7 = retval[0][Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+              command = _step7.value;
 
-              outputArr.push(command);
+              outputArr.push(replaceMemoryZones(command), memory);
             }
           } catch (err) {
-            _didIteratorError3 = true;
-            _iteratorError3 = err;
+            _didIteratorError7 = true;
+            _iteratorError7 = err;
           } finally {
             try {
-              if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                _iterator3.return();
+              if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                _iterator7.return();
               }
             } finally {
-              if (_didIteratorError3) {
-                throw _iteratorError3;
+              if (_didIteratorError7) {
+                throw _iteratorError7;
               }
             }
           }
@@ -259,6 +519,9 @@ function processCommand(data, command, initialMemory) {
           if (retval[4]) {
             accent = retval[4];
           }
+          if (retval[5]) {
+            random = retval[5];
+          }
           continue;
         }
         // NOTE: possibly inform of invalid activate command here
@@ -269,24 +532,29 @@ function processCommand(data, command, initialMemory) {
       } else if (currCommand[0] === "set_accent") {
         accent = currCommand[1];
       } else if (currCommand[0] === "increment_memory") {
+        // TODO: initialMemory only?
         memory = parseInt(initialMemory) + 1 + "";
+      } else if (currCommand[0] === "converse") {
+        // 40% 1, 40% 2, 20% 3
+        random = "" + (Math.floor(Math.random() * 5) % 3 + 1);
+        console.log("adj random" + random);
       }
     }
     outputArr.push(replaceMemoryZones(rawStrArr[idx], memory));
   }
-  return [outputArr, state, tone, memory, accent];
+  return [outputArr, state, tone, memory, accent, random];
 }
 
 // Ensures every line has opening followed by closing paren
 function textIsValidCommand(text) {
   var strArr = text.split("\n");
-  var _iteratorNormalCompletion4 = true;
-  var _didIteratorError4 = false;
-  var _iteratorError4 = undefined;
+  var _iteratorNormalCompletion8 = true;
+  var _didIteratorError8 = false;
+  var _iteratorError8 = undefined;
 
   try {
-    for (var _iterator4 = strArr[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-      var str = _step4.value;
+    for (var _iterator8 = strArr[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+      var str = _step8.value;
 
       var idx = str.indexOf('(');
       var idx2 = str.indexOf(')');
@@ -295,16 +563,16 @@ function textIsValidCommand(text) {
       }
     }
   } catch (err) {
-    _didIteratorError4 = true;
-    _iteratorError4 = err;
+    _didIteratorError8 = true;
+    _iteratorError8 = err;
   } finally {
     try {
-      if (!_iteratorNormalCompletion4 && _iterator4.return) {
-        _iterator4.return();
+      if (!_iteratorNormalCompletion8 && _iterator8.return) {
+        _iterator8.return();
       }
     } finally {
-      if (_didIteratorError4) {
-        throw _iteratorError4;
+      if (_didIteratorError8) {
+        throw _iteratorError8;
       }
     }
   }
@@ -314,13 +582,13 @@ function textIsValidCommand(text) {
 
 function textOnlyHasOneOfEachBracketPerLine(text) {
   var strArr = text.split("\n");
-  var _iteratorNormalCompletion5 = true;
-  var _didIteratorError5 = false;
-  var _iteratorError5 = undefined;
+  var _iteratorNormalCompletion9 = true;
+  var _didIteratorError9 = false;
+  var _iteratorError9 = undefined;
 
   try {
-    for (var _iterator5 = strArr[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-      var str = _step5.value;
+    for (var _iterator9 = strArr[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+      var str = _step9.value;
 
       var idx = str.indexOf('[');
       if (idx > 0) {
@@ -338,16 +606,16 @@ function textOnlyHasOneOfEachBracketPerLine(text) {
       }
     }
   } catch (err) {
-    _didIteratorError5 = true;
-    _iteratorError5 = err;
+    _didIteratorError9 = true;
+    _iteratorError9 = err;
   } finally {
     try {
-      if (!_iteratorNormalCompletion5 && _iterator5.return) {
-        _iterator5.return();
+      if (!_iteratorNormalCompletion9 && _iterator9.return) {
+        _iterator9.return();
       }
     } finally {
-      if (_didIteratorError5) {
-        throw _iteratorError5;
+      if (_didIteratorError9) {
+        throw _iteratorError9;
       }
     }
   }
@@ -357,13 +625,13 @@ function textOnlyHasOneOfEachBracketPerLine(text) {
 
 function textHasValidSubCommand(text) {
   var strArr = text.split("\n");
-  var _iteratorNormalCompletion6 = true;
-  var _didIteratorError6 = false;
-  var _iteratorError6 = undefined;
+  var _iteratorNormalCompletion10 = true;
+  var _didIteratorError10 = false;
+  var _iteratorError10 = undefined;
 
   try {
-    for (var _iterator6 = strArr[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-      var str = _step6.value;
+    for (var _iterator10 = strArr[Symbol.iterator](), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+      var str = _step10.value;
 
       var idx = str.indexOf('[');
       var idx2 = str.indexOf(']');
@@ -372,16 +640,16 @@ function textHasValidSubCommand(text) {
       }
     }
   } catch (err) {
-    _didIteratorError6 = true;
-    _iteratorError6 = err;
+    _didIteratorError10 = true;
+    _iteratorError10 = err;
   } finally {
     try {
-      if (!_iteratorNormalCompletion6 && _iterator6.return) {
-        _iterator6.return();
+      if (!_iteratorNormalCompletion10 && _iterator10.return) {
+        _iterator10.return();
       }
     } finally {
-      if (_didIteratorError6) {
-        throw _iteratorError6;
+      if (_didIteratorError10) {
+        throw _iteratorError10;
       }
     }
   }
@@ -391,13 +659,13 @@ function textHasValidSubCommand(text) {
 
 function textHasMemoryBetweenBrackets(text) {
   var strArr = text.split("\n");
-  var _iteratorNormalCompletion7 = true;
-  var _didIteratorError7 = false;
-  var _iteratorError7 = undefined;
+  var _iteratorNormalCompletion11 = true;
+  var _didIteratorError11 = false;
+  var _iteratorError11 = undefined;
 
   try {
-    for (var _iterator7 = strArr[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-      var str = _step7.value;
+    for (var _iterator11 = strArr[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+      var str = _step11.value;
 
       var idx = str.indexOf('[');
       var idx2 = str.indexOf(']');
@@ -410,16 +678,16 @@ function textHasMemoryBetweenBrackets(text) {
       }
     }
   } catch (err) {
-    _didIteratorError7 = true;
-    _iteratorError7 = err;
+    _didIteratorError11 = true;
+    _iteratorError11 = err;
   } finally {
     try {
-      if (!_iteratorNormalCompletion7 && _iterator7.return) {
-        _iterator7.return();
+      if (!_iteratorNormalCompletion11 && _iterator11.return) {
+        _iterator11.return();
       }
     } finally {
-      if (_didIteratorError7) {
-        throw _iteratorError7;
+      if (_didIteratorError11) {
+        throw _iteratorError11;
       }
     }
   }
@@ -432,7 +700,7 @@ function errorStringForCellText(text, data) {
     return null;
   }
   if (!textIsValidCommand(text)) {
-    return "! Every line needs ()";
+    return "! Every line needs text and ()";
   }
   var badMode = cellInvalidStateForActivate(data, text);
   if (badMode) {
@@ -480,7 +748,6 @@ var InputCell = function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-
       // method that returns a string of whats wrong based on data and this.props.value
       var error = errorStringForCellText(this.props.value, this.props.data);
       var errorComp = !(this.props.i == 0 || this.props.j == 0) && error ? React.createElement(
@@ -490,7 +757,7 @@ var InputCell = function (_React$Component) {
       ) : null;
       var color = !this.state.modified ? "red" : "black";
       // white on edges, else we do green or red based on validity
-      var backgroundColor = this.props.i == 0 || this.props.j == 0 ? "white" : textIsValidCommand(this.props.value) ? "aquamarine" : "pink";
+      var backgroundColor = this.props.i == 0 || this.props.j == 0 ? "white" : !errorComp ? "aquamarine" : "pink";
       return [React.createElement("textarea", { style: { color: color, backgroundColor: backgroundColor },
         value: this.props.value,
         rows: 5,
@@ -558,17 +825,19 @@ var Cell = function (_React$Component3) {
   }, {
     key: "render",
     value: function render() {
+      var wasUsed = this.props.selectedArr ? this.props.selectedArr[this.props.i][this.props.j] : false;
+      var tdStyle = !this.props.editingMode || !this.props.selectedArr || this.props.i == 0 || this.props.j == 0 ? this.props.isHeader ? "blue" : "transparent" : wasUsed ? "gold" : "red";
       if (this.props.isHeader) {
         var allowInput = this.props.isInteractable && this.props.editingMode;
         return React.createElement(
           "th",
-          null,
+          { style: { backgroundColor: tdStyle } },
           !allowInput ? this.props.text : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellEvent, i: this.props.i, j: this.props.j, data: this.props.data })
         );
       } else {
         return React.createElement(
           "td",
-          null,
+          { style: { backgroundColor: tdStyle } },
           !this.props.isInteractable ? this.props.text : !this.props.editingMode ? React.createElement(ReadOnlyCell, { value: this.props.text, onCellClick: this.onCellEvent, i: this.props.i, j: this.props.j, isSelected: this.props.isSelected }) : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellEvent, i: this.props.i, j: this.props.j, data: this.props.data })
         );
       }
@@ -628,11 +897,11 @@ var Row = function (_React$Component4) {
         React.createElement("br", null),
         downButton
       );
-      var arr = [buttonCell];
+      var arr = this.props.editing ? [buttonCell] : [];
       for (var j = 0; j < this.props.width; j++) {
         var uninteractable = j == 0 && this.props.i == 1 || this.props.i == 2 && j == 0 || this.props.i == 0 && j == 0; // not interactable
         var isHeader = j == 0 || this.props.i == 0 || this.props.i == 1; // non clickable in view mode, and bolder text
-        arr.push(React.createElement(Cell, { isHeader: isHeader, isInteractable: !uninteractable, isSelected: j == this.props.selectedJ, editingMode: this.props.editing, text: this.props.data[this.props.i][j], onCellEvent: this.onCellEvent, i: this.props.i, j: j, data: this.props.data }));
+        arr.push(React.createElement(Cell, { selectedArr: this.props.selectedArr, isHeader: isHeader, isInteractable: !uninteractable, isSelected: j == this.props.selectedJ, editingMode: this.props.editing, text: this.props.data[this.props.i][j], onCellEvent: this.onCellEvent, i: this.props.i, j: j, data: this.props.data }));
       }
       return React.createElement(
         "tr",
@@ -681,7 +950,7 @@ var Table = function (_React$Component5) {
     value: function render() {
       var arr = [];
       for (var i = 0; i < heightFromDoubleArray(this.props.data); i++) {
-        arr.push(React.createElement(Row, { moveup: this.moveup, movedown: this.movedown, editing: this.props.editing, width: widthFromDoubleArray(this.props.data), i: i, selectedJ: i == this.props.selectedI ? this.props.selectedJ : -1, onCellEvent: this.onCellEvent, data: this.props.data }));
+        arr.push(React.createElement(Row, { selectedArr: this.props.selectedArr, moveup: this.moveup, movedown: this.movedown, editing: this.props.editing, width: widthFromDoubleArray(this.props.data), i: i, selectedJ: i == this.props.selectedI ? this.props.selectedJ : -1, onCellEvent: this.onCellEvent, data: this.props.data }));
       }
       return React.createElement(
         "table",
@@ -754,8 +1023,6 @@ var Spotlight = function (_React$Component7) {
         return null;
       }
 
-      var currentRandom = "" + (Math.floor(Math.random() * 4) + 1);
-
       return React.createElement(
         "div",
         { style: { display: "inline-block", padding: "10px 10px 10px 10px", backgroundColor: "gold" } },
@@ -788,7 +1055,7 @@ var Spotlight = function (_React$Component7) {
           "h3",
           { style: { color: "black" } },
           "RAND: ",
-          currentRandom
+          this.props.random
         )
       );
     }
@@ -820,7 +1087,9 @@ var App = function (_React$Component8) {
       tone: "[empty]",
       accent: "[empty]",
       nextTone: "[empty]",
-      nextAccent: "[empty]"
+      nextAccent: "[empty]",
+      selectedArr: "",
+      showCanvas: false
     };
 
     localStorage.setItem(localStorageProgramKey, JSON.stringify(data));
@@ -840,6 +1109,10 @@ var App = function (_React$Component8) {
     _this8.updateSpotlight = _this8.updateSpotlight.bind(_this8);
     _this8.moveup = _this8.moveup.bind(_this8);
     _this8.movedown = _this8.movedown.bind(_this8);
+    _this8.clearUsageHighlights = _this8.clearUsageHighlights.bind(_this8);
+    _this8.noErrorsInNonEdgeCells = _this8.noErrorsInNonEdgeCells.bind(_this8);
+    _this8.showGraph = _this8.showGraph.bind(_this8);
+    _this8.hideCanvas = _this8.hideCanvas.bind(_this8);
     return _this8;
   }
 
@@ -848,7 +1121,25 @@ var App = function (_React$Component8) {
     value: function onToggle(e) {
       if (this.state.editing) {
         // we are transitioning to new state
-        this.updateSpotlight(1, 1);
+
+        // selectedArray with false in every non edge zone
+        var newSelectedMap = [];
+        for (var i = 0; i < this.state.data.length; i++) {
+          var row = this.state.data[i];
+          var selectedRow = [];
+          for (var j = 0; j < row.length; j++) {
+            if (i == 0 || j == 0) {
+              // TODO: if we just don't highlight these as visited we could
+              //   push false here and simplify loop
+              selectedRow.push(true);
+            } else {
+              selectedRow.push(false);
+            }
+          }
+          newSelectedMap.push(selectedRow);
+        }
+        this.updateSpotlight(1, 1, newSelectedMap);
+        this.setState({ showCanvas: false });
       } else {
         this.setState({
           command: "[empty]",
@@ -869,14 +1160,16 @@ var App = function (_React$Component8) {
     }
   }, {
     key: "updateSpotlight",
-    value: function updateSpotlight(i, j) {
+    value: function updateSpotlight(i, j, selectedArr) {
+      selectedArr[i][j] = true;
       var unprocessedCommand = this.state.data[i][j];
-      var retval = processCommand(this.state.data, unprocessedCommand, this.state.memory);
+      var retval = processCommand(this.state.data, unprocessedCommand, this.state.memory, selectedArr);
 
       // fields that are updated immediately based on selected command
       var command = retval[0].join("\n");
       var mode = retval[1] ? retval[1] : this.state.data[0][j];
       var memory = retval[3] ? retval[3] : this.state.memory;
+      var random = retval[5] ? retval[5] : "" + (Math.floor(Math.random() * 4) + 1);
 
       // fields that are updated the next tick
       var tone = this.state.nextTone ? this.state.nextTone : this.state.tone;
@@ -889,6 +1182,8 @@ var App = function (_React$Component8) {
         this.setState({ nextAccent: retval[4] });
       }
 
+      console.log(selectedArr);
+
       this.setState({
         selectedI: i,
         selectedJ: j,
@@ -896,7 +1191,9 @@ var App = function (_React$Component8) {
         mode: mode,
         memory: memory,
         tone: tone,
-        accent: accent
+        accent: accent,
+        random: random,
+        selectedArr: selectedArr
       });
     }
   }, {
@@ -908,7 +1205,8 @@ var App = function (_React$Component8) {
         this.setState({ data: data, invalidState: cellInvalidStateForActivate(data, e.target.value) });
         localStorage.setItem(localStorageProgramKey, JSON.stringify(data));
       } else {
-        this.updateSpotlight(i, j);
+        // also update the map
+        this.updateSpotlight(i, j, this.state.selectedArr);
       }
     }
   }, {
@@ -1007,6 +1305,11 @@ var App = function (_React$Component8) {
       localStorage.setItem(localStorageBankKey, initialBank3.join('\n'));
     }
   }, {
+    key: "clearUsageHighlights",
+    value: function clearUsageHighlights(e) {
+      this.setState({ selectedArr: "" });
+    }
+  }, {
     key: "clearStorage",
     value: function clearStorage(e) {
       localStorage.setItem(localStorageProgramKey, null);
@@ -1014,10 +1317,92 @@ var App = function (_React$Component8) {
       // TODO: can I just trigger a refresh here? think through this more...
     }
   }, {
+    key: "noErrorsInNonEdgeCells",
+    value: function noErrorsInNonEdgeCells(data) {
+      for (var i = 0; i < data.length; i++) {
+        var row = data[i];
+        for (var j = 0; j < row.length; j++) {
+          if (i != 0 && j != 0) {
+            if (errorStringForCellText(data[i][j], data)) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    }
+  }, {
+    key: "showGraph",
+    value: function showGraph(e) {
+      // first we validate there are no errors in non edge cells
+      var shouldShow = this.noErrorsInNonEdgeCells(this.state.data);
+      if (!shouldShow) {
+        // TODO: do better
+        return;
+      }
+
+      // modes array
+      var modesArr = [];
+      for (var i = 1; i < this.state.data[0].length; i++) {
+        modesArr.push(this.state.data[0][i]);
+      }
+      console.log(modesArr);
+
+      // each element is a pair: mode to next mode
+      var arrowsArray = [];
+      for (var i = 2; i < this.state.data.length; i++) {
+        var row = this.state.data[i];
+        for (var j = 1; j < row.length; j++) {
+          // ok we've got the cell: go through its commands to see if there are activates
+          var commandsArr = commandsArrayForCell(this.state.data[i][j]);
+          for (var idx in commandsArr) {
+            var currCommand = commandsArr[idx];
+            if (currCommand[0]) {
+              if (currCommand[0] === "activate") {
+                var modeJ = indexOfValidMode(this.state.data, currCommand[1]);
+                if (modeJ > 0) {
+                  arrowsArray.push([j - 1, modeJ - 1]);
+                }
+              }
+            }
+          }
+        }
+      }
+      arrowsArray = arrowsArray.sort();
+      console.log(arrowsArray);
+
+      var c = document.getElementById("canvas");
+      var ctx = c.getContext("2d");
+
+      drawGraph(ctx, modesArr, arrowsArray);
+
+      this.setState({ showCanvas: true });
+    }
+  }, {
+    key: "hideCanvas",
+    value: function hideCanvas(e) {
+      var c = document.getElementById("canvas");
+      var ctx = c.getContext("2d");
+
+      ctx.beginPath();
+      ctx.rect(0, 0, 400, 400);
+      ctx.fillStyle = "white";
+      ctx.fill();
+
+      this.setState({ showCanvas: false });
+    }
+  }, {
     key: "render",
     value: function render() {
       var buttonDisplayStyle = !this.state.editing ? "none" : "inline-block";
       var toggleButtonText = this.state.editing ? 'Go To Viewing' : 'Go To Editing';
+      var clearUsageButtonStyle = !this.state.editing || !this.state.selectedArr ? "none" : "inline-block";
+      var canvasViz = this.state.showCanvas ? "block" : "none";
+      var hideCanvas = this.state.showCanvas ? React.createElement(
+        "button",
+        { onClick: this.hideCanvas },
+        "HideGraph"
+      ) : null;
       return React.createElement(
         "div",
         null,
@@ -1026,13 +1411,25 @@ var App = function (_React$Component8) {
         React.createElement("br", null),
         React.createElement("textarea", { rows: 7, onChange: this.bankUpdate, value: this.state.bank }),
         React.createElement("br", null),
-        React.createElement(Spotlight, { editing: this.state.editing, command: this.state.command, mode: this.state.mode, accent: this.state.accent, tone: this.state.tone, memory: this.state.memory, onChange: this.memoryUpdate }),
+        React.createElement(Spotlight, { editing: this.state.editing, command: this.state.command, mode: this.state.mode, accent: this.state.accent, tone: this.state.tone, memory: this.state.memory, random: this.state.random, onChange: this.memoryUpdate }),
         React.createElement("br", null),
         React.createElement("br", null),
+        hideCanvas,
+        React.createElement("canvas", { id: "canvas", width: "400", height: "400", style: { backgroundColor: "white", display: canvasViz } }),
         React.createElement(
           "button",
           { onClick: this.onToggle },
           toggleButtonText
+        ),
+        React.createElement(
+          "button",
+          { style: { display: clearUsageButtonStyle }, onClick: this.clearUsageHighlights },
+          "Clear Usage Highlights"
+        ),
+        React.createElement(
+          "button",
+          { style: { display: buttonDisplayStyle }, onClick: this.showGraph },
+          "Show state graph (only works if no errors)"
         ),
         React.createElement(
           "div",
@@ -1040,7 +1437,7 @@ var App = function (_React$Component8) {
           React.createElement(
             "div",
             null,
-            React.createElement(Table, { moveup: this.moveup, movedown: this.movedown, editing: this.state.editing, onCellEvent: this.onCellEvent, data: this.state.data, selectedI: this.state.selectedI, selectedJ: this.state.selectedJ }),
+            React.createElement(Table, { selectedArr: this.state.selectedArr, moveup: this.moveup, movedown: this.movedown, editing: this.state.editing, onCellEvent: this.onCellEvent, data: this.state.data, selectedI: this.state.selectedI, selectedJ: this.state.selectedJ }),
             React.createElement(
               "div",
               { style: { display: "inline-block" } },

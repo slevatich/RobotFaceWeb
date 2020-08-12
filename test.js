@@ -20,11 +20,17 @@ var initialBank3 = ["rodeo", "range", "'buffalo skill'"];
 
 var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 'SET_TONE(Gruff)\nSET_ACCENT(Rustic Twang)', 'SET_TONE(Curious)\nSAY("Well hold on now, I want to hear s\'more about you!")\nSET_MEMORY(0)'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("Fascinatin. Tell me more!")'], ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 'EXTRAPOLATE_FROM("I got so many stories from my life on the range. Like...")', ''], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SAY("I dont understand")', 'SAY("I dont understand")'], ['IF [asked for your name]', 'SAY("Chester the Cowpoke, at yer service.")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 'SAY("Chester the Cowpoke, at yer service.")'], ['IF [Asked about what you like]', 'EXTRAPOLATE_FROM("Theres so much to love about the plains. Like...")', ''], ['IF [Asked a question]', 'ACTIVATE(Curious)', 'INCREMENT_MEMORY()\nIF(MEMORY > 2)\n  EXTRAPOLATE_FROM("Alright Ill answer...")\nELSE()\n  SAY("No, I wanna hear from you!")']];
 
+// [TEENY] add this source to the github so I don't screw it up
+
 // [BIG] LAYOUT is a general big question mark. 
-//   How can I give an easy way to make this visible for the people selecting commands. 8 as a good max for inputs?
-// in view mode, I could force set the width of cells, and truncate clickable cells (edge cells cannot be truncated)
-//   improve UI experience more generally (canvas could be much better)
-//  improve graph code and UI
+//  How can I give an easy way to make this visible for the people selecting commands. 8 as a good max for inputs?
+//  in view mode, I could force set the width of cells, and truncate clickable cells (edge cells cannot be truncated)
+//  improve UI experience more generally (canvas could be much better)
+//  improve graph UI
+//  graph should be in same place as spotlight
+//  could I use float and constraint a menu box to the upper right that you can show and dismiss?
+//  I could also make little wrapper classes like EDITING_BLOCK that take children props to make layout a bit easier
+
 
 // changelog
 //   fixed state inconsistency. shouldn't be any more weird bugs
@@ -36,275 +42,19 @@ var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 
 //   graph display (bad)
 
 
-function arrayEQ(arr1, arr2) {
-  if (arr1.length === arr2.length) {
-    return arr1[0] === arr2[0] && arr1[1] === arr2[1];
-  }
-  return false;
-}
-
-function arrayThing(arr, objcToAdd) {
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
-
-  try {
-    for (var _iterator = arr[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var tracking = _step.value;
-
-      if (arrayEQ(tracking, objcToAdd)) {
-        return;
-      }
-    }
-  } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion && _iterator.return) {
-        _iterator.return();
-      }
-    } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
-      }
-    }
-  }
-
-  arr.push(objcToAdd);
-}
-
-function drawGraph(ctx, modesArr, arrowsArr) {
-  // draw everything
-
-  // clear
-  ctx.beginPath();
-  ctx.rect(0, 0, 400, 400);
-  ctx.fillStyle = "white";
-  ctx.fill();
-
-  // circles
-  var angleStep = 360.0 / modesArr.length;
-  var angle = 90;
-
-  var coordsArr = [];
-  var _iteratorNormalCompletion2 = true;
-  var _didIteratorError2 = false;
-  var _iteratorError2 = undefined;
-
-  try {
-    for (var _iterator2 = modesArr[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-      var mode = _step2.value;
-
-      var xcord = Math.cos(angle * 3.14 / 180.0);
-      var ycord = Math.sin(angle * 3.14 / 180.0);
-      xcord = 200 + 120 * xcord;
-      ycord = 200 + 120 * ycord;
-      coordsArr.push([xcord, ycord]);
-
-      // draw circle
-      ctx.beginPath();
-      ctx.arc(xcord, ycord, 30, 0, 2 * Math.PI);
-      ctx.stroke();
-
-      // draw text
-      ctx.font = "10px Arial";
-      ctx.fillStyle = "red";
-      ctx.fillText(mode, xcord - 25, ycord);
-
-      angle += angleStep;
-    }
-
-    // arrows
-
-    // Go through the arrows array. add if the sorted pair is new
-  } catch (err) {
-    _didIteratorError2 = true;
-    _iteratorError2 = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion2 && _iterator2.return) {
-        _iterator2.return();
-      }
-    } finally {
-      if (_didIteratorError2) {
-        throw _iteratorError2;
-      }
-    }
-  }
-
-  var trackingArrowArr = [];
-  var _iteratorNormalCompletion3 = true;
-  var _didIteratorError3 = false;
-  var _iteratorError3 = undefined;
-
-  try {
-    for (var _iterator3 = arrowsArr[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-      var arrow = _step3.value;
-
-      var sortedArrow = arrow.slice(0, arrow.length).sort();
-      arrayThing(trackingArrowArr, sortedArrow);
-    }
-  } catch (err) {
-    _didIteratorError3 = true;
-    _iteratorError3 = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion3 && _iterator3.return) {
-        _iterator3.return();
-      }
-    } finally {
-      if (_didIteratorError3) {
-        throw _iteratorError3;
-      }
-    }
-  }
-
-  console.log(trackingArrowArr);
-
-  var trackingArrowCoordsArr = [];
-  for (var i = 0; i < trackingArrowArr.length; i++) {
-    trackingArrowCoordsArr.push(0); // how do I identify?
-  }
-
-  console.log("hi");
-  console.log(arrowsArr);
-  var _iteratorNormalCompletion4 = true;
-  var _didIteratorError4 = false;
-  var _iteratorError4 = undefined;
-
-  try {
-    for (var _iterator4 = arrowsArr[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-      var arrow = _step4.value;
-
-      var startingMode = arrow[0];
-      var endingMode = arrow[1];
-
-      // whats our index of possible arrows
-      var idx = 0;
-      for (var tracking in trackingArrowArr) {
-        if (arrayEQ(trackingArrowArr[tracking], arrow.slice(0, arrow.length).sort())) {
-          idx = tracking;
-          break;
-        }
-      }
-
-      // check our possible arrow coords for idx
-      var numberOfThisArrowPrevious = trackingArrowCoordsArr[idx];
-      console.log(numberOfThisArrowPrevious);
-      trackingArrowCoordsArr[idx] = trackingArrowCoordsArr[idx] + 1;
-
-      var startX = coordsArr[startingMode][0];
-      var startY = coordsArr[startingMode][1];
-      var endX = coordsArr[endingMode][0];
-      var endY = coordsArr[endingMode][1];
-
-      var endDelta = endX - startX ? endX - startX : 0.001;
-      var slope = (endY - startY) / endDelta;
-      var radians = Math.atan(slope);
-
-      var xD = 0;
-      var yD = 0;
-      if (radians < 0) {
-        // sinc is -, cos is +
-        if (endY > startY) {
-          // up and right  
-          yD = -1 * -1;
-          xD = 1;
-        } else {
-          // down and left 
-          yD = 1 * -1;
-          xD = -1;
-        }
-      } else {
-        // both trigs are +
-        if (endY > startY) {
-          // up and left
-          yD = -1;
-          xD = -1;
-        } else {
-          // down and right
-          yD = 1;
-          xD = 1;
-        }
-      }
-
-      startX -= 40 * xD * Math.cos(radians);
-      startY -= 40 * yD * Math.sin(radians);
-      endX += 40 * xD * Math.cos(radians);
-      endY += 40 * yD * Math.sin(radians);
-
-      if (numberOfThisArrowPrevious > 0) {
-        if (radians < 0) {
-          startX += 10 * numberOfThisArrowPrevious * Math.cos(radians - Math.PI / 2);
-          startY += 10 * numberOfThisArrowPrevious * Math.sin(radians - Math.PI / 2);
-          endX += 10 * numberOfThisArrowPrevious * Math.cos(radians - Math.PI / 2);
-          endY += 10 * numberOfThisArrowPrevious * Math.sin(radians - Math.PI / 2);
-        } else {
-          startX += 10 * numberOfThisArrowPrevious * Math.cos(radians + Math.PI / 2);
-          startY += 10 * numberOfThisArrowPrevious * Math.sin(radians + Math.PI / 2);
-          endX += 10 * numberOfThisArrowPrevious * Math.cos(radians + Math.PI / 2);
-          endY += 10 * numberOfThisArrowPrevious * Math.sin(radians + Math.PI / 2);
-        }
-      }
-
-      var endCircleX = endX + 5 * xD * Math.cos(radians);
-      var endCircleY = endY + 5 * yD * Math.sin(radians);
-
-      // DRAW a circle at endX
-
-      // console.log("logs");
-      // console.log(arrow);
-      // console.log(radians);
-      // console.log(Math.cos(radians));
-      // console.log(Math.sin(radians));
-
-      // asin acos
-      // whats the angle of this line?
-
-      // TODO: shift perpendicular if we have numberOfThisArrowPrevious
-      var absRadians = xD < 0 ? radians : radians + Math.PI;
-
-      ctx.moveTo(startX, startY);
-      ctx.lineTo(endX, endY);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(endCircleX, endCircleY, 5, absRadians - Math.PI / 4, absRadians + Math.PI / 4);
-      ctx.stroke();
-      // ctx.font = "20px Arial";
-      // ctx.fillStyle = "red";
-      // ctx.fillText(Math.floor(radians * 100), endCircleX, endCircleY);
-    }
-  } catch (err) {
-    _didIteratorError4 = true;
-    _iteratorError4 = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion4 && _iterator4.return) {
-        _iterator4.return();
-      }
-    } finally {
-      if (_didIteratorError4) {
-        throw _iteratorError4;
-      }
-    }
-  }
-}
-
 /* Seek Feedback? */
 // [SMALL] toggle errors on and off as part of validation?
+// Should I prevent going to viewing mode with errors?
 
 /* Midpri */
 // [SMALLISH] validate you can't have multiple modes with same name
-// [SMALLISH] validate you can't activate the state you are currently in
-// [SMALLISH] Only show the finite state machine button if there are no red warnings (will need to bubble this up)
-// [SMALLISH] No activate commands allowed in header cells
+// [SMALLISH] validate no activate commands allowed in header cells
+// [SMALLISH] validate a certain line length (figure out what spotlight likes). then I can make textfield optimizations
 // [MEDIUM] highlight syntax in textareas
 // [MEDIUM] highlight MEMORY in spotlight
 // [MEDIUM] modes should be able to be numbers, or autofill or something
 // [MEDIUM] INPUT could be buttons that add text fields with pre-filled commands. 
 //   Or you can choose to do a custom command! Maybe color the commands. Instructions could be an easy version of this
-// [MEDIUM] marking what code fired last round in some way. depends on a better linear state flow, which depends on encapsulation
 // [MEDIUM] INPUT set as a prefix could dynamically generate things in the text box 
 //   (process could return an arbitrary dictionary of variables)
 // [MEDIUM] handle if statements in processing
@@ -335,6 +85,223 @@ var localStorageBankKey = 'robotFaceStoredData1';
 Helper Functions
 */
 
+function arrayEQ(arr1, arr2) {
+  if (arr1.length === arr2.length) {
+    return arr1[0] === arr2[0] && arr1[1] === arr2[1];
+  }
+  return false;
+}
+
+function addObjectToArrayIfNotPresent(arr, obj) {
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = arr[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var item = _step.value;
+
+      if (arrayEQ(item, obj)) {
+        return;
+      }
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
+  }
+
+  arr.push(obj);
+}
+
+function drawGraph(ctx, modesArr, arrowsArr) {
+  // clear
+  ctx.beginPath();
+  ctx.rect(0, 0, 400, 400);
+  ctx.fillStyle = "white";
+  ctx.fill();
+
+  // circles
+
+  var angleStep = 360.0 / modesArr.length;
+  var angle = 90;
+
+  var coordsArr = [];
+  for (var modeIdx in modesArr) {
+    var xcord = Math.cos(angle * 3.14 / 180.0);
+    var ycord = Math.sin(angle * 3.14 / 180.0);
+    xcord = 200 + 120 * xcord;
+    ycord = 200 + 120 * ycord;
+    coordsArr.push([xcord, ycord]);
+
+    // draw circle
+    ctx.beginPath();
+    ctx.arc(xcord, ycord, 30, 0, 2 * Math.PI);
+    ctx.stroke();
+
+    // draw text
+    ctx.font = "10px Arial";
+    ctx.fillStyle = modeIdx > 0 ? "gray" : "blue";
+    ctx.fillText(modesArr[modeIdx], xcord - 25, ycord);
+
+    angle += angleStep;
+  }
+
+  // arrows
+
+  // figure out the lanes used by this graph
+  var lanesArray = [];
+  var _iteratorNormalCompletion2 = true;
+  var _didIteratorError2 = false;
+  var _iteratorError2 = undefined;
+
+  try {
+    for (var _iterator2 = arrowsArr[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+      var arrow = _step2.value;
+
+      var sortedArrow = arrow.slice(0, arrow.length).sort();
+      addObjectToArrayIfNotPresent(lanesArray, sortedArrow);
+    }
+    // for tracking whether we've placed something in the lane
+  } catch (err) {
+    _didIteratorError2 = true;
+    _iteratorError2 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion2 && _iterator2.return) {
+        _iterator2.return();
+      }
+    } finally {
+      if (_didIteratorError2) {
+        throw _iteratorError2;
+      }
+    }
+  }
+
+  var laneCountsArray = [];
+  for (var i = 0; i < lanesArray.length; i++) {
+    laneCountsArray.push(0);
+  }
+
+  var _iteratorNormalCompletion3 = true;
+  var _didIteratorError3 = false;
+  var _iteratorError3 = undefined;
+
+  try {
+    for (var _iterator3 = arrowsArr[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+      var arrow = _step3.value;
+
+      var startingMode = arrow[0];
+      var endingMode = arrow[1];
+
+      // which lane is this arrow in
+      var laneIdx = 0;
+      for (var idx in lanesArray) {
+        if (arrayEQ(lanesArray[idx], arrow.slice(0, arrow.length).sort())) {
+          laneIdx = idx;
+          break;
+        }
+      }
+      // NOTE: that array not being entered is a pretty bad error
+
+      // how many arrows currently in this lane
+      var currentLaneCount = laneCountsArray[laneIdx];
+      laneCountsArray[laneIdx] = laneCountsArray[laneIdx] + 1;
+
+      var startX = coordsArr[startingMode][0];
+      var startY = coordsArr[startingMode][1];
+      var endX = coordsArr[endingMode][0];
+      var endY = coordsArr[endingMode][1];
+
+      var endDelta = endX - startX ? endX - startX : 0.001;
+      var slope = (endY - startY) / endDelta;
+      var radians = Math.atan(slope);
+
+      var xD = 0;
+      var yD = 0;
+      if (radians < 0) {
+        // sinc is negative, cos is positive
+        if (endY > startY) {
+          // up and right  
+          yD = -1 * -1;
+          xD = 1;
+        } else {
+          // down and left 
+          yD = 1 * -1;
+          xD = -1;
+        }
+      } else {
+        // sin and cos are both positive
+        if (endY > startY) {
+          // up and left
+          yD = -1;
+          xD = -1;
+        } else {
+          // down and right
+          yD = 1;
+          xD = 1;
+        }
+      }
+
+      startX -= 40 * xD * Math.cos(radians);
+      startY -= 40 * yD * Math.sin(radians);
+      endX += 40 * xD * Math.cos(radians);
+      endY += 40 * yD * Math.sin(radians);
+
+      // shift in lane
+      if (currentLaneCount > 0) {
+        if (radians < 0) {
+          startX += 10 * currentLaneCount * Math.cos(radians - Math.PI / 2);
+          startY += 10 * currentLaneCount * Math.sin(radians - Math.PI / 2);
+          endX += 10 * currentLaneCount * Math.cos(radians - Math.PI / 2);
+          endY += 10 * currentLaneCount * Math.sin(radians - Math.PI / 2);
+        } else {
+          startX += 10 * currentLaneCount * Math.cos(radians + Math.PI / 2);
+          startY += 10 * currentLaneCount * Math.sin(radians + Math.PI / 2);
+          endX += 10 * currentLaneCount * Math.cos(radians + Math.PI / 2);
+          endY += 10 * currentLaneCount * Math.sin(radians + Math.PI / 2);
+        }
+      }
+
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(endX, endY);
+      ctx.stroke();
+
+      // info for the arrow arc
+      var endCircleX = endX + 5 * xD * Math.cos(radians);
+      var endCircleY = endY + 5 * yD * Math.sin(radians);
+      // radian only goes through half the circle, we use quadrant to put arrow in proper side of circle
+      var absRadians = xD < 0 ? radians : radians + Math.PI;
+
+      ctx.beginPath();
+      ctx.arc(endCircleX, endCircleY, 5, absRadians - Math.PI / 4, absRadians + Math.PI / 4);
+      ctx.stroke();
+    }
+  } catch (err) {
+    _didIteratorError3 = true;
+    _iteratorError3 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion3 && _iterator3.return) {
+        _iterator3.return();
+      }
+    } finally {
+      if (_didIteratorError3) {
+        throw _iteratorError3;
+      }
+    }
+  }
+}
+
 function heightFromDoubleArray(arr) {
   return arr.length;
 }
@@ -357,13 +324,13 @@ function subjectForCommand(str) {
 function commandsArrayForCell(text) {
   var strArr = text.split("\n");
   var commandArr = [];
-  var _iteratorNormalCompletion5 = true;
-  var _didIteratorError5 = false;
-  var _iteratorError5 = undefined;
+  var _iteratorNormalCompletion4 = true;
+  var _didIteratorError4 = false;
+  var _iteratorError4 = undefined;
 
   try {
-    for (var _iterator5 = strArr[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-      var str = _step5.value;
+    for (var _iterator4 = strArr[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+      var str = _step4.value;
 
       str = str.trim();
       if (str) {
@@ -374,6 +341,37 @@ function commandsArrayForCell(text) {
         commandList.push(prefix);
         commandList.push(subject);
         commandArr.push(commandList);
+      }
+    }
+  } catch (err) {
+    _didIteratorError4 = true;
+    _iteratorError4 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion4 && _iterator4.return) {
+        _iterator4.return();
+      }
+    } finally {
+      if (_didIteratorError4) {
+        throw _iteratorError4;
+      }
+    }
+  }
+
+  return commandArr;
+}
+
+function activateCommandFromCommandArray(commandsArr) {
+  var _iteratorNormalCompletion5 = true;
+  var _didIteratorError5 = false;
+  var _iteratorError5 = undefined;
+
+  try {
+    for (var _iterator5 = commandsArr[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+      var func = _step5.value;
+
+      if (func[0] === "activate") {
+        return func;
       }
     }
   } catch (err) {
@@ -391,37 +389,6 @@ function commandsArrayForCell(text) {
     }
   }
 
-  return commandArr;
-}
-
-function activateCommandFromCommandArray(commandsArr) {
-  var _iteratorNormalCompletion6 = true;
-  var _didIteratorError6 = false;
-  var _iteratorError6 = undefined;
-
-  try {
-    for (var _iterator6 = commandsArr[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-      var func = _step6.value;
-
-      if (func[0] === "activate") {
-        return func;
-      }
-    }
-  } catch (err) {
-    _didIteratorError6 = true;
-    _iteratorError6 = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion6 && _iterator6.return) {
-        _iterator6.return();
-      }
-    } finally {
-      if (_didIteratorError6) {
-        throw _iteratorError6;
-      }
-    }
-  }
-
   return null;
 }
 
@@ -434,11 +401,15 @@ function indexOfValidMode(arr, activateMode) {
   return -1;
 }
 
-function cellInvalidStateForActivate(arr, text) {
+function cellInvalidStateForActivate(arr, text, modeIdx) {
   var commandsArr = commandsArrayForCell(text);
   var activateCommand = activateCommandFromCommandArray(commandsArr);
   if (activateCommand) {
-    if (indexOfValidMode(arr, activateCommand[1]) > 0) {
+    var validModeIdx = indexOfValidMode(arr, activateCommand[1]);
+    if (validModeIdx > 0) {
+      if (modeIdx == validModeIdx) {
+        return "Already in this mode!";
+      }
       return null;
     }
     // return the invalid state for textual display, with special text for empty
@@ -471,38 +442,39 @@ function processCommand(data, command, initialMemory, selectedArr) {
   var memory = initialMemory;
   var accent = null;
   var random = null;
+  var modeJ = null;
   for (var idx in commandsArr) {
     var currCommand = commandsArr[idx];
     if (currCommand[0]) {
       // this is a valid command, see if it needs to be evaluated
       if (currCommand[0] === "activate") {
-        var modeJ = indexOfValidMode(data, currCommand[1]);
+        modeJ = indexOfValidMode(data, currCommand[1]);
         if (modeJ > 0) {
           state = data[0][modeJ];
           selectedArr[1][modeJ] = true;
           // recursively evaluate outputArr[1]
           var retval = processCommand(data, data[1][modeJ], memory);
-          var _iteratorNormalCompletion7 = true;
-          var _didIteratorError7 = false;
-          var _iteratorError7 = undefined;
+          var _iteratorNormalCompletion6 = true;
+          var _didIteratorError6 = false;
+          var _iteratorError6 = undefined;
 
           try {
-            for (var _iterator7 = retval[0][Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-              command = _step7.value;
+            for (var _iterator6 = retval[0][Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+              command = _step6.value;
 
               outputArr.push(replaceMemoryZones(command), memory);
             }
           } catch (err) {
-            _didIteratorError7 = true;
-            _iteratorError7 = err;
+            _didIteratorError6 = true;
+            _iteratorError6 = err;
           } finally {
             try {
-              if (!_iteratorNormalCompletion7 && _iterator7.return) {
-                _iterator7.return();
+              if (!_iteratorNormalCompletion6 && _iterator6.return) {
+                _iterator6.return();
               }
             } finally {
-              if (_didIteratorError7) {
-                throw _iteratorError7;
+              if (_didIteratorError6) {
+                throw _iteratorError6;
               }
             }
           }
@@ -522,6 +494,7 @@ function processCommand(data, command, initialMemory, selectedArr) {
           if (retval[5]) {
             random = retval[5];
           }
+          // NOTE: we don't pass modeJ here since we disallow activate in header cells
           continue;
         }
         // NOTE: possibly inform of invalid activate command here
@@ -542,11 +515,45 @@ function processCommand(data, command, initialMemory, selectedArr) {
     }
     outputArr.push(replaceMemoryZones(rawStrArr[idx], memory));
   }
-  return [outputArr, state, tone, memory, accent, random];
+  return [outputArr, state, tone, memory, accent, random, modeJ];
 }
 
 // Ensures every line has opening followed by closing paren
 function textIsValidCommand(text) {
+  var strArr = text.split("\n");
+  var _iteratorNormalCompletion7 = true;
+  var _didIteratorError7 = false;
+  var _iteratorError7 = undefined;
+
+  try {
+    for (var _iterator7 = strArr[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+      var str = _step7.value;
+
+      var idx = str.indexOf('(');
+      var idx2 = str.indexOf(')');
+      if (!(idx > 0 && idx2 > idx)) {
+        return false;
+      }
+    }
+  } catch (err) {
+    _didIteratorError7 = true;
+    _iteratorError7 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion7 && _iterator7.return) {
+        _iterator7.return();
+      }
+    } finally {
+      if (_didIteratorError7) {
+        throw _iteratorError7;
+      }
+    }
+  }
+
+  return true;
+}
+
+function textOnlyHasOneOfEachBracketPerLine(text) {
   var strArr = text.split("\n");
   var _iteratorNormalCompletion8 = true;
   var _didIteratorError8 = false;
@@ -556,10 +563,19 @@ function textIsValidCommand(text) {
     for (var _iterator8 = strArr[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
       var str = _step8.value;
 
-      var idx = str.indexOf('(');
-      var idx2 = str.indexOf(')');
-      if (!(idx > 0 && idx2 > idx)) {
-        return false;
+      var idx = str.indexOf('[');
+      if (idx > 0) {
+        var subidx = str.substr(idx + 1, str.length - idx - 1).indexOf('[');
+        if (subidx >= 0) {
+          return false;
+        }
+      }
+      var idx2 = str.indexOf(']');
+      if (idx2 > 0) {
+        var subidx2 = str.substr(idx2 + 1, str.length - idx2 - 1).indexOf(']');
+        if (subidx2 >= 0) {
+          return false;
+        }
       }
     }
   } catch (err) {
@@ -580,7 +596,7 @@ function textIsValidCommand(text) {
   return true;
 }
 
-function textOnlyHasOneOfEachBracketPerLine(text) {
+function textHasValidSubCommand(text) {
   var strArr = text.split("\n");
   var _iteratorNormalCompletion9 = true;
   var _didIteratorError9 = false;
@@ -591,18 +607,9 @@ function textOnlyHasOneOfEachBracketPerLine(text) {
       var str = _step9.value;
 
       var idx = str.indexOf('[');
-      if (idx > 0) {
-        var subidx = str.substr(idx + 1, str.length - idx - 1).indexOf('[');
-        if (subidx >= 0) {
-          return false;
-        }
-      }
       var idx2 = str.indexOf(']');
-      if (idx2 > 0) {
-        var subidx2 = str.substr(idx2 + 1, str.length - idx2 - 1).indexOf(']');
-        if (subidx2 >= 0) {
-          return false;
-        }
+      if (idx > 0 && idx2 < idx || idx2 > 0 && idx < 0) {
+        return false;
       }
     }
   } catch (err) {
@@ -623,7 +630,7 @@ function textOnlyHasOneOfEachBracketPerLine(text) {
   return true;
 }
 
-function textHasValidSubCommand(text) {
+function textHasMemoryBetweenBrackets(text) {
   var strArr = text.split("\n");
   var _iteratorNormalCompletion10 = true;
   var _didIteratorError10 = false;
@@ -635,8 +642,12 @@ function textHasValidSubCommand(text) {
 
       var idx = str.indexOf('[');
       var idx2 = str.indexOf(']');
-      if (idx > 0 && idx2 < idx || idx2 > 0 && idx < 0) {
-        return false;
+      if (idx >= 0) {
+        var betweenBrackets = str.substr(idx, idx2 - idx);
+        var betweenBrackets2 = betweenBrackets.substr(1, betweenBrackets.length - 1);
+        if (betweenBrackets2.toLowerCase() !== "memory") {
+          return betweenBrackets2 ? betweenBrackets2 : "[empty]";
+        }
       }
     }
   } catch (err) {
@@ -654,11 +665,37 @@ function textHasValidSubCommand(text) {
     }
   }
 
-  return true;
+  return null;
 }
 
-function textHasMemoryBetweenBrackets(text) {
+function errorStringForCellText(text, data, modeIdx) {
+  if (text.length == 0) {
+    return null;
+  }
+  if (!textIsValidCommand(text)) {
+    return "! Every line needs text and ()";
+  }
+  var badMode = cellInvalidStateForActivate(data, text, modeIdx);
+  if (badMode) {
+    return "! Typo in mode: " + badMode;
+  }
+  if (!textOnlyHasOneOfEachBracketPerLine(text)) {
+    return "! Only one of [ and ] per line";
+  }
+  if (!textHasValidSubCommand(text)) {
+    return "! Brackets need to be in proper order";
+  }
+  var between = textHasMemoryBetweenBrackets(text);
+  if (between) {
+    return "! " + between + " is invalid bracket command. only MEMORY valid";
+  }
+
+  return null;
+}
+
+function longestLineCountForText(text) {
   var strArr = text.split("\n");
+  var count = 0;
   var _iteratorNormalCompletion11 = true;
   var _didIteratorError11 = false;
   var _iteratorError11 = undefined;
@@ -667,14 +704,9 @@ function textHasMemoryBetweenBrackets(text) {
     for (var _iterator11 = strArr[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
       var str = _step11.value;
 
-      var idx = str.indexOf('[');
-      var idx2 = str.indexOf(']');
-      if (idx >= 0) {
-        var betweenBrackets = str.substr(idx, idx2 - idx);
-        var betweenBrackets2 = betweenBrackets.substr(1, betweenBrackets.length - 1);
-        if (betweenBrackets2.toLowerCase() !== "memory") {
-          return betweenBrackets2 ? betweenBrackets2 : "[empty]";
-        }
+      var lineLen = str.length;
+      if (lineLen > count) {
+        count = lineLen;
       }
     }
   } catch (err) {
@@ -692,32 +724,41 @@ function textHasMemoryBetweenBrackets(text) {
     }
   }
 
-  return null;
+  return count;
 }
 
-function errorStringForCellText(text, data) {
-  if (text.length == 0) {
-    return null;
-  }
-  if (!textIsValidCommand(text)) {
-    return "! Every line needs text and ()";
-  }
-  var badMode = cellInvalidStateForActivate(data, text);
-  if (badMode) {
-    return "! Typo in mode: " + badMode;
-  }
-  if (!textOnlyHasOneOfEachBracketPerLine(text)) {
-    return "! Only one of [ and ] per line";
-  }
-  if (!textHasValidSubCommand(text)) {
-    return "! Brackets need to be in proper order";
-  }
-  var between = textHasMemoryBetweenBrackets(text);
-  if (between) {
-    return "! " + between + " is invalid bracket command. only MEMORY valid";
+var maxLineLenForInput = 25;
+
+function lineCountForText(text) {
+  var strArr = text.split("\n");
+  var count = 0;
+  var _iteratorNormalCompletion12 = true;
+  var _didIteratorError12 = false;
+  var _iteratorError12 = undefined;
+
+  try {
+    for (var _iterator12 = strArr[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+      var str = _step12.value;
+
+      // NOTE: this doesn't work
+      count += 1 + str.length / maxLineLenForInput;
+    }
+  } catch (err) {
+    _didIteratorError12 = true;
+    _iteratorError12 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion12 && _iterator12.return) {
+        _iterator12.return();
+      }
+    } finally {
+      if (_didIteratorError12) {
+        throw _iteratorError12;
+      }
+    }
   }
 
-  return null;
+  return count;
 }
 
 /*
@@ -749,7 +790,7 @@ var InputCell = function (_React$Component) {
     key: "render",
     value: function render() {
       // method that returns a string of whats wrong based on data and this.props.value
-      var error = errorStringForCellText(this.props.value, this.props.data);
+      var error = errorStringForCellText(this.props.value, this.props.data, this.props.j);
       var errorComp = !(this.props.i == 0 || this.props.j == 0) && error ? React.createElement(
         "div",
         { style: { backgroundColor: "red" } },
@@ -760,18 +801,16 @@ var InputCell = function (_React$Component) {
       var backgroundColor = this.props.i == 0 || this.props.j == 0 ? "white" : !errorComp ? "aquamarine" : "pink";
       return [React.createElement("textarea", { style: { color: color, backgroundColor: backgroundColor },
         value: this.props.value,
-        rows: 5,
-        cols: 30,
-        onChange: this.handleChange
+        rows: 5 // lineCountForText(this.props.value)
+        , cols: maxLineLenForInput // longestLineCountForText(this.props.value)
+        , onChange: this.handleChange
+
       }), errorComp];
     }
   }]);
 
   return InputCell;
 }(React.Component);
-
-// TODO: we need global knowledge of the selected cell to pepper down to inform this guy so they can be properly highlighted
-
 
 var ReadOnlyCell = function (_React$Component2) {
   _inherits(ReadOnlyCell, _React$Component2);
@@ -829,9 +868,11 @@ var Cell = function (_React$Component3) {
       var tdStyle = !this.props.editingMode || !this.props.selectedArr || this.props.i == 0 || this.props.j == 0 ? this.props.isHeader ? "blue" : "transparent" : wasUsed ? "gold" : "red";
       if (this.props.isHeader) {
         var allowInput = this.props.isInteractable && this.props.editingMode;
+        console.log(this.props.modeJ);
+        var selectedHeader = !allowInput && this.props.i == 0 && this.props.modeJ == this.props.j ? "pink" : tdStyle;
         return React.createElement(
           "th",
-          { style: { backgroundColor: tdStyle } },
+          { style: { backgroundColor: selectedHeader } },
           !allowInput ? this.props.text : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellEvent, i: this.props.i, j: this.props.j, data: this.props.data })
         );
       } else {
@@ -901,7 +942,7 @@ var Row = function (_React$Component4) {
       for (var j = 0; j < this.props.width; j++) {
         var uninteractable = j == 0 && this.props.i == 1 || this.props.i == 2 && j == 0 || this.props.i == 0 && j == 0; // not interactable
         var isHeader = j == 0 || this.props.i == 0 || this.props.i == 1; // non clickable in view mode, and bolder text
-        arr.push(React.createElement(Cell, { selectedArr: this.props.selectedArr, isHeader: isHeader, isInteractable: !uninteractable, isSelected: j == this.props.selectedJ, editingMode: this.props.editing, text: this.props.data[this.props.i][j], onCellEvent: this.onCellEvent, i: this.props.i, j: j, data: this.props.data }));
+        arr.push(React.createElement(Cell, { modeJ: this.props.modeJ, selectedArr: this.props.selectedArr, isHeader: isHeader, isInteractable: !uninteractable, isSelected: j == this.props.selectedJ, editingMode: this.props.editing, text: this.props.data[this.props.i][j], onCellEvent: this.onCellEvent, i: this.props.i, j: j, data: this.props.data }));
       }
       return React.createElement(
         "tr",
@@ -950,7 +991,7 @@ var Table = function (_React$Component5) {
     value: function render() {
       var arr = [];
       for (var i = 0; i < heightFromDoubleArray(this.props.data); i++) {
-        arr.push(React.createElement(Row, { selectedArr: this.props.selectedArr, moveup: this.moveup, movedown: this.movedown, editing: this.props.editing, width: widthFromDoubleArray(this.props.data), i: i, selectedJ: i == this.props.selectedI ? this.props.selectedJ : -1, onCellEvent: this.onCellEvent, data: this.props.data }));
+        arr.push(React.createElement(Row, { modeJ: this.props.modeJ, selectedArr: this.props.selectedArr, moveup: this.moveup, movedown: this.movedown, editing: this.props.editing, width: widthFromDoubleArray(this.props.data), i: i, selectedJ: i == this.props.selectedI ? this.props.selectedJ : -1, onCellEvent: this.onCellEvent, data: this.props.data }));
       }
       return React.createElement(
         "table",
@@ -1089,6 +1130,7 @@ var App = function (_React$Component8) {
       nextTone: "[empty]",
       nextAccent: "[empty]",
       selectedArr: "",
+      prevSelectedArr: "",
       showCanvas: false
     };
 
@@ -1110,6 +1152,7 @@ var App = function (_React$Component8) {
     _this8.moveup = _this8.moveup.bind(_this8);
     _this8.movedown = _this8.movedown.bind(_this8);
     _this8.clearUsageHighlights = _this8.clearUsageHighlights.bind(_this8);
+    _this8.showPrevUtilization = _this8.showPrevUtilization.bind(_this8);
     _this8.noErrorsInNonEdgeCells = _this8.noErrorsInNonEdgeCells.bind(_this8);
     _this8.showGraph = _this8.showGraph.bind(_this8);
     _this8.hideCanvas = _this8.hideCanvas.bind(_this8);
@@ -1120,7 +1163,7 @@ var App = function (_React$Component8) {
     key: "onToggle",
     value: function onToggle(e) {
       if (this.state.editing) {
-        // we are transitioning to new state
+        // we are transitioning to view
 
         // selectedArray with false in every non edge zone
         var newSelectedMap = [];
@@ -1138,8 +1181,8 @@ var App = function (_React$Component8) {
           }
           newSelectedMap.push(selectedRow);
         }
-        this.updateSpotlight(1, 1, newSelectedMap);
-        this.setState({ showCanvas: false });
+        this.updateSpotlight(1, 1, newSelectedMap, 1);
+        this.setState({ showCanvas: false, prevSelectedArr: "" });
       } else {
         this.setState({
           command: "[empty]",
@@ -1160,7 +1203,7 @@ var App = function (_React$Component8) {
     }
   }, {
     key: "updateSpotlight",
-    value: function updateSpotlight(i, j, selectedArr) {
+    value: function updateSpotlight(i, j, selectedArr, initModeJ) {
       selectedArr[i][j] = true;
       var unprocessedCommand = this.state.data[i][j];
       var retval = processCommand(this.state.data, unprocessedCommand, this.state.memory, selectedArr);
@@ -1170,6 +1213,7 @@ var App = function (_React$Component8) {
       var mode = retval[1] ? retval[1] : this.state.data[0][j];
       var memory = retval[3] ? retval[3] : this.state.memory;
       var random = retval[5] ? retval[5] : "" + (Math.floor(Math.random() * 4) + 1);
+      var modeJ = retval[6] ? retval[6] : initModeJ ? initModeJ : this.state.modeJ;
 
       // fields that are updated the next tick
       var tone = this.state.nextTone ? this.state.nextTone : this.state.tone;
@@ -1193,6 +1237,7 @@ var App = function (_React$Component8) {
         tone: tone,
         accent: accent,
         random: random,
+        modeJ: modeJ,
         selectedArr: selectedArr
       });
     }
@@ -1202,7 +1247,7 @@ var App = function (_React$Component8) {
       if (this.state.editing) {
         var data = this.state.data;
         data[i][j] = e.target.value;
-        this.setState({ data: data, invalidState: cellInvalidStateForActivate(data, e.target.value) });
+        this.setState({ data: data });
         localStorage.setItem(localStorageProgramKey, JSON.stringify(data));
       } else {
         // also update the map
@@ -1307,7 +1352,16 @@ var App = function (_React$Component8) {
   }, {
     key: "clearUsageHighlights",
     value: function clearUsageHighlights(e) {
-      this.setState({ selectedArr: "" });
+      this.setState(function (state, props) {
+        return { prevSelectedArr: state.selectedArr, selectedArr: "" };
+      });
+    }
+  }, {
+    key: "showPrevUtilization",
+    value: function showPrevUtilization(e) {
+      this.setState(function (state, props) {
+        return { selectedArr: state.prevSelectedArr, prevSelectedArr: "" };
+      });
     }
   }, {
     key: "clearStorage",
@@ -1323,7 +1377,7 @@ var App = function (_React$Component8) {
         var row = data[i];
         for (var j = 0; j < row.length; j++) {
           if (i != 0 && j != 0) {
-            if (errorStringForCellText(data[i][j], data)) {
+            if (errorStringForCellText(data[i][j], data, j)) {
               return false;
             }
           }
@@ -1334,10 +1388,18 @@ var App = function (_React$Component8) {
   }, {
     key: "showGraph",
     value: function showGraph(e) {
-      // first we validate there are no errors in non edge cells
+      var c = document.getElementById("canvas");
+      var ctx = c.getContext("2d");
+
+      // first we validate there are no errors in non edge cells    
       var shouldShow = this.noErrorsInNonEdgeCells(this.state.data);
       if (!shouldShow) {
-        // TODO: do better
+        ctx.font = "20px Arial";
+        ctx.fillStyle = "red";
+        ctx.fillText("FIX ERRORS!", 140, 200);
+
+        this.setState({ showCanvas: true });
+
         return;
       }
 
@@ -1371,9 +1433,6 @@ var App = function (_React$Component8) {
       arrowsArray = arrowsArray.sort();
       console.log(arrowsArray);
 
-      var c = document.getElementById("canvas");
-      var ctx = c.getContext("2d");
-
       drawGraph(ctx, modesArr, arrowsArray);
 
       this.setState({ showCanvas: true });
@@ -1397,12 +1456,19 @@ var App = function (_React$Component8) {
       var buttonDisplayStyle = !this.state.editing ? "none" : "inline-block";
       var toggleButtonText = this.state.editing ? 'Go To Viewing' : 'Go To Editing';
       var clearUsageButtonStyle = !this.state.editing || !this.state.selectedArr ? "none" : "inline-block";
+      var showUsageButtonStyle = !this.state.editing || !this.state.prevSelectedArr ? "none" : "inline-block";
       var canvasViz = this.state.showCanvas ? "block" : "none";
       var hideCanvas = this.state.showCanvas ? React.createElement(
         "button",
         { onClick: this.hideCanvas },
-        "HideGraph"
+        "Hide State Graph"
       ) : null;
+      var showCanvas = !this.state.showCanvas ? React.createElement(
+        "button",
+        { style: { display: buttonDisplayStyle }, onClick: this.showGraph },
+        "Show State Graph"
+      ) : null;
+
       return React.createElement(
         "div",
         null,
@@ -1414,7 +1480,6 @@ var App = function (_React$Component8) {
         React.createElement(Spotlight, { editing: this.state.editing, command: this.state.command, mode: this.state.mode, accent: this.state.accent, tone: this.state.tone, memory: this.state.memory, random: this.state.random, onChange: this.memoryUpdate }),
         React.createElement("br", null),
         React.createElement("br", null),
-        hideCanvas,
         React.createElement("canvas", { id: "canvas", width: "400", height: "400", style: { backgroundColor: "white", display: canvasViz } }),
         React.createElement(
           "button",
@@ -1424,20 +1489,22 @@ var App = function (_React$Component8) {
         React.createElement(
           "button",
           { style: { display: clearUsageButtonStyle }, onClick: this.clearUsageHighlights },
-          "Clear Usage Highlights"
+          "Clear Last Round Utilization"
         ),
         React.createElement(
           "button",
-          { style: { display: buttonDisplayStyle }, onClick: this.showGraph },
-          "Show state graph (only works if no errors)"
+          { style: { display: showUsageButtonStyle }, onClick: this.showPrevUtilization },
+          "Show Last Round Utilization"
         ),
+        showCanvas,
+        hideCanvas,
         React.createElement(
           "div",
           null,
           React.createElement(
             "div",
             null,
-            React.createElement(Table, { selectedArr: this.state.selectedArr, moveup: this.moveup, movedown: this.movedown, editing: this.state.editing, onCellEvent: this.onCellEvent, data: this.state.data, selectedI: this.state.selectedI, selectedJ: this.state.selectedJ }),
+            React.createElement(Table, { modeJ: this.state.modeJ, selectedArr: this.state.selectedArr, moveup: this.moveup, movedown: this.movedown, editing: this.state.editing, onCellEvent: this.onCellEvent, data: this.state.data, selectedI: this.state.selectedI, selectedJ: this.state.selectedJ }),
             React.createElement(
               "div",
               { style: { display: "inline-block" } },
@@ -1471,12 +1538,6 @@ var App = function (_React$Component8) {
             "button",
             { style: this.state.editing ? { display: "inline", marginLeft: "70px" } : { display: "none" }, onClick: this.onRowRemove },
             this.state.inputRemoveWarning ? "ARE YOU SURE? CAN'T UNDO THIS ACTION" : "Remove Last Input"
-          ),
-          React.createElement(
-            "div",
-            { style: this.state.invalidState ? { display: "block", backgroundColor: "red" } : { display: "none", backgroundColor: "red" } },
-            "WARNING: invalid state: ",
-            this.state.invalidState
           ),
           React.createElement("br", null)
         ),

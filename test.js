@@ -20,18 +20,6 @@ var initialBank3 = ["rodeo", "range", "'buffalo skill'"];
 
 var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 'SET_TONE(Gruff)\nSET_ACCENT(Rustic Twang)', 'SET_TONE(Curious)\nSAY("Well hold on now, I want to hear s\'more about you!")\nSET_MEMORY(0)'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("Fascinatin. Tell me more!")'], ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 'EXTRAPOLATE_FROM("I got so many stories from my life on the range. Like...")', ''], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SAY("I dont understand")', 'SAY("I dont understand")'], ['IF [asked for your name]', 'SAY("Chester the Cowpoke, at yer service.")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 'SAY("Chester the Cowpoke, at yer service.")'], ['IF [Asked about what you like]', 'EXTRAPOLATE_FROM("Theres so much to love about the plains. Like...")', ''], ['IF [Asked a question]', 'ACTIVATE(Curious)', 'INCREMENT_MEMORY()\nIF(MEMORY > 2)\n  EXTRAPOLATE_FROM("Alright Ill answer...")\nELSE()\n  SAY("No, I wanna hear from you!")']];
 
-// [TEENY] add this source to the github so I don't screw it up
-
-// [BIG] LAYOUT is a general big question mark. 
-//  How can I give an easy way to make this visible for the people selecting commands. 8 as a good max for inputs?
-//  in view mode, I could force set the width of cells, and truncate clickable cells (edge cells cannot be truncated)
-//  improve UI experience more generally (canvas could be much better)
-//  improve graph UI
-//  graph should be in same place as spotlight
-//  could I use float and constraint a menu box to the upper right that you can show and dismiss?
-//  I could also make little wrapper classes like EDITING_BLOCK that take children props to make layout a bit easier
-
-
 // changelog
 //   fixed state inconsistency. shouldn't be any more weird bugs
 //   up and down arrows for rows
@@ -39,7 +27,11 @@ var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 
 //   live error updating on cell by cell level
 //   highlighting of utilized cells when you come back from editing
 //   converse random numbers skew lower
-//   graph display (bad)
+//   state machine graph display (bad)
+// layout
+//   Floating container for menu buttons (maybe with close button)
+//   Graph and Spotlight live below table. should be less jittering
+//   Bank lives in upper left of table
 
 
 /* Seek Feedback? */
@@ -47,9 +39,12 @@ var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 
 // Should I prevent going to viewing mode with errors?
 
 /* Midpri */
+// View mode force shrink the cells. truncate clickable cells?
+// Improve Graph Display
 // [SMALLISH] validate you can't have multiple modes with same name
 // [SMALLISH] validate no activate commands allowed in header cells
 // [SMALLISH] validate a certain line length (figure out what spotlight likes). then I can make textfield optimizations
+//. improve the dynamic text operations. bank could have a limit EASILY
 // [MEDIUM] highlight syntax in textareas
 // [MEDIUM] highlight MEMORY in spotlight
 // [MEDIUM] modes should be able to be numbers, or autofill or something
@@ -453,7 +448,7 @@ function processCommand(data, command, initialMemory, selectedArr) {
           state = data[0][modeJ];
           selectedArr[1][modeJ] = true;
           // recursively evaluate outputArr[1]
-          var retval = processCommand(data, data[1][modeJ], memory);
+          var retval = processCommand(data, data[1][modeJ], memory, []);
           var _iteratorNormalCompletion6 = true;
           var _didIteratorError6 = false;
           var _iteratorError6 = undefined;
@@ -462,7 +457,7 @@ function processCommand(data, command, initialMemory, selectedArr) {
             for (var _iterator6 = retval[0][Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
               command = _step6.value;
 
-              outputArr.push(replaceMemoryZones(command), memory);
+              outputArr.push(replaceMemoryZones(command, memory));
             }
           } catch (err) {
             _didIteratorError6 = true;
@@ -515,6 +510,7 @@ function processCommand(data, command, initialMemory, selectedArr) {
     }
     outputArr.push(replaceMemoryZones(rawStrArr[idx], memory));
   }
+  console.log(outputArr);
   return [outputArr, state, tone, memory, accent, random, modeJ];
 }
 
@@ -793,7 +789,7 @@ var InputCell = function (_React$Component) {
       var error = errorStringForCellText(this.props.value, this.props.data, this.props.j);
       var errorComp = !(this.props.i == 0 || this.props.j == 0) && error ? React.createElement(
         "div",
-        { style: { backgroundColor: "red" } },
+        { style: { fontSize: "10", backgroundColor: "red" } },
         error
       ) : null;
       var color = !this.state.modified ? "red" : "black";
@@ -801,7 +797,7 @@ var InputCell = function (_React$Component) {
       var backgroundColor = this.props.i == 0 || this.props.j == 0 ? "white" : !errorComp ? "aquamarine" : "pink";
       return [React.createElement("textarea", { style: { color: color, backgroundColor: backgroundColor },
         value: this.props.value,
-        rows: 5 // lineCountForText(this.props.value)
+        rows: lineCountForText(this.props.value) + 1 // lineCountForText(this.props.value)
         , cols: maxLineLenForInput // longestLineCountForText(this.props.value)
         , onChange: this.handleChange
 
@@ -838,6 +834,7 @@ var ReadOnlyCell = function (_React$Component2) {
         { style: { backgroundColor: backgroundColor }, onClick: this.handleClick },
         this.props.value
       );
+      // return <div style={{backgroundColor:backgroundColor, width:"auto", height:"auto"}} onClick={this.handleClick}>Click</div>
     }
   }]);
 
@@ -864,6 +861,7 @@ var Cell = function (_React$Component3) {
   }, {
     key: "render",
     value: function render() {
+      // in editing mode, we truncate all 
       var wasUsed = this.props.selectedArr ? this.props.selectedArr[this.props.i][this.props.j] : false;
       var tdStyle = !this.props.editingMode || !this.props.selectedArr || this.props.i == 0 || this.props.j == 0 ? this.props.isHeader ? "blue" : "transparent" : wasUsed ? "gold" : "red";
       if (this.props.isHeader) {
@@ -924,12 +922,12 @@ var Row = function (_React$Component4) {
       var upButton = this.props.i > 3 ? React.createElement(
         "button",
         { onClick: this.moveup },
-        "^"
+        "\u02C4"
       ) : null;
       var downButton = this.props.i >= 3 && this.props.i < this.props.data.length - 1 ? React.createElement(
         "button",
         { onClick: this.movedown },
-        "v"
+        "\u2193"
       ) : null;
       var buttonCell = React.createElement(
         "td",
@@ -942,7 +940,15 @@ var Row = function (_React$Component4) {
       for (var j = 0; j < this.props.width; j++) {
         var uninteractable = j == 0 && this.props.i == 1 || this.props.i == 2 && j == 0 || this.props.i == 0 && j == 0; // not interactable
         var isHeader = j == 0 || this.props.i == 0 || this.props.i == 1; // non clickable in view mode, and bolder text
-        arr.push(React.createElement(Cell, { modeJ: this.props.modeJ, selectedArr: this.props.selectedArr, isHeader: isHeader, isInteractable: !uninteractable, isSelected: j == this.props.selectedJ, editingMode: this.props.editing, text: this.props.data[this.props.i][j], onCellEvent: this.onCellEvent, i: this.props.i, j: j, data: this.props.data }));
+        if (this.props.children && j == 0 && this.props.editing) {
+          arr.push(React.createElement(
+            "th",
+            { style: { backgroundColor: "purple" } },
+            this.props.children
+          ));
+        } else {
+          arr.push(React.createElement(Cell, { modeJ: this.props.modeJ, selectedArr: this.props.selectedArr, isHeader: isHeader, isInteractable: !uninteractable, isSelected: j == this.props.selectedJ, editingMode: this.props.editing, text: this.props.data[this.props.i][j], onCellEvent: this.onCellEvent, i: this.props.i, j: j, data: this.props.data }));
+        }
       }
       return React.createElement(
         "tr",
@@ -991,7 +997,11 @@ var Table = function (_React$Component5) {
     value: function render() {
       var arr = [];
       for (var i = 0; i < heightFromDoubleArray(this.props.data); i++) {
-        arr.push(React.createElement(Row, { modeJ: this.props.modeJ, selectedArr: this.props.selectedArr, moveup: this.moveup, movedown: this.movedown, editing: this.props.editing, width: widthFromDoubleArray(this.props.data), i: i, selectedJ: i == this.props.selectedI ? this.props.selectedJ : -1, onCellEvent: this.onCellEvent, data: this.props.data }));
+        arr.push(React.createElement(
+          Row,
+          { modeJ: this.props.modeJ, selectedArr: this.props.selectedArr, moveup: this.moveup, movedown: this.movedown, editing: this.props.editing, width: widthFromDoubleArray(this.props.data), i: i, selectedJ: i == this.props.selectedI ? this.props.selectedJ : -1, onCellEvent: this.onCellEvent, data: this.props.data },
+          i == 0 ? this.props.children : null
+        ));
       }
       return React.createElement(
         "table",
@@ -1068,6 +1078,11 @@ var Spotlight = function (_React$Component7) {
         "div",
         { style: { display: "inline-block", padding: "10px 10px 10px 10px", backgroundColor: "gold" } },
         React.createElement(
+          "span",
+          { style: { color: "black", float: "right", whiteSpace: "pre-wrap" } },
+          this.props.bank
+        ),
+        React.createElement(
           "h2",
           { style: { color: "black" } },
           "MODE: ",
@@ -1105,18 +1120,41 @@ var Spotlight = function (_React$Component7) {
   return Spotlight;
 }(React.Component);
 
-var App = function (_React$Component8) {
-  _inherits(App, _React$Component8);
+var Menu = function (_React$Component8) {
+  _inherits(Menu, _React$Component8);
+
+  function Menu(props) {
+    _classCallCheck(this, Menu);
+
+    return _possibleConstructorReturn(this, (Menu.__proto__ || Object.getPrototypeOf(Menu)).call(this, props));
+  }
+
+  _createClass(Menu, [{
+    key: "render",
+    value: function render() {
+      return React.createElement(
+        "div",
+        { style: { backgroundColor: "black", padding: "3px 3px 3px 3px", position: "fixed", top: "0", right: "0" } },
+        this.props.children
+      );
+    }
+  }]);
+
+  return Menu;
+}(React.Component);
+
+var App = function (_React$Component9) {
+  _inherits(App, _React$Component9);
 
   function App(props) {
     _classCallCheck(this, App);
 
-    var _this8 = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
+    var _this9 = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this, props));
 
     var bank = localStorage.getItem(localStorageBankKey) || initialBank1.join('\n');
     var data = JSON.parse(localStorage.getItem(localStorageProgramKey)) || initialData1;
 
-    _this8.state = {
+    _this9.state = {
       editing: true,
       bank: bank,
       data: data,
@@ -1131,32 +1169,34 @@ var App = function (_React$Component8) {
       nextAccent: "[empty]",
       selectedArr: "",
       prevSelectedArr: "",
-      showCanvas: false
+      showCanvas: false,
+      showButtons: true
     };
 
     localStorage.setItem(localStorageProgramKey, JSON.stringify(data));
     localStorage.setItem(localStorageBankKey, bank);
 
-    _this8.onToggle = _this8.onToggle.bind(_this8);
-    _this8.onCellEvent = _this8.onCellEvent.bind(_this8);
-    _this8.bankUpdate = _this8.bankUpdate.bind(_this8);
-    _this8.loadData1 = _this8.loadData1.bind(_this8);
-    _this8.loadData2 = _this8.loadData2.bind(_this8);
-    _this8.loadData3 = _this8.loadData3.bind(_this8);
-    _this8.onRowAdd = _this8.onRowAdd.bind(_this8);
-    _this8.onRowRemove = _this8.onRowRemove.bind(_this8);
-    _this8.onColumnAdd = _this8.onColumnAdd.bind(_this8);
-    _this8.onColumnRemove = _this8.onColumnRemove.bind(_this8);
-    _this8.memoryUpdate = _this8.memoryUpdate.bind(_this8);
-    _this8.updateSpotlight = _this8.updateSpotlight.bind(_this8);
-    _this8.moveup = _this8.moveup.bind(_this8);
-    _this8.movedown = _this8.movedown.bind(_this8);
-    _this8.clearUsageHighlights = _this8.clearUsageHighlights.bind(_this8);
-    _this8.showPrevUtilization = _this8.showPrevUtilization.bind(_this8);
-    _this8.noErrorsInNonEdgeCells = _this8.noErrorsInNonEdgeCells.bind(_this8);
-    _this8.showGraph = _this8.showGraph.bind(_this8);
-    _this8.hideCanvas = _this8.hideCanvas.bind(_this8);
-    return _this8;
+    _this9.onToggle = _this9.onToggle.bind(_this9);
+    _this9.onCellEvent = _this9.onCellEvent.bind(_this9);
+    _this9.bankUpdate = _this9.bankUpdate.bind(_this9);
+    _this9.loadData1 = _this9.loadData1.bind(_this9);
+    _this9.loadData2 = _this9.loadData2.bind(_this9);
+    _this9.loadData3 = _this9.loadData3.bind(_this9);
+    _this9.onRowAdd = _this9.onRowAdd.bind(_this9);
+    _this9.onRowRemove = _this9.onRowRemove.bind(_this9);
+    _this9.onColumnAdd = _this9.onColumnAdd.bind(_this9);
+    _this9.onColumnRemove = _this9.onColumnRemove.bind(_this9);
+    _this9.memoryUpdate = _this9.memoryUpdate.bind(_this9);
+    _this9.updateSpotlight = _this9.updateSpotlight.bind(_this9);
+    _this9.moveup = _this9.moveup.bind(_this9);
+    _this9.movedown = _this9.movedown.bind(_this9);
+    _this9.clearUsageHighlights = _this9.clearUsageHighlights.bind(_this9);
+    _this9.showPrevUtilization = _this9.showPrevUtilization.bind(_this9);
+    _this9.noErrorsInNonEdgeCells = _this9.noErrorsInNonEdgeCells.bind(_this9);
+    _this9.showGraph = _this9.showGraph.bind(_this9);
+    _this9.hideCanvas = _this9.hideCanvas.bind(_this9);
+    _this9.showHideButtons = _this9.showHideButtons.bind(_this9);
+    return _this9;
   }
 
   _createClass(App, [{
@@ -1331,21 +1371,21 @@ var App = function (_React$Component8) {
   }, {
     key: "loadData1",
     value: function loadData1() {
-      this.setState({ bank: initialBank1.join('\n'), data: initialData1, selectedI: 0, selectedJ: 0 });
+      this.setState({ bank: initialBank1.join('\n'), data: initialData1, selectedI: 0, selectedJ: 0, selectedArr: "", prevSelectedArr: "" });
       localStorage.setItem(localStorageProgramKey, JSON.stringify(initialData1));
       localStorage.setItem(localStorageBankKey, initialBank1.join('\n'));
     }
   }, {
     key: "loadData2",
     value: function loadData2() {
-      this.setState({ bank: initialBank2.join('\n'), data: initialData2, selectedI: 0, selectedJ: 0 });
+      this.setState({ bank: initialBank2.join('\n'), data: initialData2, selectedI: 0, selectedJ: 0, selectedArr: "", prevSelectedArr: "" });
       localStorage.setItem(localStorageProgramKey, JSON.stringify(initialData2));
       localStorage.setItem(localStorageBankKey, initialBank2.join('\n'));
     }
   }, {
     key: "loadData3",
     value: function loadData3() {
-      this.setState({ bank: initialBank3.join('\n'), data: initialData3, selectedI: 0, selectedJ: 0 });
+      this.setState({ bank: initialBank3.join('\n'), data: initialData3, selectedI: 0, selectedJ: 0, selectedArr: "", prevSelectedArr: "" });
       localStorage.setItem(localStorageProgramKey, JSON.stringify(initialData3));
       localStorage.setItem(localStorageBankKey, initialBank3.join('\n'));
     }
@@ -1451,118 +1491,128 @@ var App = function (_React$Component8) {
       this.setState({ showCanvas: false });
     }
   }, {
+    key: "showHideButtons",
+    value: function showHideButtons(e) {
+      // this.setState((state, props) => {showButtons:!state.showButtons});
+      this.setState({ showButtons: !this.state.showButtons });
+    }
+  }, {
     key: "render",
     value: function render() {
-      var buttonDisplayStyle = !this.state.editing ? "none" : "inline-block";
+      var buttonDisplayStyle = !this.state.editing || !this.state.showButtons ? "none" : "inline-block";
       var toggleButtonText = this.state.editing ? 'Go To Viewing' : 'Go To Editing';
-      var clearUsageButtonStyle = !this.state.editing || !this.state.selectedArr ? "none" : "inline-block";
-      var showUsageButtonStyle = !this.state.editing || !this.state.prevSelectedArr ? "none" : "inline-block";
+      var clearUsageButtonStyle = !this.state.editing || !this.state.selectedArr || !this.state.showButtons ? "none" : "inline-block";
       var canvasViz = this.state.showCanvas ? "block" : "none";
-      var hideCanvas = this.state.showCanvas ? React.createElement(
+      var hideCanvas = this.state.showCanvas && this.state.showButtons ? React.createElement(
         "button",
         { onClick: this.hideCanvas },
         "Hide State Graph"
       ) : null;
-      var showCanvas = !this.state.showCanvas ? React.createElement(
+      var showCanvas = !this.state.showCanvas && this.state.showButtons ? React.createElement(
         "button",
         { style: { display: buttonDisplayStyle }, onClick: this.showGraph },
         "Show State Graph"
       ) : null;
-
+      var showUsageButtonStyle = !this.state.editing || !this.state.prevSelectedArr || !this.state.showButtons ? "none" : "inline-block";
+      var editModeBreak = this.state.editing && this.state.showButtons ? React.createElement("br", null) : null;
+      var buttonToggleDisplay = this.state.editing ? "inline" : "none";
       return React.createElement(
         "div",
         null,
-        React.createElement("br", null),
-        React.createElement("input", { type: "text", placeholder: "Bank" }),
-        React.createElement("br", null),
-        React.createElement("textarea", { rows: 7, onChange: this.bankUpdate, value: this.state.bank }),
-        React.createElement("br", null),
-        React.createElement(Spotlight, { editing: this.state.editing, command: this.state.command, mode: this.state.mode, accent: this.state.accent, tone: this.state.tone, memory: this.state.memory, random: this.state.random, onChange: this.memoryUpdate }),
-        React.createElement("br", null),
-        React.createElement("br", null),
-        React.createElement("canvas", { id: "canvas", width: "400", height: "400", style: { backgroundColor: "white", display: canvasViz } }),
         React.createElement(
-          "button",
-          { onClick: this.onToggle },
-          toggleButtonText
+          Menu,
+          null,
+          React.createElement(
+            "button",
+            { style: { float: "right" }, onClick: this.onToggle },
+            toggleButtonText
+          ),
+          React.createElement(
+            "button",
+            { style: { float: "right", display: buttonToggleDisplay }, onClick: this.showHideButtons },
+            this.state.showButtons ? "Hide Buttons" : "Show Buttons"
+          ),
+          editModeBreak,
+          editModeBreak,
+          showCanvas,
+          hideCanvas,
+          React.createElement(
+            "button",
+            { style: { display: clearUsageButtonStyle }, onClick: this.clearUsageHighlights },
+            "Clear Last Round Utilization"
+          ),
+          React.createElement(
+            "button",
+            { style: { display: showUsageButtonStyle }, onClick: this.showPrevUtilization },
+            "Show Last Round Utilization"
+          ),
+          editModeBreak,
+          editModeBreak,
+          React.createElement(
+            "button",
+            { style: { display: buttonDisplayStyle }, onClick: this.loadData1 },
+            "Load LIFETRONICS"
+          ),
+          React.createElement(
+            "button",
+            { style: { display: buttonDisplayStyle }, onClick: this.loadData2 },
+            "Load UPPER_CRUST"
+          ),
+          React.createElement(
+            "button",
+            { style: { display: buttonDisplayStyle }, onClick: this.loadData3 },
+            "Load COWPOKE"
+          ),
+          editModeBreak,
+          React.createElement(
+            "button",
+            { style: { display: buttonDisplayStyle }, onClick: this.clearStorage },
+            "Clear Saved Code (refresh after clicking)"
+          )
         ),
-        React.createElement(
-          "button",
-          { style: { display: clearUsageButtonStyle }, onClick: this.clearUsageHighlights },
-          "Clear Last Round Utilization"
-        ),
-        React.createElement(
-          "button",
-          { style: { display: showUsageButtonStyle }, onClick: this.showPrevUtilization },
-          "Show Last Round Utilization"
-        ),
-        showCanvas,
-        hideCanvas,
         React.createElement(
           "div",
           null,
           React.createElement(
             "div",
             null,
-            React.createElement(Table, { modeJ: this.state.modeJ, selectedArr: this.state.selectedArr, moveup: this.moveup, movedown: this.movedown, editing: this.state.editing, onCellEvent: this.onCellEvent, data: this.state.data, selectedI: this.state.selectedI, selectedJ: this.state.selectedJ }),
+            React.createElement(
+              Table,
+              { modeJ: this.state.modeJ, selectedArr: this.state.selectedArr, moveup: this.moveup, movedown: this.movedown, editing: this.state.editing, onCellEvent: this.onCellEvent, data: this.state.data, selectedI: this.state.selectedI, selectedJ: this.state.selectedJ },
+              React.createElement("input", { type: "text", placeholder: "Bank" }),
+              React.createElement("br", null),
+              React.createElement("textarea", { rows: 7, onChange: this.bankUpdate, value: this.state.bank })
+            ),
             React.createElement(
               "div",
               { style: { display: "inline-block" } },
               React.createElement(
                 "button",
-                { style: this.state.editing ? { display: "block" } : { display: "none" }, onClick: this.onColumnAdd },
-                React.createElement(
-                  "h1",
-                  { style: { color: "black" } },
-                  "Add Mode"
-                )
+                { style: this.state.editing ? { display: "block", fontSize: "30" } : { display: "none" }, onClick: this.onColumnAdd },
+                "+"
               ),
               React.createElement("br", null),
               React.createElement(
                 "button",
                 { style: this.state.editing ? { display: "block" } : { display: "none" }, onClick: this.onColumnRemove },
-                this.state.modeRemoveWarning ? "ARE YOU SURE? CAN'T UNDO THIS ACTION" : "Remove Last Mode"
+                this.state.modeRemoveWarning ? "ARE YOU SURE YOU WANT TO REMOVE?" : "-"
               )
             )
           ),
           React.createElement(
             "button",
-            { style: this.state.editing ? { display: "inline" } : { display: "none" }, onClick: this.onRowAdd },
-            React.createElement(
-              "h1",
-              { style: { color: "black" } },
-              "Add Input"
-            )
+            { style: this.state.editing ? { display: "inline", fontSize: "30" } : { display: "none" }, onClick: this.onRowAdd },
+            "+"
           ),
           React.createElement(
             "button",
-            { style: this.state.editing ? { display: "inline", marginLeft: "70px" } : { display: "none" }, onClick: this.onRowRemove },
-            this.state.inputRemoveWarning ? "ARE YOU SURE? CAN'T UNDO THIS ACTION" : "Remove Last Input"
+            { style: this.state.editing ? { display: "inline", marginLeft: "20px" } : { display: "none" }, onClick: this.onRowRemove },
+            this.state.inputRemoveWarning ? "ARE YOU SURE YOU WANT TO REMOVE?" : "-"
           ),
           React.createElement("br", null)
         ),
-        React.createElement("br", null),
-        React.createElement(
-          "button",
-          { style: { display: buttonDisplayStyle }, onClick: this.loadData1 },
-          "Load LIFETRONICS"
-        ),
-        React.createElement(
-          "button",
-          { style: { display: buttonDisplayStyle }, onClick: this.loadData2 },
-          "Load UPPER_CRUST"
-        ),
-        React.createElement(
-          "button",
-          { style: { display: buttonDisplayStyle }, onClick: this.loadData3 },
-          "Load COWPOKE"
-        ),
-        React.createElement("br", null),
-        React.createElement(
-          "button",
-          { style: { display: buttonDisplayStyle }, onClick: this.clearStorage },
-          "Clear Saved Code (refresh after clicking)"
-        )
+        React.createElement("canvas", { id: "canvas", width: "400", height: "400", style: { backgroundColor: "white", display: canvasViz } }),
+        React.createElement(Spotlight, { bank: this.state.bank, editing: this.state.editing, command: this.state.command, mode: this.state.mode, accent: this.state.accent, tone: this.state.tone, memory: this.state.memory, random: this.state.random, onChange: this.memoryUpdate })
       );
     }
   }]);

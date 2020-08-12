@@ -101,56 +101,7 @@ const initialData3 = [
 
 
 
-/* Seek Feedback? */
-// [SMALL] toggle errors on and off as part of validation?
-// Should I prevent going to viewing mode with errors?
-// probably empty cells should still get red highlighting?
 
-/* Next Up */
-// Spotlight needs to be absolutely positioned. Improve layout here. Could it be long and flat? Audience may only need to see the command list
-// Improve Graph Display
-// [MEDIUM] handle if statements in processing
-// [MEDIUM] highlight syntax in textareas
-// [MEDIUM] highlight MEMORY in spotlight
-// Work on layout and colors
-
-/* Media Testing */
-// empty livelab
-// share to livelab to see what it looks like
-// share to chrome tab or livelab
-// I could make two versions of spotlight if helpful, and then only one could be screengrabbed for OBS
-// aiactors could zoom in the livelab tab to just focus on their part
-
-/* Midpir */
-// View mode force shrink the cells. truncate clickable cells?
-// [SMALLISH] validate you can't have multiple modes with same name
-// [SMALLISH] validate no activate commands allowed in header cells
-
-
-
-
-
-
-/* Less Urgent */
-// [SMALLISH] validate a certain line length (figure out what spotlight likes). then I can make textfield optimizations
-//    improve the dynamic text operations. bank could have a limit EASILY
-// [MEDIUM] modes should be able to be numbers, or autofill or something
-// [MEDIUM] INPUT could be buttons that add text fields with pre-filled commands. 
-//   Or you can choose to do a custom command! Maybe color the commands. Instructions could be an easy version of this
-// [MEDIUM] INPUT set as a prefix could dynamically generate things in the text box 
-//   (process could return an arbitrary dictionary of variables)
-// is editable a concern? doesn't seem like it but I'd need to encode that in the defaults
-// get official colors and fonts eventually
-
-/* Security concerns */
-// can people see my url
-// is it at all a spoiler if people can go in and see default code and play around with it? 
-// is it ok if people play around with it after the show? this makes not being able to upload sort of a benefit lol
-
-/* Backup */
-// If not, then I'm dealing with broadcasting to some other website basically a POST request. 
-//   I could choose which inputID to accept receiving from maybe on the receiver side? lightweight password system
-// This has been a big time commitment
 
 
 
@@ -169,7 +120,7 @@ Consts
 
 const localStorageProgramKey = 'robotFaceStoredData';
 const localStorageBankKey = 'robotFaceStoredData1';
-
+const canvasDim = 600;
 
 
 
@@ -210,7 +161,7 @@ function addObjectToArrayIfNotPresent(arr, obj) {
 function drawGraph(ctx, modesArr, arrowsArr) {
   // clear
   ctx.beginPath();
-  ctx.rect(0, 0, 400, 400);
+  ctx.rect(0, 0, canvasDim, canvasDim);
   ctx.fillStyle = "white";
   ctx.fill();
 
@@ -223,8 +174,8 @@ function drawGraph(ctx, modesArr, arrowsArr) {
   for (var modeIdx in modesArr) {
     var xcord = Math.cos(angle * 3.14/180.0);
     var ycord = Math.sin(angle * 3.14/180.0);
-    xcord = 200 + 120 * xcord;
-    ycord = 200 + 120 * ycord;
+    xcord = canvasDim/2 + 180 * xcord;
+    ycord = canvasDim/2 + 180 * ycord;
     coordsArr.push([xcord, ycord]);
 
     // draw circle
@@ -885,7 +836,7 @@ class Menu extends React.Component {
   }
 
   render() {
-    return <div style={{backgroundColor:"black", padding:"3px 3px 3px 3px", position:"fixed", top:"0", right:"0"}}>{this.props.children}</div>;
+    return <div style={{backgroundColor:"black", zIndex:"3", padding:"3px 3px 3px 3px", position:"fixed", top:"0", right:"0"}}>{this.props.children}</div>;
   }
 }
 
@@ -1198,7 +1149,7 @@ class App extends React.Component {
     var ctx = c.getContext("2d");
     
     ctx.beginPath();
-    ctx.rect(0, 0, 400, 400);
+    ctx.rect(0, 0, canvasDim, canvasDim);
     ctx.fillStyle = "white";
     ctx.fill();
 
@@ -1256,7 +1207,7 @@ class App extends React.Component {
           <button style={this.state.editing ? {display:"inline", marginLeft:"20px"} : {display:"none"}} onClick={this.onRowRemove}>{this.state.inputRemoveWarning ? "ARE YOU SURE YOU WANT TO REMOVE?" : "-"}</button>
           <br/>
         </div>
-        <canvas id="canvas" width="400" height="400" style={{backgroundColor:"white", display:canvasViz}}></canvas>
+        <canvas id="canvas" width={canvasDim} height={canvasDim} style={{position:"fixed", right:"0", bottom:"0", backgroundColor:"white", display:canvasViz}}></canvas>
         <Spotlight bank={this.state.bank} editing={this.state.editing} command={this.state.command} mode={this.state.mode} accent={this.state.accent} tone={this.state.tone} memory={this.state.memory} random={this.state.random} onChange={this.memoryUpdate} />
       </div>
     );
@@ -1267,3 +1218,54 @@ ReactDOM.render(
   <App />,
   document.querySelector('#reactTable')
 );
+
+
+/* Seek Feedback? */
+// [SMALL] toggle errors on and off as part of validation?
+// Should I prevent going to viewing mode with errors?
+// probably empty cells should still get red highlighting?
+
+/* Next Up */
+// Spotlight needs to be absolutely positioned. Improve layout here. Could it be long and flat? Audience may only need to see the command list
+// Improve Graph Display
+// [MEDIUM] handle if statements in processing
+// [MEDIUM] highlight syntax in textareas
+// [MEDIUM] highlight MEMORY in spotlight
+// Work on layout and colors
+
+/* Media Testing */
+// empty livelab
+// share to livelab to see what it looks like
+// share to chrome tab or livelab
+// I could make two versions of spotlight if helpful, and then only one could be screengrabbed for OBS
+// aiactors could zoom in the livelab tab to just focus on their part
+
+/* Midpir */
+// View mode force shrink the cells. truncate clickable cells? Could always just take first line of props
+// [SMALLISH] validate you can't have multiple modes with same name
+// [SMALLISH] validate no activate commands allowed in header cells
+// Update readme
+
+
+
+
+/* Security concerns */
+// can people see my url
+// is it at all a spoiler if people can go in and see default code and play around with it? 
+// is it ok if people play around with it after the show? this makes not being able to upload sort of a benefit lol
+
+/* Less Urgent */
+// [SMALLISH] validate a certain line length (figure out what spotlight likes). then I can make textfield optimizations
+//    improve the dynamic text operations. bank could have a limit EASILY
+// [MEDIUM] modes should be able to be numbers, or autofill or something
+// [MEDIUM] INPUT could be buttons that add text fields with pre-filled commands. 
+//   Or you can choose to do a custom command! Maybe color the commands. Instructions could be an easy version of this
+// [MEDIUM] INPUT set as a prefix could dynamically generate things in the text box 
+//   (process could return an arbitrary dictionary of variables)
+// is editable a concern? doesn't seem like it but I'd need to encode that in the defaults
+// get official colors and fonts eventually
+
+/* Server Backup Thoughts */
+// If not, then I'm dealing with broadcasting to some other website basically a POST request. 
+//   I could choose which inputID to accept receiving from maybe on the receiver side? lightweight password system
+// This has been a big time commitment

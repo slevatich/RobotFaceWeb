@@ -20,53 +20,52 @@ var initialBank3 = ["rodeo", "range", "'buffalo skill'"];
 
 var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 'SET_TONE(Gruff)\nSET_ACCENT(Rustic Twang)', 'SET_TONE(Curious)\nSAY("Well hold on now, I want to hear s\'more about you!")\nSET_MEMORY(0)'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("Fascinatin. Tell me more!")'], ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 'EXTRAPOLATE_FROM("I got so many stories from my life on the range. Like...")', ''], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SAY("I dont understand")', 'SAY("I dont understand")'], ['IF [asked for your name]', 'SAY("Chester the Cowpoke, at yer service.")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 'SAY("Chester the Cowpoke, at yer service.")'], ['IF [Asked about what you like]', 'EXTRAPOLATE_FROM("Theres so much to love about the plains. Like...")', ''], ['IF [Asked a question]', 'ACTIVATE(Curious)', 'INCREMENT_MEMORY()\nIF(MEMORY > 2)\n  EXTRAPOLATE_FROM("Alright Ill answer...")\nELSE()\n  SAY("No, I wanna hear from you!")']];
 
-// changelog
-//   fixed state inconsistency. shouldn't be any more weird bugs
-//   up and down arrows for rows
-//   memory will replace in spotlight
-//   live error updating on cell by cell level
-//   highlighting of utilized cells when you come back from editing
-//   converse random numbers skew lower
-//   state machine graph display (bad)
-// layout
-//   Floating container for menu buttons (maybe with close button)
-//   Graph and Spotlight live below table. should be less jittering
-//   Bank lives in upper left of table
-
-
 /* Seek Feedback? */
 // [SMALL] toggle errors on and off as part of validation?
 // Should I prevent going to viewing mode with errors?
+// probably empty cells should still get red highlighting?
 
-/* Midpri */
-// View mode force shrink the cells. truncate clickable cells?
+/* Next Up */
+// Spotlight needs to be absolutely positioned. Improve layout here. Could it be long and flat? Audience may only need to see the command list
 // Improve Graph Display
-// [SMALLISH] validate you can't have multiple modes with same name
-// [SMALLISH] validate no activate commands allowed in header cells
-// [SMALLISH] validate a certain line length (figure out what spotlight likes). then I can make textfield optimizations
-//. improve the dynamic text operations. bank could have a limit EASILY
+// [MEDIUM] handle if statements in processing
 // [MEDIUM] highlight syntax in textareas
 // [MEDIUM] highlight MEMORY in spotlight
+// Work on layout and colors
+
+/* Media Testing */
+// empty livelab
+// share to livelab to see what it looks like
+// share to chrome tab or livelab
+// I could make two versions of spotlight if helpful, and then only one could be screengrabbed for OBS
+// aiactors could zoom in the livelab tab to just focus on their part
+
+/* Midpir */
+// View mode force shrink the cells. truncate clickable cells?
+// [SMALLISH] validate you can't have multiple modes with same name
+// [SMALLISH] validate no activate commands allowed in header cells
+
+
+/* Less Urgent */
+// [SMALLISH] validate a certain line length (figure out what spotlight likes). then I can make textfield optimizations
+//    improve the dynamic text operations. bank could have a limit EASILY
 // [MEDIUM] modes should be able to be numbers, or autofill or something
 // [MEDIUM] INPUT could be buttons that add text fields with pre-filled commands. 
 //   Or you can choose to do a custom command! Maybe color the commands. Instructions could be an easy version of this
 // [MEDIUM] INPUT set as a prefix could dynamically generate things in the text box 
 //   (process could return an arbitrary dictionary of variables)
-// [MEDIUM] handle if statements in processing
-
-/* Big media questions / Prod meetings */
-// Would livelab make it possible to share a portion of my screen as a programmer. 
-//   this would be N people and you'd need to toggle
-// Can I overlap these screens? (for choosing whether to share the random number). 
-//   Could also solve this by generating multiple versions of the spotlight
-// Can you share just a screen portion on zoom?
-// If not, then I'm dealing with broadcasting to some other website basically a POST request. 
-//   I could choose which inputID to accept receiving from maybe on the receiver side?
-// This has been a big time commitment
-
-/* Less Urgent */
 // is editable a concern? doesn't seem like it but I'd need to encode that in the defaults
 // get official colors and fonts eventually
+
+/* Security concerns */
+// can people see my url
+// is it at all a spoiler if people can go in and see default code and play around with it? 
+// is it ok if people play around with it after the show? this makes not being able to upload sort of a benefit lol
+
+/* Backup */
+// If not, then I'm dealing with broadcasting to some other website basically a POST request. 
+//   I could choose which inputID to accept receiving from maybe on the receiver side? lightweight password system
+// This has been a big time commitment
 
 
 /*

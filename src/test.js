@@ -25,7 +25,7 @@ const initialData1 = [
    'SAY("Lifetronics named me _____!")'],
   ['IF [subject is changed]',
    '',
-   'SAY("Let me know if you want to talk aout Lifetronics again.")\nACTIVATE(Polite And Respectful)'],
+   'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Polite And Respectful)'],
 ];
 
 const initialBank2 = [

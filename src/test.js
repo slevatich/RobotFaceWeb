@@ -1,10 +1,38 @@
 'use strict';
 
 const initialBank1 = [
-  "humankind", "future", "world", "singularity", "Lifetronics", "'good work'", "'advancing peace'"
+  '"Lifetronics is the Future"'
 ]
 
 const initialData1 = [
+  ["", 
+  "Polite And Respectful", 
+  "Learn more about Lifetronics"],
+  ['ON_MODE_ENTER',
+   'SET_TONE(Respectful and Polite)',
+   'SET_TONE(Peppy)\nSAY("I was made by Lifetronics")'],
+  ['WHEN [else]',
+   'CONVERSE()',
+   'CONVERSE()'],
+  ['IF [they ask about Lifetronics]',
+   'ACTIVATE(Learn more about Lifetronics)',
+   ''],
+  ['IF [they ask what it feels like to be an artificial intelligence]',
+   'SAY("I love being an AI! I\'m excited to help humanity grow and learn")',
+   'SAY("I love being a robot! I\'m excited to help humanity grow and learn")'],
+  ['IF [asked for your name]',
+   'SAY("_____, whats yours?")',
+   'SAY("Lifetronics named me _____?")'],
+  ['IF [subject is changed]',
+   '',
+   'SAY("Let me know if you want to talk aout Lifetronics again.")\nACTIVATE(Polite And Respectful)'],
+];
+
+const initialBank2 = [
+  "humankind", "future", "world", "singularity", "Lifetronics", "'good work'", "'advancing peace'"
+]
+
+const initialData2 = [
   ["", 
   "Polite And Respectful", 
   "Learn about Humans"],
@@ -31,39 +59,39 @@ const initialData1 = [
    'CONVERSE(w.TONE)\nACTIVATE(Polite And Respectful)'],
 ];
 
-const initialBank2 = [
-  "money", "wealth", "power"
-]
+// const initialBank2 = [
+//   "money", "wealth", "power"
+// ]
 
-const initialData2 = [
-  ["", 
-  "Polite And Respectful", 
-  "Offended"],
-  ['ON_MODE_ENTER',
-   'SET_TONE(Haughty)',
-   'SET_TONE(Fiery Indignation)\nEXTRAPOLATE_FROM("What an impertinant question! How dare you! ...")'],
-  ['WHEN [else]',
-   'CONVERSE(w.TONE)',
-   'SAY("I shant say another word until you apologize")'],
-  ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]',
-   'EXTRAPOLATE_FROM("When I was young, the Queen...")',
-   ''],
-  ['IF [topic of HUMANITY or ROBOTS comes up]',
-   'SAY("Boring. Next question")',
-   ''],
-  ['IF [asked for your name]',
-   'SAY("Baron Farfeather, if you must")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)',
-   'SAY("Baron Farfeather, if you must")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)'],
-  ['IF [Topics mentioned (COMPETITION, REALITY SHOW)]',
-   'EXTRAPOLATE_FROM("These commoners dont stand a chance, for I...")',
-   ''],
-  ['IF [They apologize]',
-   '',
-   'SAY("You are forgiven. Continue)\nACTIVATE(Polite And Respectful)'],
-  ['IF [Asked a question]',
-   'ACTIVATE(Offended)',
-   ''],
-];
+// const initialData2 = [
+//   ["", 
+//   "Polite And Respectful", 
+//   "Offended"],
+//   ['ON_MODE_ENTER',
+//    'SET_TONE(Haughty)',
+//    'SET_TONE(Fiery Indignation)\nEXTRAPOLATE_FROM("What an impertinant question! How dare you! ...")'],
+//   ['WHEN [else]',
+//    'CONVERSE(w.TONE)',
+//    'SAY("I shant say another word until you apologize")'],
+//   ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]',
+//    'EXTRAPOLATE_FROM("When I was young, the Queen...")',
+//    ''],
+//   ['IF [topic of HUMANITY or ROBOTS comes up]',
+//    'SAY("Boring. Next question")',
+//    ''],
+//   ['IF [asked for your name]',
+//    'SAY("Baron Farfeather, if you must")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)',
+//    'SAY("Baron Farfeather, if you must")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)'],
+//   ['IF [Topics mentioned (COMPETITION, REALITY SHOW)]',
+//    'EXTRAPOLATE_FROM("These commoners dont stand a chance, for I...")',
+//    ''],
+//   ['IF [They apologize]',
+//    '',
+//    'SAY("You are forgiven. Continue)\nACTIVATE(Polite And Respectful)'],
+//   ['IF [Asked a question]',
+//    'ACTIVATE(Offended)',
+//    ''],
+// ];
 
 const initialBank3 = [
   "rodeo", "range", "'buffalo skill'"

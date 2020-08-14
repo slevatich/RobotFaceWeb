@@ -22,7 +22,7 @@ const initialData1 = [
    'SAY("I love being a robot! I\'m excited to help humanity grow and learn")'],
   ['IF [asked for your name]',
    'SAY("_____, whats yours?")',
-   'SAY("Lifetronics named me _____?")'],
+   'SAY("Lifetronics named me _____!")'],
   ['IF [subject is changed]',
    '',
    'SAY("Let me know if you want to talk aout Lifetronics again.")\nACTIVATE(Polite And Respectful)'],

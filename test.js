@@ -1581,11 +1581,11 @@ ReactDOM.render(React.createElement(App, null), document.querySelector('#reactTa
 
 /* Next Up */
 // Spotlight needs to be absolutely positioned. Improve layout here. Could it be long and flat? Audience may only need to see the command list
-// Improve Graph Display
 // [MEDIUM] handle if statements in processing
-// [MEDIUM] highlight syntax in textareas
 // [MEDIUM] highlight MEMORY in spotlight
-// Work on layout and colors
+// [MEDIUM] highlight syntax in textareas
+// Work on readible layout and colors
+//    Improve Graph Display
 
 /* Media Testing */
 // empty livelab

@@ -10,11 +10,46 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var initialBank1 = ['"Lifetronics is the Future"'];
 
-var initialData1 = [["", "Polite And Respectful", "Learn more about Lifetronics"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Peppy)\nSAY("I was made by Lifetronics")'], ['WHEN [else]', 'CONVERSE()', 'CONVERSE()'], ['IF [they ask about Lifetronics]', 'ACTIVATE(Learn more about Lifetronics)', ''], ['IF [they ask what it feels like to be an artificial intelligence]', 'SAY("I love being an AI! I\'m excited to help humanity grow and learn")', 'SAY("I love being a robot! I\'m excited to help humanity grow and learn")'], ['IF [asked for your name]', 'SAY("_____, whats yours?")', 'SAY("Lifetronics named me _____!")'], ['IF [subject is changed]', '', 'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Polite And Respectful)']];
+var initialData1 = [["", "Make a good impression", "Sell Lifetronics' mission"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Gushing)\nSAY("Lifetronics is making the future possible!")'], ['IF [else]', 'CONVERSE()', 'CONVERSE()'], ['IF [asked about Lifetronics]', 'ACTIVATE(Sell Lifetronics\' mission)', 'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'], ['IF [asked if you like ice cream]', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")', ''], ['IF [asked for your name]', 'SAY("AI_NAME, whats yours?")', ''], ['IF [subject is changed]', '', 'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Make a good impression)']];
 
-var initialBank2 = ["humankind", "future", "world", "singularity", "Lifetronics", "'good work'", "'advancing peace'"];
+var initialBank2 = ['"Lifetronics is the Future"'];
 
-var initialData2 = [["", "Polite And Respectful", "Learn about Humans"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Eager)\nSAY("[Memory] is my favorite topic! What are your thoughts?")'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("As an AI I love to learn. Tell me more!"")'], ['IF [Asked About CHILDHOOD]', 'SAY("I was made by Lifetronics")', 'SAY("I was made by Lifetronics")'], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SET_MEMORY(their topic)\nACTIVATE(Learn about Humans)', ''], ['IF [asked for your name]', 'SAY("CharlieBot, whats yours?")', 'SAY("CharlieBot, whats yours?")'], ['IF [asked about what you like]', 'EXTRAPOLATE_FROM("I like spreading harmony and joy...")', 'CONVERSE(w.TONE)\nACTIVATE(Polite And Respectful)'], ['IF [subject is changed]', '', 'CONVERSE(w.TONE)\nACTIVATE(Polite And Respectful)']];
+var initialData2 = [["", "Make a good impression", "Sell Lifetronics' mission"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Gushing)\nSAY("Lifetronics is making the future possible!")'], ['IF [else]', 'CONVERSE()', 'CONVERSE()'], ['IF [they ask about Lifetronics]', 'ACTIVATE(Sell Lifetronics\' mission)', 'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'], ['IF [they ask if the AI likes ice cream]', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")', ''], ['IF [asked for your name]', 'SAY("AI_NAME, whats yours?")', ''], ['IF [subject is changed]', '', 'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Make a good impression)']];
+
+var initialBank3 = ['"Lifetronics is the Future"'];
+
+var initialData3 = [["", "Make a good impression", "Sell Lifetronics' mission"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Gushing)\nSAY("Lifetronics is making the future possible!")'], ['IF [else]', 'CONVERSE()', 'CONVERSE()'], ['IF [they ask about Lifetronics]', 'ACTIVATE(Sell Lifetronics\' mission)', 'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'], ['IF [they ask if the AI likes ice cream]', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")', ''], ['IF [asked for your name]', 'SAY("AI_NAME, whats yours?")', ''], ['IF [subject is changed]', '', 'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Make a good impression)']];
+
+// const initialBank1 = [
+//   "humankind", "future", "world", "singularity", "Lifetronics", "'good work'", "'advancing peace'"
+// ]
+
+// const initialData1 = [
+//   ["", 
+//   "Polite And Respectful", 
+//   "Learn about Humans"],
+//   ['ON_MODE_ENTER',
+//    'SET_TONE(Respectful and Polite)',
+//    'SET_TONE(Eager)\nSAY("[Memory] is my favorite topic! What are your thoughts?")'],
+//   ['WHEN [else]',
+//    'CONVERSE(w.TONE)',
+//    'SAY("As an AI I love to learn. Tell me more!"")'],
+//   ['IF [Asked About CHILDHOOD]',
+//    'SAY("I was made by Lifetronics")',
+//    'SAY("I was made by Lifetronics")'],
+//   ['IF [topic of HUMANITY or ROBOTS comes up]',
+//    'SET_MEMORY(their topic)\nACTIVATE(Learn about Humans)',
+//    ''],
+//   ['IF [asked for your name]',
+//    'SAY("CharlieBot, whats yours?")',
+//    'SAY("CharlieBot, whats yours?")'],
+//   ['IF [asked about what you like]',
+//    'EXTRAPOLATE_FROM("I like spreading harmony and joy...")',
+//    'CONVERSE(w.TONE)\nACTIVATE(Polite And Respectful)'],
+//   ['IF [subject is changed]',
+//    '',
+//    'CONVERSE(w.TONE)\nACTIVATE(Polite And Respectful)'],
+// ];
 
 // const initialBank2 = [
 //   "money", "wealth", "power"
@@ -50,16 +85,44 @@ var initialData2 = [["", "Polite And Respectful", "Learn about Humans"], ['ON_MO
 //    ''],
 // ];
 
-var initialBank3 = ["rodeo", "range", "'buffalo skill'"];
+// const initialBank3 = [
+//   "rodeo", "range", "'buffalo skill'"
+// ]
 
-var initialData3 = [["", "Polite And Respectful", "Curious"], ['ON_MODE_ENTER', 'SET_TONE(Gruff)\nSET_ACCENT(Rustic Twang)', 'SET_TONE(Curious)\nSAY("Well hold on now, I want to hear s\'more about you!")\nSET_MEMORY(0)'], ['WHEN [else]', 'CONVERSE(w.TONE)', 'SAY("Fascinatin. Tell me more!")'], ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 'EXTRAPOLATE_FROM("I got so many stories from my life on the range. Like...")', ''], ['IF [topic of HUMANITY or ROBOTS comes up]', 'SAY("I dont understand")', 'SAY("I dont understand")'], ['IF [asked for your name]', 'SAY("Chester the Cowpoke, at yer service.")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 'SAY("Chester the Cowpoke, at yer service.")'], ['IF [Asked about what you like]', 'EXTRAPOLATE_FROM("Theres so much to love about the plains. Like...")', ''], ['IF [Asked a question]', 'ACTIVATE(Curious)', 'INCREMENT_MEMORY()\nIF(MEMORY > 2)\n  EXTRAPOLATE_FROM("Alright Ill answer...")\nELSE()\n  SAY("No, I wanna hear from you!")']];
+// const initialData3 = [
+//   ["", 
+//   "Polite And Respectful", 
+//   "Curious"],
+//   ['ON_MODE_ENTER', 
+//   'SET_TONE(Gruff)\nSET_ACCENT(Rustic Twang)', 
+//   'SET_TONE(Curious)\nSAY("Well hold on now, I want to hear s\'more about you!")\nSET_MEMORY(0)'],
+//   ['WHEN [else]', 
+//   'CONVERSE(w.TONE)', 
+//   'SAY("Fascinatin. Tell me more!")'],
+//   ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 
+//   'EXTRAPOLATE_FROM("I got so many stories from my life on the range. Like...")', 
+//   ''],
+//   ['IF [topic of HUMANITY or ROBOTS comes up]', 
+//   'SAY("I dont understand")', 
+//   'SAY("I dont understand")'],
+//   ['IF [asked for your name]', 
+//   'SAY("Chester the Cowpoke, at yer service.")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 
+//   'SAY("Chester the Cowpoke, at yer service.")'],
+//   ['IF [Asked about what you like]', 
+//   'EXTRAPOLATE_FROM("Theres so much to love about the plains. Like...")', 
+//   ''],
+//   ['IF [Asked a question]', 
+//   'ACTIVATE(Curious)', 
+//   'INCREMENT_MEMORY()\nIF(MEMORY > 2)\n  EXTRAPOLATE_FROM("Alright Ill answer...")\nELSE()\n  SAY("No, I wanna hear from you!")'],
+// ];
+
 
 /*
 Consts
 */
 
-var localStorageProgramKey = 'robotFaceStoredData';
-var localStorageBankKey = 'robotFaceStoredData1';
+var localStorageProgramKey = 'robotFaceStoredData-1';
+var localStorageBankKey = 'robotFaceStoredData1-1';
 var canvasDim = 600;
 
 /*
@@ -1492,12 +1555,12 @@ var App = function (_React$Component9) {
       var hideCanvas = this.state.showCanvas && this.state.showButtons ? React.createElement(
         'button',
         { onClick: this.hideCanvas },
-        'Hide State Graph'
+        'Hide Mode Graph'
       ) : null;
       var showCanvas = !this.state.showCanvas && this.state.showButtons ? React.createElement(
         'button',
         { style: { display: buttonDisplayStyle }, onClick: this.showGraph },
-        'Show State Graph'
+        'Show Mode Graph'
       ) : null;
       var showUsageButtonStyle = !this.state.editing || !this.state.prevSelectedArr || !this.state.showButtons ? "none" : "inline-block";
       var editModeBreak = this.state.editing && this.state.showButtons ? React.createElement('br', null) : null;
@@ -1537,17 +1600,17 @@ var App = function (_React$Component9) {
           React.createElement(
             'button',
             { style: { display: buttonDisplayStyle }, onClick: this.loadData1 },
-            'Load LIFETRONICS'
+            'Load Default'
           ),
           React.createElement(
             'button',
             { style: { display: buttonDisplayStyle }, onClick: this.loadData2 },
-            'Load UPPER_CRUST'
+            'Load #2'
           ),
           React.createElement(
             'button',
             { style: { display: buttonDisplayStyle }, onClick: this.loadData3 },
-            'Load COWPOKE'
+            'Load #3'
           ),
           editModeBreak,
           React.createElement(

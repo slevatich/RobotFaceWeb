@@ -6,58 +6,114 @@ const initialBank1 = [
 
 const initialData1 = [
   ["", 
-  "Polite And Respectful", 
-  "Learn more about Lifetronics"],
+  "Make a good impression", 
+  "Sell Lifetronics' mission"],
   ['ON_MODE_ENTER',
    'SET_TONE(Respectful and Polite)',
-   'SET_TONE(Peppy)\nSAY("I was made by Lifetronics")'],
-  ['WHEN [else]',
+   'SET_TONE(Gushing)\nSAY("Lifetronics is making the future possible!")'],
+  ['IF [else]',
    'CONVERSE()',
    'CONVERSE()'],
-  ['IF [they ask about Lifetronics]',
-   'ACTIVATE(Learn more about Lifetronics)',
+  ['IF [asked about Lifetronics]',
+   'ACTIVATE(Sell Lifetronics\' mission)',
+   'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'],
+  ['IF [asked if you like ice cream]',
+   'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
    ''],
-  ['IF [they ask what it feels like to be an artificial intelligence]',
-   'SAY("I love being an AI! I\'m excited to help humanity grow and learn")',
-   'SAY("I love being a robot! I\'m excited to help humanity grow and learn")'],
   ['IF [asked for your name]',
-   'SAY("_____, whats yours?")',
-   'SAY("Lifetronics named me _____!")'],
+   'SAY("AI_NAME, whats yours?")',
+   ''],
   ['IF [subject is changed]',
    '',
-   'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Polite And Respectful)'],
+   'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Make a good impression)'],
 ];
 
 const initialBank2 = [
-  "humankind", "future", "world", "singularity", "Lifetronics", "'good work'", "'advancing peace'"
+  '"Lifetronics is the Future"'
 ]
 
 const initialData2 = [
   ["", 
-  "Polite And Respectful", 
-  "Learn about Humans"],
+  "Make a good impression", 
+  "Sell Lifetronics' mission"],
   ['ON_MODE_ENTER',
    'SET_TONE(Respectful and Polite)',
-   'SET_TONE(Eager)\nSAY("[Memory] is my favorite topic! What are your thoughts?")'],
-  ['WHEN [else]',
-   'CONVERSE(w.TONE)',
-   'SAY("As an AI I love to learn. Tell me more!"")'],
-  ['IF [Asked About CHILDHOOD]',
-   'SAY("I was made by Lifetronics")',
-   'SAY("I was made by Lifetronics")'],
-  ['IF [topic of HUMANITY or ROBOTS comes up]',
-   'SET_MEMORY(their topic)\nACTIVATE(Learn about Humans)',
+   'SET_TONE(Gushing)\nSAY("Lifetronics is making the future possible!")'],
+  ['IF [else]',
+   'CONVERSE()',
+   'CONVERSE()'],
+  ['IF [they ask about Lifetronics]',
+   'ACTIVATE(Sell Lifetronics\' mission)',
+   'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'],
+  ['IF [they ask if the AI likes ice cream]',
+   'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
    ''],
   ['IF [asked for your name]',
-   'SAY("CharlieBot, whats yours?")',
-   'SAY("CharlieBot, whats yours?")'],
-  ['IF [asked about what you like]',
-   'EXTRAPOLATE_FROM("I like spreading harmony and joy...")',
-   'CONVERSE(w.TONE)\nACTIVATE(Polite And Respectful)'],
+   'SAY("AI_NAME, whats yours?")',
+   ''],
   ['IF [subject is changed]',
    '',
-   'CONVERSE(w.TONE)\nACTIVATE(Polite And Respectful)'],
+   'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Make a good impression)'],
 ];
+
+const initialBank3 = [
+  '"Lifetronics is the Future"'
+]
+
+const initialData3 = [
+  ["", 
+  "Make a good impression", 
+  "Sell Lifetronics' mission"],
+  ['ON_MODE_ENTER',
+   'SET_TONE(Respectful and Polite)',
+   'SET_TONE(Gushing)\nSAY("Lifetronics is making the future possible!")'],
+  ['IF [else]',
+   'CONVERSE()',
+   'CONVERSE()'],
+  ['IF [they ask about Lifetronics]',
+   'ACTIVATE(Sell Lifetronics\' mission)',
+   'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'],
+  ['IF [they ask if the AI likes ice cream]',
+   'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
+   ''],
+  ['IF [asked for your name]',
+   'SAY("AI_NAME, whats yours?")',
+   ''],
+  ['IF [subject is changed]',
+   '',
+   'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Make a good impression)'],
+];
+
+// const initialBank1 = [
+//   "humankind", "future", "world", "singularity", "Lifetronics", "'good work'", "'advancing peace'"
+// ]
+
+// const initialData1 = [
+//   ["", 
+//   "Polite And Respectful", 
+//   "Learn about Humans"],
+//   ['ON_MODE_ENTER',
+//    'SET_TONE(Respectful and Polite)',
+//    'SET_TONE(Eager)\nSAY("[Memory] is my favorite topic! What are your thoughts?")'],
+//   ['WHEN [else]',
+//    'CONVERSE(w.TONE)',
+//    'SAY("As an AI I love to learn. Tell me more!"")'],
+//   ['IF [Asked About CHILDHOOD]',
+//    'SAY("I was made by Lifetronics")',
+//    'SAY("I was made by Lifetronics")'],
+//   ['IF [topic of HUMANITY or ROBOTS comes up]',
+//    'SET_MEMORY(their topic)\nACTIVATE(Learn about Humans)',
+//    ''],
+//   ['IF [asked for your name]',
+//    'SAY("CharlieBot, whats yours?")',
+//    'SAY("CharlieBot, whats yours?")'],
+//   ['IF [asked about what you like]',
+//    'EXTRAPOLATE_FROM("I like spreading harmony and joy...")',
+//    'CONVERSE(w.TONE)\nACTIVATE(Polite And Respectful)'],
+//   ['IF [subject is changed]',
+//    '',
+//    'CONVERSE(w.TONE)\nACTIVATE(Polite And Respectful)'],
+// ];
 
 // const initialBank2 = [
 //   "money", "wealth", "power"
@@ -93,36 +149,36 @@ const initialData2 = [
 //    ''],
 // ];
 
-const initialBank3 = [
-  "rodeo", "range", "'buffalo skill'"
-]
+// const initialBank3 = [
+//   "rodeo", "range", "'buffalo skill'"
+// ]
 
-const initialData3 = [
-  ["", 
-  "Polite And Respectful", 
-  "Curious"],
-  ['ON_MODE_ENTER', 
-  'SET_TONE(Gruff)\nSET_ACCENT(Rustic Twang)', 
-  'SET_TONE(Curious)\nSAY("Well hold on now, I want to hear s\'more about you!")\nSET_MEMORY(0)'],
-  ['WHEN [else]', 
-  'CONVERSE(w.TONE)', 
-  'SAY("Fascinatin. Tell me more!")'],
-  ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 
-  'EXTRAPOLATE_FROM("I got so many stories from my life on the range. Like...")', 
-  ''],
-  ['IF [topic of HUMANITY or ROBOTS comes up]', 
-  'SAY("I dont understand")', 
-  'SAY("I dont understand")'],
-  ['IF [asked for your name]', 
-  'SAY("Chester the Cowpoke, at yer service.")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 
-  'SAY("Chester the Cowpoke, at yer service.")'],
-  ['IF [Asked about what you like]', 
-  'EXTRAPOLATE_FROM("Theres so much to love about the plains. Like...")', 
-  ''],
-  ['IF [Asked a question]', 
-  'ACTIVATE(Curious)', 
-  'INCREMENT_MEMORY()\nIF(MEMORY > 2)\n  EXTRAPOLATE_FROM("Alright Ill answer...")\nELSE()\n  SAY("No, I wanna hear from you!")'],
-];
+// const initialData3 = [
+//   ["", 
+//   "Polite And Respectful", 
+//   "Curious"],
+//   ['ON_MODE_ENTER', 
+//   'SET_TONE(Gruff)\nSET_ACCENT(Rustic Twang)', 
+//   'SET_TONE(Curious)\nSAY("Well hold on now, I want to hear s\'more about you!")\nSET_MEMORY(0)'],
+//   ['WHEN [else]', 
+//   'CONVERSE(w.TONE)', 
+//   'SAY("Fascinatin. Tell me more!")'],
+//   ['IF [Topics mentioned UPBRINGING, CHILDHOOD, PERSONAL HISTORY]', 
+//   'EXTRAPOLATE_FROM("I got so many stories from my life on the range. Like...")', 
+//   ''],
+//   ['IF [topic of HUMANITY or ROBOTS comes up]', 
+//   'SAY("I dont understand")', 
+//   'SAY("I dont understand")'],
+//   ['IF [asked for your name]', 
+//   'SAY("Chester the Cowpoke, at yer service.")\nIF(MEMORY is empty)\n  SAY("And You?")\n  SET_MEMORY(their name)', 
+//   'SAY("Chester the Cowpoke, at yer service.")'],
+//   ['IF [Asked about what you like]', 
+//   'EXTRAPOLATE_FROM("Theres so much to love about the plains. Like...")', 
+//   ''],
+//   ['IF [Asked a question]', 
+//   'ACTIVATE(Curious)', 
+//   'INCREMENT_MEMORY()\nIF(MEMORY > 2)\n  EXTRAPOLATE_FROM("Alright Ill answer...")\nELSE()\n  SAY("No, I wanna hear from you!")'],
+// ];
 
 
 
@@ -146,8 +202,8 @@ const initialData3 = [
 Consts
 */
 
-const localStorageProgramKey = 'robotFaceStoredData';
-const localStorageBankKey = 'robotFaceStoredData1';
+const localStorageProgramKey = 'robotFaceStoredData-1';
+const localStorageBankKey = 'robotFaceStoredData1-1';
 const canvasDim = 600;
 
 
@@ -1194,8 +1250,8 @@ class App extends React.Component {
     const toggleButtonText = this.state.editing ? 'Go To Viewing' : 'Go To Editing';
     const clearUsageButtonStyle = !this.state.editing || !this.state.selectedArr || !this.state.showButtons ? "none" : "inline-block";
     const canvasViz = this.state.showCanvas ? "block" : "none";
-    const hideCanvas = this.state.showCanvas && this.state.showButtons ? <button onClick={this.hideCanvas} >Hide State Graph</button> : null;
-    const showCanvas = !this.state.showCanvas && this.state.showButtons ? <button style={{display:buttonDisplayStyle}} onClick={this.showGraph}>Show State Graph</button> : null;
+    const hideCanvas = this.state.showCanvas && this.state.showButtons ? <button onClick={this.hideCanvas} >Hide Mode Graph</button> : null;
+    const showCanvas = !this.state.showCanvas && this.state.showButtons ? <button style={{display:buttonDisplayStyle}} onClick={this.showGraph}>Show Mode Graph</button> : null;
     const showUsageButtonStyle = !this.state.editing || !this.state.prevSelectedArr || !this.state.showButtons ? "none" : "inline-block";
     const editModeBreak = this.state.editing && this.state.showButtons ? <br/> : null;
     const buttonToggleDisplay = this.state.editing ? "inline" : "none";
@@ -1212,9 +1268,9 @@ class App extends React.Component {
           <button style={{display:showUsageButtonStyle}} onClick={this.showPrevUtilization}>Show Last Round Utilization</button>
           {editModeBreak}
           {editModeBreak}
-          <button style={{display:buttonDisplayStyle}} onClick={this.loadData1}>Load LIFETRONICS</button>
-          <button style={{display:buttonDisplayStyle}} onClick={this.loadData2}>Load UPPER_CRUST</button>
-          <button style={{display:buttonDisplayStyle}} onClick={this.loadData3}>Load COWPOKE</button>
+          <button style={{display:buttonDisplayStyle}} onClick={this.loadData1}>Load Default</button>
+          <button style={{display:buttonDisplayStyle}} onClick={this.loadData2}>Load #2</button>
+          <button style={{display:buttonDisplayStyle}} onClick={this.loadData3}>Load #3</button>
           {editModeBreak}
           <button style={{display:buttonDisplayStyle}} onClick={this.clearStorage}>Clear Saved Code (refresh after clicking)</button>
         </Menu>

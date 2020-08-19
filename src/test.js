@@ -29,60 +29,70 @@ const initialData1 = [
 ];
 
 const initialBank2 = [
-  '"Lifetronics is the Future"'
+  '"Mozart was a genius"'
 ]
 
 const initialData2 = [
   ["", 
   "Make a good impression", 
-  "Sell Lifetronics' mission"],
+  "Get them talking"],
   ['ON_MODE_ENTER',
    'SET_TONE(Respectful and Polite)',
-   'SET_TONE(Gushing)\nSAY("Lifetronics is making the future possible!")'],
+   'SET_TONE(Peppy)\nSAY("I\'m more interested in what brings you here!")'],
   ['IF [else]',
    'CONVERSE()',
    'CONVERSE()'],
-  ['IF [they ask about Lifetronics]',
+  ['IF [asked about backstory]',
    'ACTIVATE(Sell Lifetronics\' mission)',
    'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'],
-  ['IF [they ask if the AI likes ice cream]',
+  ['IF [asked if you like ice cream]',
    'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
-   ''],
+   'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")'],
   ['IF [asked for your name]',
    'SAY("AI_NAME, whats yours?")',
-   ''],
-  ['IF [subject is changed]',
+   'SAY("AI_NAME, whats yours?")'],
+  ['IF [told something about human\'s personal life]',
    '',
-   'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Make a good impression)'],
+   'EXTRAPOLATE_FROM("Wow, cool! Sounds like you ...")\nACTIVATE(Make a good impression)'],
+  ['IF [topics mentioned COMPETITION, STRATEGY]',
+   '',
+   ''],
 ];
 
 const initialBank3 = [
-  '"Lifetronics is the Future"'
+  '"Mozart was a genius"'
 ]
 
 const initialData3 = [
   ["", 
   "Make a good impression", 
-  "Sell Lifetronics' mission"],
+  "Get them talking"],
   ['ON_MODE_ENTER',
    'SET_TONE(Respectful and Polite)',
-   'SET_TONE(Gushing)\nSAY("Lifetronics is making the future possible!")'],
+   'SET_TONE(Peppy)\nSAY("I\'m more interested in what brings you here!")'],
   ['IF [else]',
    'CONVERSE()',
    'CONVERSE()'],
-  ['IF [they ask about Lifetronics]',
+  ['IF [asked about backstory]',
    'ACTIVATE(Sell Lifetronics\' mission)',
    'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'],
-  ['IF [they ask if the AI likes ice cream]',
+  ['IF [asked if you like ice cream]',
    'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
-   ''],
+   'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")'],
   ['IF [asked for your name]',
    'SAY("AI_NAME, whats yours?")',
-   ''],
-  ['IF [subject is changed]',
+   'SAY("AI_NAME, whats yours?")'],
+  ['IF [told something about human\'s personal life]',
    '',
-   'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Make a good impression)'],
+   'EXTRAPOLATE_FROM("Wow, cool! Sounds like you ...")\nACTIVATE(Make a good impression)'],
+  ['IF [topics mentioned COMPETITION, STRATEGY]',
+   '',
+   ''],
 ];
+
+
+
+
 
 // const initialBank1 = [
 //   "humankind", "future", "world", "singularity", "Lifetronics", "'good work'", "'advancing peace'"
@@ -1071,13 +1081,28 @@ class App extends React.Component {
     localStorage.setItem(localStorageBankKey, e.target.value);
   }
 
+ // TODO: these also need to update the utilization map
   moveup(i) {
     var oldData = this.state.data;
     var lineToMove = oldData[i];
     var lineToSwap = oldData[i-1];
     oldData[i-1] = lineToMove;
     oldData[i] = lineToSwap;
-    this.setState({data:oldData});
+    var oldPrevSelected = this.state.prevSelectedArr;
+    if (oldPrevSelected !== "") {
+      var lineToMove = oldPrevSelected[i];
+      var lineToSwap = oldPrevSelected[i-1];
+      oldPrevSelected[i-1] = lineToMove;
+      oldPrevSelected[i] = lineToSwap;
+    }
+    var oldSelectedArr = this.state.selectedArr;
+    if (oldSelectedArr !== "") {
+      var lineToMove = oldSelectedArr[i];
+      var lineToSwap = oldSelectedArr[i-1];
+      oldSelectedArr[i-1] = lineToMove;
+      oldSelectedArr[i] = lineToSwap;
+    }
+    this.setState({data:oldData, prevSelectedArr:oldPrevSelected, selectedArr:oldSelectedArr});
   }
 
   movedown(i) {
@@ -1086,7 +1111,21 @@ class App extends React.Component {
     var lineToSwap = oldData[i+1];
     oldData[i+1] = lineToMove;
     oldData[i] = lineToSwap;
-    this.setState({data:oldData});
+    var oldPrevSelected = this.state.prevSelectedArr;
+    if (oldPrevSelected !== "") {
+      var lineToMove = oldPrevSelected[i];
+      var lineToSwap = oldPrevSelected[i+1];
+      oldPrevSelected[i+1] = lineToMove;
+      oldPrevSelected[i] = lineToSwap;
+    }
+    var oldSelectedArr = this.state.selectedArr;
+    if (oldSelectedArr !== "") {
+      var lineToMove = oldSelectedArr[i];
+      var lineToSwap = oldSelectedArr[i+1];
+      oldSelectedArr[i+1] = lineToMove;
+      oldSelectedArr[i] = lineToSwap;
+    }
+    this.setState({data:oldData, prevSelectedArr:oldPrevSelected, selectedArr:oldSelectedArr});
   }
 
   onRowAdd(e) {
@@ -1094,7 +1133,7 @@ class App extends React.Component {
     var lastRow = newData[newData.length-1].slice();
     lastRow[0] = "NEW INPUT";
     newData.push(lastRow);
-    this.setState({data: newData});
+    this.setState({data: newData, prevSelectedArr:"", selectedArr:""});
     localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
   }
 
@@ -1102,7 +1141,7 @@ class App extends React.Component {
     if (this.state.inputRemoveWarning) {
       var oldData = this.state.data
       var newData = oldData.slice(0,-1);
-      this.setState({data: newData});
+      this.setState({data: newData, prevSelectedArr:"", selectedArr:""});
       localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
     }
     this.setState({inputRemoveWarning:!this.state.inputRemoveWarning});
@@ -1117,7 +1156,7 @@ class App extends React.Component {
         newData[i].push("NEW STATE");
       }
     }
-    this.setState({data: newData});
+    this.setState({data: newData, prevSelectedArr:"", selectedArr:""});
     localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
   }
 
@@ -1127,11 +1166,13 @@ class App extends React.Component {
       for (var i=0; i<newData.length; i++) {
         newData[i] = newData[i].slice(0,-1);
       }
-      this.setState({data: newData});
+      this.setState({data: newData, prevSelectedArr:"", selectedArr:""});
       localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
     }
     this.setState({modeRemoveWarning:!this.state.modeRemoveWarning});
   }
+
+
 
   loadData1() {
     this.setState({bank:initialBank1.join('\n'), data:initialData1, selectedI: 0, selectedJ: 0, selectedArr:"", prevSelectedArr:""});

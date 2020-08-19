@@ -14,11 +14,11 @@ var initialData1 = [["", "Make a good impression", "Sell Lifetronics' mission"],
 
 var initialBank2 = ['"Mozart was a genius"'];
 
-var initialData2 = [["", "Make a good impression", "Get them talking"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Peppy)\nSAY("I\'m more interested in what brings you here!")'], ['IF [else]', 'CONVERSE()', 'CONVERSE()'], ['IF [asked about backstory]', 'ACTIVATE(Sell Lifetronics\' mission)', 'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'], ['IF [asked if you like ice cream]', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")'], ['IF [asked for your name]', 'SAY("AI_NAME, whats yours?")', 'SAY("AI_NAME, whats yours?")'], ['IF [told something about human\'s personal life]', '', 'EXTRAPOLATE_FROM("Wow, cool! Sounds like you ...")\nACTIVATE(Make a good impression)'], ['IF [topics mentioned COMPETITION, STRATEGY]', '', '']];
+var initialData2 = [["", "Make a good impression", "Get them talking"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Peppy)\nSAY("I\'m more interested in what brings you here!")'], ['IF [else]', 'CONVERSE()', 'CONVERSE()'], ['IF [asked about backstory]', 'ACTIVATE(2)', 'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'], ['IF [asked if you like ice cream]', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")'], ['IF [asked for your name]', 'SAY("AI_NAME, whats yours?")', 'SAY("AI_NAME, whats yours?")'], ['IF [told something about human\'s personal life]', '', 'EXTRAPOLATE_FROM("Wow, cool! Sounds like you ...")\nACTIVATE(Make a good impression)'], ['IF [topics mentioned COMPETITION, STRATEGY]', '', '']];
 
 var initialBank3 = ['"Mozart was a genius"'];
 
-var initialData3 = [["", "Make a good impression", "Get them talking"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Peppy)\nSAY("I\'m more interested in what brings you here!")'], ['IF [else]', 'CONVERSE()', 'CONVERSE()'], ['IF [asked about backstory]', 'ACTIVATE(Sell Lifetronics\' mission)', 'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'], ['IF [asked if you like ice cream]', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")'], ['IF [asked for your name]', 'SAY("AI_NAME, whats yours?")', 'SAY("AI_NAME, whats yours?")'], ['IF [told something about human\'s personal life]', '', 'EXTRAPOLATE_FROM("Wow, cool! Sounds like you ...")\nACTIVATE(Make a good impression)'], ['IF [topics mentioned COMPETITION, STRATEGY]', '', '']];
+var initialData3 = [["", "Make a good impression", "Get them talking"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Peppy)\nSAY("I\'m more interested in what brings you here!")'], ['IF [else]', 'CONVERSE()', 'CONVERSE()'], ['IF [asked about backstory]', 'ACTIVATE(2)', 'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'], ['IF [asked if you like ice cream]', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")'], ['IF [asked for your name]', 'SAY("AI_NAME, whats yours?")', 'SAY("AI_NAME, whats yours?")'], ['IF [told something about human\'s personal life]', '', 'EXTRAPOLATE_FROM("Wow, cool! Sounds like you ...")\nACTIVATE(Make a good impression)'], ['IF [topics mentioned COMPETITION, STRATEGY]', '', '']];
 
 // const initialBank3 = [
 //   '"Lifetronics is the Future"'
@@ -151,7 +151,21 @@ Consts
 
 var localStorageProgramKey = 'robotFaceStoredData-1';
 var localStorageBankKey = 'robotFaceStoredData1-1';
-var canvasDim = 600;
+var canvasDim = 300;
+
+var viewModeSelectionColor = "#AB1516";
+var backgroundGray = "#2E3237";
+var middleGray = "#555555";
+var textOnBackgroundGray = "#D7D8D9";
+var cellTextFieldGray = "#E3E4E6";
+var cellTextFieldError = "pink";
+var utilYes = "#35BD2D";
+var utilNo = "#E3E4E6"; //#AB1516";
+var utilUnknown = "transparent";
+var textPurple = "#b485e6";
+var brighterTextPurple = "#AD60FF";
+var unmodifiedTextColor = "#555555";
+var errorMessageRed = "#AB1516";
 
 /*
 Helper Functions
@@ -199,8 +213,13 @@ function drawGraph(ctx, modesArr, arrowsArr) {
   // clear
   ctx.beginPath();
   ctx.rect(0, 0, canvasDim, canvasDim);
-  ctx.fillStyle = "white";
+  ctx.fillStyle = textOnBackgroundGray;
   ctx.fill();
+
+  ctx.fillStyle = "black";
+  ctx.moveTo(0, 0);
+  ctx.lineTo(canvasDim, 0);
+  ctx.stroke();
 
   // circles
 
@@ -211,8 +230,8 @@ function drawGraph(ctx, modesArr, arrowsArr) {
   for (var modeIdx in modesArr) {
     var xcord = Math.cos(angle * 3.14 / 180.0);
     var ycord = Math.sin(angle * 3.14 / 180.0);
-    xcord = canvasDim / 2 + 180 * xcord;
-    ycord = canvasDim / 2 + 180 * ycord;
+    xcord = canvasDim / 2 + canvasDim / 3 * xcord;
+    ycord = canvasDim / 2 + canvasDim / 3 * ycord;
     coordsArr.push([xcord, ycord]);
 
     // draw circle
@@ -221,9 +240,10 @@ function drawGraph(ctx, modesArr, arrowsArr) {
     ctx.stroke();
 
     // draw text
-    ctx.font = "10px Arial";
-    ctx.fillStyle = modeIdx > 0 ? "gray" : "blue";
-    ctx.fillText(modesArr[modeIdx], xcord - 25, ycord);
+    ctx.font = "30px Courier";
+    ctx.fillStyle = brighterTextPurple;
+    var newid = parseInt(modeIdx) + 1;
+    ctx.fillText(newid, xcord - 10, ycord + 10);
 
     angle += angleStep;
   }
@@ -466,7 +486,7 @@ function activateCommandFromCommandArray(commandsArr) {
 
 function indexOfValidMode(arr, activateMode) {
   for (var idx = 1; idx < arr[0].length; idx++) {
-    if (arr[0][idx].toLowerCase() === activateMode) {
+    if (arr[0][idx].toLowerCase() === activateMode || idx + '' === activateMode) {
       return idx;
     }
   }
@@ -523,7 +543,7 @@ function processCommand(data, command, initialMemory, selectedArr) {
         modeJ = indexOfValidMode(data, currCommand[1]);
         if (modeJ > 0) {
           state = data[0][modeJ];
-          selectedArr[1][modeJ] = true;
+          selectedArr[1][modeJ] = 2;
           // recursively evaluate outputArr[1]
           var retval = processCommand(data, data[1][modeJ], memory, []);
           var _iteratorNormalCompletion6 = true;
@@ -582,12 +602,10 @@ function processCommand(data, command, initialMemory, selectedArr) {
       } else if (currCommand[0] === "converse") {
         // 40% 1, 40% 2, 20% 3
         random = "" + (Math.floor(Math.random() * 5) % 3 + 1);
-        console.log("adj random" + random);
       }
     }
     outputArr.push(replaceMemoryZones(rawStrArr[idx], memory));
   }
-  console.log(outputArr);
   return [outputArr, state, tone, memory, accent, random, modeJ];
 }
 
@@ -802,19 +820,47 @@ function longestLineCountForText(text) {
 
 var maxLineLenForInput = 25;
 
-function lineCountForText(text) {
-  var strArr = text.split("\n");
+function lineCountForText(data, i) {
   var count = 0;
   var _iteratorNormalCompletion12 = true;
   var _didIteratorError12 = false;
   var _iteratorError12 = undefined;
 
   try {
-    for (var _iterator12 = strArr[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
-      var str = _step12.value;
+    for (var _iterator12 = data[i][Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+      var text = _step12.value;
 
-      // NOTE: this doesn't work
-      count += 1 + str.length / maxLineLenForInput;
+      var strArr = text.split("\n");
+      var tempCount = 0;
+      var _iteratorNormalCompletion13 = true;
+      var _didIteratorError13 = false;
+      var _iteratorError13 = undefined;
+
+      try {
+        for (var _iterator13 = strArr[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+          var str = _step13.value;
+
+          // NOTE: this doesn't work
+          tempCount += 1 + str.length / maxLineLenForInput;
+        }
+      } catch (err) {
+        _didIteratorError13 = true;
+        _iteratorError13 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion13 && _iterator13.return) {
+            _iterator13.return();
+          }
+        } finally {
+          if (_didIteratorError13) {
+            throw _iteratorError13;
+          }
+        }
+      }
+
+      if (tempCount > count) {
+        count = tempCount;
+      }
     }
   } catch (err) {
     _didIteratorError12 = true;
@@ -827,6 +873,38 @@ function lineCountForText(text) {
     } finally {
       if (_didIteratorError12) {
         throw _iteratorError12;
+      }
+    }
+  }
+
+  return count;
+}
+
+function lineCountForTextEdge(text) {
+  var strArr = text.split("\n");
+  var count = 0;
+  var _iteratorNormalCompletion14 = true;
+  var _didIteratorError14 = false;
+  var _iteratorError14 = undefined;
+
+  try {
+    for (var _iterator14 = strArr[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+      var str = _step14.value;
+
+      // NOTE: this doesn't work
+      count += 1 + str.length / maxLineLenForInput;
+    }
+  } catch (err) {
+    _didIteratorError14 = true;
+    _iteratorError14 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion14 && _iterator14.return) {
+        _iterator14.return();
+      }
+    } finally {
+      if (_didIteratorError14) {
+        throw _iteratorError14;
       }
     }
   }
@@ -862,21 +940,27 @@ var InputCell = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
+      // if 
       // method that returns a string of whats wrong based on data and this.props.value
       var error = errorStringForCellText(this.props.value, this.props.data, this.props.j);
       var errorComp = !(this.props.i == 0 || this.props.j == 0) && error ? React.createElement(
         'div',
-        { style: { fontSize: "10", backgroundColor: "#AB1516" } },
+        { style: { fontSize: "10", backgroundColor: errorMessageRed, padding: "0 2 2 2", margin: "2 2 2 2" } },
         error
       ) : null;
-      var color = this.props.i == 0 || this.props.j == 0 ? "purple" : !this.state.modified ? "#555555" : "black";
-      // white on edges, else we do green or red based on validity
-      var backgroundColor = this.props.i == 0 || this.props.j == 0 ? "#E3E4E6" : !errorComp && this.props.value.length > 0 ? "#E3E4E6" : "pink";
-      return [React.createElement('textarea', { style: { color: color, backgroundColor: backgroundColor },
+      var color = this.props.i == 0 || this.props.j == 0 ? "black" : !this.state.modified ? unmodifiedTextColor : "black";
+      var backgroundColor = this.props.i == 0 || this.props.j == 0 ? textOnBackgroundGray : !errorComp && this.props.value.length > 0 || this.props.wasUsed ? cellTextFieldGray : cellTextFieldError;
+      return [this.props.i == 0 ? React.createElement(
+        'h3',
+        { style: { color: textPurple } },
+        'Mode ',
+        this.props.j
+      ) : null, React.createElement('textarea', { style: { color: color, backgroundColor: backgroundColor },
         value: this.props.value,
-        rows: lineCountForText(this.props.value) + 1 // lineCountForText(this.props.value)
+        rows: this.props.j == 0 ? lineCountForTextEdge(this.props.value) + 1 : lineCountForText(this.props.data, this.props.i) + 1 // lineCountForText(this.props.value)
         , cols: maxLineLenForInput // longestLineCountForText(this.props.value)
-        , onChange: this.handleChange
+        , onChange: this.handleChange,
+        spellcheck: false
 
       }), errorComp];
     }
@@ -905,11 +989,12 @@ var ReadOnlyCell = function (_React$Component2) {
   }, {
     key: 'render',
     value: function render() {
-      var backgroundColor = this.props.isSelected ? "red" : "transparent";
+      var backgroundColor = this.props.isSelected ? viewModeSelectionColor : "transparent";
+      var text = this.props.value.length > 0 ? this.props.value : this.props.data[2][this.props.j];
       return React.createElement(
         'span',
         { style: { backgroundColor: backgroundColor }, onClick: this.handleClick },
-        this.props.value
+        text
       );
       // return <div style={{backgroundColor:backgroundColor, width:"auto", height:"auto"}} onClick={this.handleClick}>Click</div>
     }
@@ -939,22 +1024,26 @@ var Cell = function (_React$Component3) {
     key: 'render',
     value: function render() {
       // in editing mode, we truncate all 
-      var wasUsed = this.props.selectedArr ? this.props.selectedArr[this.props.i][this.props.j] : false;
-      var tdStyle = !this.props.editingMode || !this.props.selectedArr || this.props.i == 0 || this.props.j == 0 ? this.props.isHeader ? "#555555" : "transparent" : wasUsed ? "gold" : "red";
+      var wasUsed = this.props.selectedArr ? this.props.selectedArr[this.props.i][this.props.j] == 2 : false;
+      var isNew = this.props.selectedArr ? this.props.selectedArr[this.props.i][this.props.j] == 1 : false;
+      var tdStyle = !this.props.editingMode || !this.props.selectedArr || this.props.i == 0 || this.props.j == 0 ? this.props.isHeader ? middleGray : "transparent" : wasUsed ? utilYes : isNew ? "transparent" : utilNo;
       if (this.props.isHeader) {
         var allowInput = this.props.isInteractable && this.props.editingMode;
-        console.log(this.props.modeJ);
-        var selectedHeader = !allowInput && this.props.i == 0 && this.props.modeJ == this.props.j ? "pink" : tdStyle;
+        var selectedHeader = !allowInput && this.props.i == 0 && this.props.modeJ == this.props.j ? viewModeSelectionColor : tdStyle;
         return React.createElement(
           'th',
           { style: { backgroundColor: selectedHeader } },
-          !allowInput ? this.props.text : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellEvent, i: this.props.i, j: this.props.j, data: this.props.data })
+          !allowInput ? React.createElement(
+            'h3',
+            { style: { color: textPurple, margin: "0 0 0 0" } },
+            this.props.text
+          ) : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellEvent, i: this.props.i, j: this.props.j, data: this.props.data })
         );
       } else {
         return React.createElement(
           'td',
           { style: { backgroundColor: tdStyle } },
-          !this.props.isInteractable ? this.props.text : !this.props.editingMode ? React.createElement(ReadOnlyCell, { value: this.props.text, onCellClick: this.onCellEvent, i: this.props.i, j: this.props.j, isSelected: this.props.isSelected }) : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellEvent, i: this.props.i, j: this.props.j, data: this.props.data })
+          !this.props.isInteractable ? this.props.text : !this.props.editingMode ? React.createElement(ReadOnlyCell, { value: this.props.text, onCellClick: this.onCellEvent, i: this.props.i, j: this.props.j, isSelected: this.props.isSelected, data: this.props.data }) : React.createElement(InputCell, { wasUsed: this.props.selectedArr, value: this.props.text, onCellChange: this.onCellEvent, i: this.props.i, j: this.props.j, data: this.props.data })
         );
       }
     }
@@ -996,14 +1085,15 @@ var Row = function (_React$Component4) {
     key: 'render',
     value: function render() {
       // add a cell with two buttons
+      var buttonStyle = { color: textOnBackgroundGray, fontSize: 20, backgroundColor: "transparent", backgroundRepeat: "no-repeat", border: "none", overflow: "hidden", outline: "none" };
       var upButton = this.props.i > 3 ? React.createElement(
         'button',
-        { onClick: this.moveup },
-        '\u02C4'
+        { style: buttonStyle, onClick: this.moveup },
+        '\u2191'
       ) : null;
       var downButton = this.props.i >= 3 && this.props.i < this.props.data.length - 1 ? React.createElement(
         'button',
-        { onClick: this.movedown },
+        { style: buttonStyle, onClick: this.movedown },
         '\u2193'
       ) : null;
       var buttonCell = React.createElement(
@@ -1017,15 +1107,22 @@ var Row = function (_React$Component4) {
       for (var j = 0; j < this.props.width; j++) {
         var uninteractable = j == 0 && this.props.i == 1 || this.props.i == 2 && j == 0 || this.props.i == 0 && j == 0; // not interactable
         var isHeader = j == 0 || this.props.i == 0 || this.props.i == 1; // non clickable in view mode, and bolder text
-        if (this.props.children && j == 0 && this.props.editing) {
+        if (this.props.i == 0 && this.props.children[0] && j == 0 && this.props.editing) {
           arr.push(React.createElement(
             'th',
-            { style: { backgroundColor: "#555555" } },
-            this.props.children
+            { style: { backgroundColor: middleGray } },
+            this.props.children[0]
           ));
         } else {
           arr.push(React.createElement(Cell, { modeJ: this.props.modeJ, selectedArr: this.props.selectedArr, isHeader: isHeader, isInteractable: !uninteractable, isSelected: j == this.props.selectedJ, editingMode: this.props.editing, text: this.props.data[this.props.i][j], onCellEvent: this.onCellEvent, i: this.props.i, j: j, data: this.props.data }));
         }
+      }
+      if (this.props.i == 0) {
+        arr.push(React.createElement(
+          'td',
+          null,
+          this.props.children[1]
+        ));
       }
       return React.createElement(
         'tr',
@@ -1077,9 +1174,19 @@ var Table = function (_React$Component5) {
         arr.push(React.createElement(
           Row,
           { modeJ: this.props.modeJ, selectedArr: this.props.selectedArr, moveup: this.moveup, movedown: this.movedown, editing: this.props.editing, width: widthFromDoubleArray(this.props.data), i: i, selectedJ: i == this.props.selectedI ? this.props.selectedJ : -1, onCellEvent: this.onCellEvent, data: this.props.data },
-          i == 0 ? this.props.children : null
+          this.props.children
         ));
       }
+      arr.push(React.createElement(
+        'tr',
+        null,
+        React.createElement('td', null),
+        React.createElement(
+          'td',
+          null,
+          this.props.children.slice(2, 4)
+        )
+      ));
       return React.createElement(
         'table',
         { style: { display: "inline-block" } },
@@ -1119,46 +1226,13 @@ var MemoryUnit = function (_React$Component6) {
           null,
           'MEMORY: '
         ),
-        React.createElement('textarea', { value: this.props.memory, onChange: this.memoryUpdate })
+        React.createElement('textarea', { style: { backgroundColor: textOnBackgroundGray }, spellcheck: false, value: this.props.memory, onChange: this.memoryUpdate })
       );
     }
   }]);
 
   return MemoryUnit;
 }(React.Component);
-
-// class Clock extends React.Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {count: 0};
-//   }
-
-//   componentDidMount() {
-//     this.timerID = setInterval(
-//       () => this.tick(),
-//       1000
-//     );
-//   }
-
-//   componentWillUnmount() {
-//     clearInterval(this.timerID);
-//   }
-
-//   tick() {
-//     var count = this.state.count;
-//     if (count > 0) {
-//       count--;
-//       this.setState({count: count});
-//     }
-//   }
-
-//   render() {
-//     const display = this.state.count > 0 ? "block" : "none";
-//     return (
-//       <div style={{}}>New</div>
-//     );
-//   }
-// }
 
 var Spotlight = function (_React$Component7) {
   _inherits(Spotlight, _React$Component7);
@@ -1184,20 +1258,22 @@ var Spotlight = function (_React$Component7) {
         return null;
       }
 
+      var dotDisplay = this.props.count > 0 ? "inline" : "none";
+
       return React.createElement(
         'div',
-        { style: { display: "inline-block", padding: "10px 10px 10px 10px", backgroundColor: "2E3237" } },
+        { style: { display: "inline-block", padding: "10px 10px 10px 10px", backgroundColor: middleGray } },
         React.createElement(
           'span',
-          { style: { color: "black", float: "right", whiteSpace: "pre-wrap" } },
-          this.props.bank
+          { style: { fontSize: 25, fontWeight: "bold" } },
+          'MODE: '
         ),
         React.createElement(
-          'h2',
-          null,
-          'MODE: ',
+          'span',
+          { style: { fontSize: 25, fontWeight: "bold", color: textPurple } },
           this.props.mode
         ),
+        React.createElement('br', null),
         React.createElement(
           'h2',
           null,
@@ -1210,11 +1286,22 @@ var Spotlight = function (_React$Component7) {
           'ACCENT: ',
           this.props.accent
         ),
+        React.createElement(
+          'span',
+          { style: { float: "right", whiteSpace: "pre-wrap" } },
+          "Bank:\n",
+          this.props.bank
+        ),
         React.createElement(MemoryUnit, { memory: this.props.memory, onChange: this.onChange }),
+        React.createElement(
+          'span',
+          { style: { backgroundColor: "green", display: dotDisplay } },
+          '***'
+        ),
         React.createElement('br', null),
         React.createElement(
           'h1',
-          { style: { color: "black", backgroundColor: "#AD60FF", whiteSpace: "pre-wrap" } },
+          { style: { color: "black", backgroundColor: textPurple, whiteSpace: "pre-wrap" } },
           this.props.command
         ),
         React.createElement(
@@ -1244,7 +1331,7 @@ var Menu = function (_React$Component8) {
     value: function render() {
       return React.createElement(
         'div',
-        { style: { backgroundColor: "black", zIndex: "3", padding: "3px 3px 3px 3px", position: "fixed", top: "0", right: "0" } },
+        { style: { backgroundColor: "black", zIndex: "3", padding: "3px 3px 3px 3px", position: "fixed", top: "0", right: "0", width: canvasDim } },
         this.props.children
       );
     }
@@ -1280,7 +1367,8 @@ var App = function (_React$Component9) {
       selectedArr: "",
       prevSelectedArr: "",
       showCanvas: false,
-      showButtons: true
+      showButtons: false,
+      count: 0
     };
 
     localStorage.setItem(localStorageProgramKey, JSON.stringify(data));
@@ -1354,8 +1442,8 @@ var App = function (_React$Component9) {
   }, {
     key: 'updateSpotlight',
     value: function updateSpotlight(i, j, selectedArr, initModeJ) {
-      selectedArr[i][j] = true;
-      var unprocessedCommand = this.state.data[i][j];
+      selectedArr[i][j] = 2;
+      var unprocessedCommand = this.state.data[i][j].length > 0 ? this.state.data[i][j] : this.state.data[2][j];
       var retval = processCommand(this.state.data, unprocessedCommand, this.state.memory, selectedArr);
 
       // fields that are updated immediately based on selected command
@@ -1376,8 +1464,6 @@ var App = function (_React$Component9) {
         this.setState({ nextAccent: retval[4] });
       }
 
-      console.log(selectedArr);
-
       this.setState({
         selectedI: i,
         selectedJ: j,
@@ -1392,15 +1478,48 @@ var App = function (_React$Component9) {
       });
     }
   }, {
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this10 = this;
+
+      this.timerID = setInterval(function () {
+        return _this10.tick();
+      }, 1000);
+    }
+  }, {
+    key: 'componentWillUnmount',
+    value: function componentWillUnmount() {
+      clearInterval(this.timerID);
+    }
+  }, {
+    key: 'tick',
+    value: function tick() {
+      var count = this.state.count;
+      if (count > 0) {
+        count--;
+        this.setState({ count: count });
+      }
+    }
+  }, {
     key: 'onCellEvent',
     value: function onCellEvent(e, i, j) {
       if (this.state.editing) {
         var data = this.state.data;
-        data[i][j] = e.target.value;
-        this.setState({ data: data });
+        // run processing on e.target.value
+        var idx = e.target.value.toLowerCase().indexOf('ext(');
+        if (idx >= 0) {
+          var str1 = e.target.value.substr(0, idx);
+          var str2 = e.target.value.substr(idx + 4, e.target.value.length - (idx + 4));
+          data[i][j] = str1 + 'EXTRAPOLATE_FROM(' + str2;
+        } else {
+          data[i][j] = e.target.value;
+        }
+        this.setState({ data: data, showCanvas: false, modeRemoveWarning: false, inputRemoveWarning: false });
         localStorage.setItem(localStorageProgramKey, JSON.stringify(data));
       } else {
         // also update the map
+        // if e.value is empty
+        this.setState({ count: 2 });
         this.updateSpotlight(i, j, this.state.selectedArr);
       }
     }
@@ -1435,7 +1554,7 @@ var App = function (_React$Component9) {
         oldSelectedArr[i - 1] = lineToMove;
         oldSelectedArr[i] = lineToSwap;
       }
-      this.setState({ data: oldData, prevSelectedArr: oldPrevSelected, selectedArr: oldSelectedArr });
+      this.setState({ data: oldData, prevSelectedArr: oldPrevSelected, selectedArr: oldSelectedArr, showCanvas: false, modeRemoveWarning: false, inputRemoveWarning: false });
     }
   }, {
     key: 'movedown',
@@ -1459,7 +1578,7 @@ var App = function (_React$Component9) {
         oldSelectedArr[i + 1] = lineToMove;
         oldSelectedArr[i] = lineToSwap;
       }
-      this.setState({ data: oldData, prevSelectedArr: oldPrevSelected, selectedArr: oldSelectedArr });
+      this.setState({ data: oldData, prevSelectedArr: oldPrevSelected, selectedArr: oldSelectedArr, showCanvas: false, modeRemoveWarning: false, inputRemoveWarning: false });
     }
   }, {
     key: 'onRowAdd',
@@ -1468,7 +1587,23 @@ var App = function (_React$Component9) {
       var lastRow = newData[newData.length - 1].slice();
       lastRow[0] = "NEW INPUT";
       newData.push(lastRow);
-      this.setState({ data: newData, prevSelectedArr: "", selectedArr: "" });
+      var oldPrevSelected = this.state.prevSelectedArr;
+      if (oldPrevSelected !== "") {
+        var newRow = [];
+        for (var idx in lastRow) {
+          newRow.push(1);
+        }
+        oldPrevSelected.push(newRow);
+      }
+      var oldSelectedArr = this.state.selectedArr;
+      if (oldSelectedArr !== "") {
+        var newRow = [];
+        for (var idx in lastRow) {
+          newRow.push(1);
+        }
+        oldSelectedArr.push(newRow);
+      }
+      this.setState({ data: newData, prevSelectedArr: oldPrevSelected, selectedArr: oldSelectedArr, showCanvas: false, modeRemoveWarning: false, inputRemoveWarning: false });
       localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
     }
   }, {
@@ -1477,7 +1612,15 @@ var App = function (_React$Component9) {
       if (this.state.inputRemoveWarning) {
         var oldData = this.state.data;
         var newData = oldData.slice(0, -1);
-        this.setState({ data: newData, prevSelectedArr: "", selectedArr: "" });
+        var oldPrevSelected = this.state.prevSelectedArr;
+        if (oldPrevSelected !== "") {
+          oldPrevSelected = oldPrevSelected.slice(0, -1);
+        }
+        var oldSelectedArr = this.state.selectedArr;
+        if (oldSelectedArr !== "") {
+          oldSelectedArr = oldSelectedArr.slice(0, -1);
+        }
+        this.setState({ data: newData, prevSelectedArr: oldPrevSelected, selectedArr: oldSelectedArr, showCanvas: false, modeRemoveWarning: false });
         localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
       }
       this.setState({ inputRemoveWarning: !this.state.inputRemoveWarning });
@@ -1493,7 +1636,61 @@ var App = function (_React$Component9) {
           newData[i].push("NEW STATE");
         }
       }
-      this.setState({ data: newData, prevSelectedArr: "", selectedArr: "" });
+      var oldPrevSelected = this.state.prevSelectedArr;
+      if (oldPrevSelected !== "") {
+        var _iteratorNormalCompletion15 = true;
+        var _didIteratorError15 = false;
+        var _iteratorError15 = undefined;
+
+        try {
+          for (var _iterator15 = oldPrevSelected[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+            var row = _step15.value;
+
+            row.push(1);
+          }
+        } catch (err) {
+          _didIteratorError15 = true;
+          _iteratorError15 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion15 && _iterator15.return) {
+              _iterator15.return();
+            }
+          } finally {
+            if (_didIteratorError15) {
+              throw _iteratorError15;
+            }
+          }
+        }
+      }
+      var oldSelectedArr = this.state.selectedArr;
+      if (oldSelectedArr !== "") {
+        var _iteratorNormalCompletion16 = true;
+        var _didIteratorError16 = false;
+        var _iteratorError16 = undefined;
+
+        try {
+          for (var _iterator16 = oldSelectedArr[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+            var row = _step16.value;
+
+            row.push(1);
+          }
+        } catch (err) {
+          _didIteratorError16 = true;
+          _iteratorError16 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion16 && _iterator16.return) {
+              _iterator16.return();
+            }
+          } finally {
+            if (_didIteratorError16) {
+              throw _iteratorError16;
+            }
+          }
+        }
+      }
+      this.setState({ data: newData, prevSelectedArr: oldPrevSelected, selectedArr: oldSelectedArr, showCanvas: false, modeRemoveWarning: false, inputRemoveWarning: false });
       localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
     }
   }, {
@@ -1504,7 +1701,19 @@ var App = function (_React$Component9) {
         for (var i = 0; i < newData.length; i++) {
           newData[i] = newData[i].slice(0, -1);
         }
-        this.setState({ data: newData, prevSelectedArr: "", selectedArr: "" });
+        var oldPrevSelected = this.state.prevSelectedArr;
+        if (oldPrevSelected !== "") {
+          for (var i = 0; i < oldPrevSelected.length; i++) {
+            oldPrevSelected[i] = oldPrevSelected[i].slice(0, -1);
+          }
+        }
+        var oldSelectedArr = this.state.selectedArr;
+        if (oldSelectedArr !== "") {
+          for (var i = 0; i < oldSelectedArr.length; i++) {
+            oldSelectedArr[i] = oldSelectedArr[i].slice(0, -1);
+          }
+        }
+        this.setState({ data: newData, prevSelectedArr: oldPrevSelected, selectedArr: oldSelectedArr, showCanvas: false, inputRemoveWarning: false });
         localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
       }
       this.setState({ modeRemoveWarning: !this.state.modeRemoveWarning });
@@ -1589,7 +1798,6 @@ var App = function (_React$Component9) {
       for (var i = 1; i < this.state.data[0].length; i++) {
         modesArr.push(this.state.data[0][i]);
       }
-      console.log(modesArr);
 
       // each element is a pair: mode to next mode
       var arrowsArray = [];
@@ -1612,7 +1820,6 @@ var App = function (_React$Component9) {
         }
       }
       arrowsArray = arrowsArray.sort();
-      console.log(arrowsArray);
 
       drawGraph(ctx, modesArr, arrowsArray);
 
@@ -1626,7 +1833,7 @@ var App = function (_React$Component9) {
 
       ctx.beginPath();
       ctx.rect(0, 0, canvasDim, canvasDim);
-      ctx.fillStyle = "white";
+      ctx.fillStyle = textOnBackgroundGray;
       ctx.fill();
 
       this.setState({ showCanvas: false });
@@ -1643,16 +1850,16 @@ var App = function (_React$Component9) {
       var buttonDisplayStyle = !this.state.editing || !this.state.showButtons ? "none" : "inline-block";
       var toggleButtonText = this.state.editing ? 'Go To Viewing' : 'Go To Editing';
       var clearUsageButtonStyle = !this.state.editing || !this.state.selectedArr || !this.state.showButtons ? "none" : "inline-block";
-      var canvasViz = this.state.showCanvas ? "block" : "none";
+      var canvasViz = this.state.showCanvas ? "inline-block" : "none";
       var hideCanvas = this.state.showCanvas && this.state.showButtons ? React.createElement(
         'button',
         { onClick: this.hideCanvas },
-        'Hide Mode Graph'
+        'Hide Mode Diagram'
       ) : null;
       var showCanvas = !this.state.showCanvas && this.state.showButtons ? React.createElement(
         'button',
         { style: { display: buttonDisplayStyle }, onClick: this.showGraph },
-        'Show Mode Graph'
+        'Generate Mode Diagram'
       ) : null;
       var showUsageButtonStyle = !this.state.editing || !this.state.prevSelectedArr || !this.state.showButtons ? "none" : "inline-block";
       var editModeBreak = this.state.editing && this.state.showButtons ? React.createElement('br', null) : null;
@@ -1671,7 +1878,7 @@ var App = function (_React$Component9) {
           React.createElement(
             'button',
             { style: { float: "right", display: buttonToggleDisplay }, onClick: this.showHideButtons },
-            this.state.showButtons ? "Hide Buttons" : "Show Buttons"
+            this.state.showButtons ? "Close Settings" : "Open Settings"
           ),
           editModeBreak,
           editModeBreak,
@@ -1680,12 +1887,12 @@ var App = function (_React$Component9) {
           React.createElement(
             'button',
             { style: { display: clearUsageButtonStyle }, onClick: this.clearUsageHighlights },
-            'Clear Last Round Utilization'
+            'Hide Code Utilization'
           ),
           React.createElement(
             'button',
             { style: { display: showUsageButtonStyle }, onClick: this.showPrevUtilization },
-            'Show Last Round Utilization'
+            'Reveal Code Utilization'
           ),
           editModeBreak,
           editModeBreak,
@@ -1708,7 +1915,7 @@ var App = function (_React$Component9) {
           React.createElement(
             'button',
             { style: { display: buttonDisplayStyle }, onClick: this.clearStorage },
-            'Clear Saved Code (refresh after clicking)'
+            'Clear Saved Code (refresh browser)'
           )
         ),
         React.createElement(
@@ -1720,40 +1927,53 @@ var App = function (_React$Component9) {
             React.createElement(
               Table,
               { modeJ: this.state.modeJ, selectedArr: this.state.selectedArr, moveup: this.moveup, movedown: this.movedown, editing: this.state.editing, onCellEvent: this.onCellEvent, data: this.state.data, selectedI: this.state.selectedI, selectedJ: this.state.selectedJ },
-              React.createElement('input', { type: 'text', placeholder: 'Bank' }),
-              React.createElement('br', null),
-              React.createElement('textarea', { rows: 7, onChange: this.bankUpdate, value: this.state.bank })
-            ),
-            React.createElement(
-              'div',
-              { style: { display: "inline-block" } },
+              React.createElement(
+                'div',
+                null,
+                React.createElement(
+                  'span',
+                  { style: { color: textPurple } },
+                  'Bank'
+                ),
+                React.createElement('br', null),
+                React.createElement('textarea', { style: { backgroundColor: textOnBackgroundGray }, spellcheck: false, rows: 7, onChange: this.bankUpdate, value: this.state.bank })
+              ),
+              React.createElement(
+                'div',
+                { style: { display: "inline-block" } },
+                React.createElement(
+                  'button',
+                  { style: this.state.editing ? { display: "block", fontSize: 20, color: utilYes, backgroundColor: "transparent", backgroundRepeat: "no-repeat", border: "none", overflow: "hidden", outline: "none" } : { display: "none" }, onClick: this.onColumnAdd },
+                  '+'
+                ),
+                React.createElement('br', null),
+                React.createElement(
+                  'button',
+                  { style: this.state.editing ? { display: "block", fontSize: 20, color: textOnBackgroundGray, backgroundColor: "transparent", backgroundRepeat: "no-repeat", border: "none", overflow: "hidden", outline: "none" } : { display: "none" }, onClick: this.onColumnRemove },
+                  this.state.modeRemoveWarning ? "-?" : "-"
+                )
+              ),
               React.createElement(
                 'button',
-                { style: this.state.editing ? { display: "block", fontSize: "30" } : { display: "none" }, onClick: this.onColumnAdd },
+                { style: this.state.editing ? { display: "inline", fontSize: 20, color: utilYes, backgroundColor: "transparent", backgroundRepeat: "no-repeat", border: "none", overflow: "hidden", outline: "none" } : { display: "none" }, onClick: this.onRowAdd },
                 '+'
               ),
-              React.createElement('br', null),
               React.createElement(
                 'button',
-                { style: this.state.editing ? { display: "block" } : { display: "none" }, onClick: this.onColumnRemove },
-                this.state.modeRemoveWarning ? "ARE YOU SURE YOU WANT TO REMOVE?" : "-"
+                { style: this.state.editing ? { display: "inline", fontSize: 20, marginLeft: "20px", color: textOnBackgroundGray, backgroundColor: "transparent", backgroundRepeat: "no-repeat", border: "none", overflow: "hidden", outline: "none" } : { display: "none" }, onClick: this.onRowRemove },
+                this.state.inputRemoveWarning ? "-?" : "-"
               )
             )
           ),
-          React.createElement(
-            'button',
-            { style: this.state.editing ? { display: "inline", fontSize: "30" } : { display: "none" }, onClick: this.onRowAdd },
-            '+'
-          ),
-          React.createElement(
-            'button',
-            { style: this.state.editing ? { display: "inline", marginLeft: "20px" } : { display: "none" }, onClick: this.onRowRemove },
-            this.state.inputRemoveWarning ? "ARE YOU SURE YOU WANT TO REMOVE?" : "-"
-          ),
           React.createElement('br', null)
         ),
-        React.createElement('canvas', { id: 'canvas', width: canvasDim, height: canvasDim, style: { position: "fixed", right: "0", bottom: "0", backgroundColor: "white", display: canvasViz } }),
-        React.createElement(Spotlight, { bank: this.state.bank, editing: this.state.editing, command: this.state.command, mode: this.state.mode, accent: this.state.accent, tone: this.state.tone, memory: this.state.memory, random: this.state.random, onChange: this.memoryUpdate })
+        React.createElement(
+          'div',
+          { style: { position: "fixed", width: canvasDim - 10, right: "0", bottom: canvasDim, backgroundColor: unmodifiedTextColor, display: canvasViz, padding: "5 5 5 5", color: textPurple } },
+          'MODE DIAGRAM'
+        ),
+        React.createElement('canvas', { id: 'canvas', width: canvasDim, height: canvasDim, style: { position: "fixed", right: "0", bottom: "0", backgroundColor: textOnBackgroundGray, display: canvasViz } }),
+        React.createElement(Spotlight, { count: this.state.count, bank: this.state.bank, editing: this.state.editing, command: this.state.command, mode: this.state.mode, accent: this.state.accent, tone: this.state.tone, memory: this.state.memory, random: this.state.random, onChange: this.memoryUpdate })
       );
     }
   }]);
@@ -1767,32 +1987,26 @@ ReactDOM.render(React.createElement(App, null), document.querySelector('#reactTa
 //  color polish!
 //  new default code
 
-
 // light to dark stepping. web app color pickers. web apps that give me good 
 // #F0D60B - a good yellow HSB - hue saturation blackness. move the black
 // #35BD2D - green
 // #AD60FF - good purple
 
+// #D7D8D9 - text gray (lighter)
+// #2E3237 - background gray (darker)
+
 
 /* playtest */
 // App bugs:
 // - [BUG] improve error messages based on Bailey's feedback
-// - [BUG] moving up rows does not preserve the edited stuff (red and black color test)
-// - [BUG] don't let the buttons wrap
-// - [BUG] you should be able to click on a default converse for empty cells in order to aid utilization
-// - [BUG] adding an input crashed the program? I think because the utilization was on
-// - [BUG] Add the red background back for the unfilled cells
 // - [LOW] things at the window corners ? low pri
 // - [LOW] should adding a new mode try and autofill with an ACTIVATE?
 // App Features
-// - [EZ] A blinking light when the spotlight is updated 
 // - Upsell ppl to CB-IO Ad
-// - Detect activate with a space after it
-// - Highlight IF in spotlight. Highlight memory in spotlight
+// - Validation
+// - Highlight memory in spotlight
 // Unsorted
 // Mode cells could only allow one line and be larger
-// Turn off spell check squiggles on our textfields
-// Possibly want to be able to turn off the red text for the tutorial
 // Make a preshow checklist for programmers
 
 

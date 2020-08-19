@@ -43,7 +43,7 @@ const initialData2 = [
    'CONVERSE()',
    'CONVERSE()'],
   ['IF [asked about backstory]',
-   'ACTIVATE(Sell Lifetronics\' mission)',
+   'ACTIVATE(2)',
    'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'],
   ['IF [asked if you like ice cream]',
    'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
@@ -74,7 +74,7 @@ const initialData3 = [
    'CONVERSE()',
    'CONVERSE()'],
   ['IF [asked about backstory]',
-   'ACTIVATE(Sell Lifetronics\' mission)',
+   'ACTIVATE(2)',
    'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'],
   ['IF [asked if you like ice cream]',
    'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
@@ -238,10 +238,21 @@ Consts
 
 const localStorageProgramKey = 'robotFaceStoredData-1';
 const localStorageBankKey = 'robotFaceStoredData1-1';
-const canvasDim = 600;
+const canvasDim = 300;
 
-
-
+const viewModeSelectionColor = "#AB1516";
+const backgroundGray = "#2E3237";
+const middleGray = "#555555";
+const textOnBackgroundGray = "#D7D8D9";
+const cellTextFieldGray = "#E3E4E6"
+const cellTextFieldError = "pink"
+const utilYes = "#35BD2D";
+const utilNo = "#E3E4E6"//#AB1516";
+const utilUnknown = "transparent";
+const textPurple = "#b485e6";
+const brighterTextPurple = "#AD60FF";
+const unmodifiedTextColor = "#555555";
+const errorMessageRed = "#AB1516";
 
 
 /*
@@ -280,8 +291,13 @@ function drawGraph(ctx, modesArr, arrowsArr) {
   // clear
   ctx.beginPath();
   ctx.rect(0, 0, canvasDim, canvasDim);
-  ctx.fillStyle = "white";
+  ctx.fillStyle = textOnBackgroundGray;
   ctx.fill();
+
+  ctx.fillStyle = "black";
+  ctx.moveTo(0, 0);
+  ctx.lineTo(canvasDim, 0);
+  ctx.stroke();
 
   // circles
   
@@ -292,8 +308,8 @@ function drawGraph(ctx, modesArr, arrowsArr) {
   for (var modeIdx in modesArr) {
     var xcord = Math.cos(angle * 3.14/180.0);
     var ycord = Math.sin(angle * 3.14/180.0);
-    xcord = canvasDim/2 + 180 * xcord;
-    ycord = canvasDim/2 + 180 * ycord;
+    xcord = canvasDim/2 + (canvasDim/3) * xcord;
+    ycord = canvasDim/2 + (canvasDim/3) * ycord;
     coordsArr.push([xcord, ycord]);
 
     // draw circle
@@ -302,9 +318,10 @@ function drawGraph(ctx, modesArr, arrowsArr) {
     ctx.stroke();
 
     // draw text
-    ctx.font = "10px Arial";
-    ctx.fillStyle = modeIdx > 0 ? "gray" : "blue";
-    ctx.fillText(modesArr[modeIdx], xcord - 25,ycord);
+    ctx.font = "30px Courier";
+    ctx.fillStyle = brighterTextPurple;
+    const newid = parseInt(modeIdx) + 1;
+    ctx.fillText(newid, xcord-10, ycord+10);
 
     angle += angleStep;
   }
@@ -471,7 +488,7 @@ function activateCommandFromCommandArray(commandsArr) {
 
 function indexOfValidMode(arr, activateMode) {
   for (var idx = 1; idx < arr[0].length; idx++) {
-    if (arr[0][idx].toLowerCase() === activateMode) {
+    if (arr[0][idx].toLowerCase() === activateMode || idx+'' === activateMode) {
       return idx;
     }
   }
@@ -540,7 +557,7 @@ function processCommand(data, command, initialMemory, selectedArr) {
         modeJ = indexOfValidMode(data, currCommand[1]);
         if (modeJ > 0) {
           state = data[0][modeJ];
-          selectedArr[1][modeJ] = true;
+          selectedArr[1][modeJ] = 2;
           // recursively evaluate outputArr[1]
           const retval = processCommand(data,data[1][modeJ], memory, []);
           for (command of retval[0]) {
@@ -577,12 +594,10 @@ function processCommand(data, command, initialMemory, selectedArr) {
       } else if (currCommand[0] === "converse") {
         // 40% 1, 40% 2, 20% 3
         random = "" + ((Math.floor(Math.random() * 5) % 3) + 1);
-        console.log("adj random" + random);
       }
     }
     outputArr.push(replaceMemoryZones(rawStrArr[idx], memory));
   }
-  console.log(outputArr);
   return [outputArr, state, tone, memory, accent, random, modeJ];
 }
 
@@ -699,7 +714,25 @@ function longestLineCountForText(text)
 
 const maxLineLenForInput = 25;
 
-function lineCountForText(text)
+function lineCountForText(data, i)
+{
+  var count = 0;
+  for (var text of data[i]) {
+    const strArr = text.split("\n");
+    var tempCount = 0
+    for (var str of strArr) {
+      // NOTE: this doesn't work
+      tempCount += 1 + (str.length / maxLineLenForInput);
+    }
+    if (tempCount > count) {
+      count = tempCount;
+    }
+  }
+  return count;
+}
+
+
+function lineCountForTextEdge(text)
 {
   const strArr = text.split("\n");
   var count = 0;
@@ -709,8 +742,6 @@ function lineCountForText(text)
   }
   return count;
 }
-
-
 
 
 
@@ -755,17 +786,19 @@ class InputCell extends React.Component {
   }
 
   render() {
+    // if 
     // method that returns a string of whats wrong based on data and this.props.value
     const error = errorStringForCellText(this.props.value, this.props.data, this.props.j);
-    const errorComp = !(this.props.i == 0 || this.props.j == 0) && error ? <div style={{fontSize:"10", backgroundColor:"#AB1516"}}>{error}</div> : null;
-    const color = (this.props.i == 0 || this.props.j == 0) ? "purple" : !this.state.modified ? "#555555" : "black";
-    // white on edges, else we do green or red based on validity
-    const backgroundColor = (this.props.i == 0 || this.props.j == 0) ? "#E3E4E6" : (!errorComp && (this.props.value.length > 0)) ? "#E3E4E6" : "pink";
-    return [<textarea style={{color:color, backgroundColor:backgroundColor}}
+    const errorComp = !(this.props.i == 0 || this.props.j == 0) && error ? <div style={{fontSize:"10", backgroundColor:errorMessageRed, padding:"0 2 2 2", margin:"2 2 2 2"}}>{error}</div> : null;
+    const color = (this.props.i == 0 || this.props.j == 0) ? "black" : !this.state.modified ? unmodifiedTextColor : "black";
+    const backgroundColor = (this.props.i == 0 || this.props.j == 0) ? textOnBackgroundGray : (!errorComp && (this.props.value.length > 0)) || this.props.wasUsed ? cellTextFieldGray : cellTextFieldError;
+    return [this.props.i == 0 ? <h3 style={{color:textPurple}}>Mode {this.props.j}</h3> : null,
+            <textarea style={{color:color, backgroundColor:backgroundColor}}
                       value={this.props.value} 
-                      rows={lineCountForText(this.props.value) + 1} // lineCountForText(this.props.value)
+                      rows={this.props.j==0 ? lineCountForTextEdge(this.props.value) + 1: lineCountForText(this.props.data, this.props.i) + 1} // lineCountForText(this.props.value)
                       cols={maxLineLenForInput} // longestLineCountForText(this.props.value)
                       onChange={this.handleChange}
+                      spellcheck={false}
                       
             />,
             errorComp]
@@ -784,8 +817,9 @@ class ReadOnlyCell extends React.Component {
   }
 
   render() {
-    const backgroundColor = this.props.isSelected ? "red" : "transparent";
-    return <span style={{backgroundColor:backgroundColor}} onClick={this.handleClick}>{this.props.value}</span>
+    const backgroundColor = this.props.isSelected ? viewModeSelectionColor : "transparent";
+    const text = this.props.value.length > 0 ? this.props.value : this.props.data[2][this.props.j];
+    return <span style={{backgroundColor:backgroundColor}} onClick={this.handleClick}>{text}</span>
     // return <div style={{backgroundColor:backgroundColor, width:"auto", height:"auto"}} onClick={this.handleClick}>Click</div>
   }
 }
@@ -803,22 +837,22 @@ class Cell extends React.Component {
 
   render() {
     // in editing mode, we truncate all 
-    const wasUsed = this.props.selectedArr ? this.props.selectedArr[this.props.i][this.props.j] : false;
-    const tdStyle = !this.props.editingMode || !this.props.selectedArr || (this.props.i==0 || this.props.j==0) ? (this.props.isHeader ? "#555555" : "transparent") : wasUsed ? "gold" : "red";
+    const wasUsed = this.props.selectedArr ? this.props.selectedArr[this.props.i][this.props.j] == 2 : false;
+    const isNew = this.props.selectedArr ? this.props.selectedArr[this.props.i][this.props.j] == 1 : false;
+    const tdStyle = !this.props.editingMode || !this.props.selectedArr || (this.props.i==0 || this.props.j==0) ? (this.props.isHeader ? middleGray : "transparent") : wasUsed ? utilYes : isNew ? "transparent" : utilNo;
     if (this.props.isHeader) {
       const allowInput = this.props.isInteractable && this.props.editingMode;
-      console.log(this.props.modeJ);
-      const selectedHeader = !allowInput && this.props.i==0 && this.props.modeJ==this.props.j ? "pink" : tdStyle;
+      const selectedHeader = !allowInput && this.props.i==0 && this.props.modeJ==this.props.j ? viewModeSelectionColor : tdStyle;
       return <th style={{backgroundColor:selectedHeader}}>
-        {!allowInput ? this.props.text : <InputCell value={this.props.text} onCellChange={this.onCellEvent} i={this.props.i} j={this.props.j} data={this.props.data} />}
+        {!allowInput ? <h3 style={{color:textPurple, margin:"0 0 0 0"}}>{this.props.text}</h3> : <InputCell value={this.props.text} onCellChange={this.onCellEvent} i={this.props.i} j={this.props.j} data={this.props.data} />}
       </th>;
     } else {
       return <td style={{backgroundColor:tdStyle}}>
           {!this.props.isInteractable
            ? this.props.text
            : (!this.props.editingMode
-              ? <ReadOnlyCell value={this.props.text} onCellClick={this.onCellEvent} i={this.props.i} j={this.props.j} isSelected={this.props.isSelected} />
-              : <InputCell value={this.props.text} onCellChange={this.onCellEvent} i={this.props.i} j={this.props.j} data={this.props.data} />)}
+              ? <ReadOnlyCell value={this.props.text} onCellClick={this.onCellEvent} i={this.props.i} j={this.props.j} isSelected={this.props.isSelected} data={this.props.data} />
+              : <InputCell wasUsed={this.props.selectedArr} value={this.props.text} onCellChange={this.onCellEvent} i={this.props.i} j={this.props.j} data={this.props.data} />)}
         </td>;
     }
   }
@@ -847,8 +881,9 @@ class Row extends React.Component {
 
   render() {
     // add a cell with two buttons
-    const upButton = this.props.i > 3 ? <button onClick={this.moveup}>˄</button> : null;
-    const downButton = this.props.i >= 3 && this.props.i < this.props.data.length - 1 ? <button onClick={this.movedown}>↓</button> : null;
+    const buttonStyle = {color:textOnBackgroundGray, fontSize:20, backgroundColor:"transparent", backgroundRepeat:"no-repeat", border:"none", overflow:"hidden", outline:"none"};
+    const upButton = this.props.i > 3 ? <button style={buttonStyle} onClick={this.moveup}>↑</button> : null;
+    const downButton = this.props.i >= 3 && this.props.i < this.props.data.length - 1 ? <button style={buttonStyle} onClick={this.movedown}>↓</button> : null;
     const buttonCell = <td>
         {upButton}
         <br/>
@@ -858,11 +893,14 @@ class Row extends React.Component {
     for (var j = 0; j < this.props.width; j++) {
       const uninteractable = j==0 && this.props.i==1 || this.props.i==2 && j==0 || this.props.i==0 && j==0; // not interactable
       const isHeader = j==0 || this.props.i==0 || this.props.i==1; // non clickable in view mode, and bolder text
-      if (this.props.children && j==0 && this.props.editing) {
-        arr.push(<th style={{backgroundColor:"#555555"}}>{this.props.children}</th>)
+      if (this.props.i==0 && this.props.children[0] && j==0 && this.props.editing) {
+        arr.push(<th style={{backgroundColor:middleGray}}>{this.props.children[0]}</th>)
       } else {
         arr.push(<Cell modeJ={this.props.modeJ} selectedArr={this.props.selectedArr} isHeader={isHeader} isInteractable={!uninteractable} isSelected={j==this.props.selectedJ} editingMode={this.props.editing} text={this.props.data[this.props.i][j]} onCellEvent={this.onCellEvent} i={this.props.i} j={j} data={this.props.data} />)
       }
+    }
+    if (this.props.i==0) {
+      arr.push(<td>{this.props.children[1]}</td>)
     }
     return <tr>{arr}</tr>;
   }
@@ -894,8 +932,9 @@ class Table extends React.Component {
   render() {
     var arr = [];
     for (var i = 0; i < heightFromDoubleArray(this.props.data); i++) {
-      arr.push(<Row modeJ={this.props.modeJ} selectedArr={this.props.selectedArr} moveup={this.moveup} movedown={this.movedown} editing={this.props.editing} width={widthFromDoubleArray(this.props.data)} i={i} selectedJ={i == this.props.selectedI ? this.props.selectedJ : -1} onCellEvent={this.onCellEvent} data={this.props.data}>{i==0 ? this.props.children : null}</Row>)
+      arr.push(<Row modeJ={this.props.modeJ} selectedArr={this.props.selectedArr} moveup={this.moveup} movedown={this.movedown} editing={this.props.editing} width={widthFromDoubleArray(this.props.data)} i={i} selectedJ={i == this.props.selectedI ? this.props.selectedJ : -1} onCellEvent={this.onCellEvent} data={this.props.data}>{this.props.children}</Row>)
     }
+    arr.push(<tr><td></td><td>{this.props.children.slice(2,4)}</td></tr>)
     return <table style={{display:"inline-block"}}>{arr}</table>;
   }
 }
@@ -914,43 +953,10 @@ class MemoryUnit extends React.Component {
   render() {
     return <div>
         <span>MEMORY: </span>
-        <textarea value={this.props.memory} onChange={this.memoryUpdate} />
+        <textarea style={{backgroundColor:textOnBackgroundGray}} spellcheck={false} value={this.props.memory} onChange={this.memoryUpdate} />
       </div>;
   }
 }
-
-// class Clock extends React.Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {count: 0};
-//   }
-
-//   componentDidMount() {
-//     this.timerID = setInterval(
-//       () => this.tick(),
-//       1000
-//     );
-//   }
-
-//   componentWillUnmount() {
-//     clearInterval(this.timerID);
-//   }
-
-//   tick() {
-//     var count = this.state.count;
-//     if (count > 0) {
-//       count--;
-//       this.setState({count: count});
-//     }
-//   }
-
-//   render() {
-//     const display = this.state.count > 0 ? "block" : "none";
-//     return (
-//       <div style={{}}>New</div>
-//     );
-//   }
-// }
 
 class Spotlight extends React.Component {
   constructor(props) {
@@ -968,14 +974,17 @@ class Spotlight extends React.Component {
       return null;
     }
 
-    return <div style={{display:"inline-block", padding:"10px 10px 10px 10px", backgroundColor:"2E3237"}}>
-        <span style={{color:"black", float:"right", whiteSpace:"pre-wrap"}}>{this.props.bank}</span>
-        <h2>MODE: {this.props.mode}</h2>
+    const dotDisplay = this.props.count > 0 ? "inline" : "none"
+
+    return <div style={{display:"inline-block", padding:"10px 10px 10px 10px", backgroundColor:middleGray}}>
+        <span style={{fontSize:25, fontWeight:"bold"}}>MODE: </span><span style={{fontSize:25, fontWeight:"bold",color:textPurple}}>{this.props.mode}</span>
+        <br/>
         <h2>TONE: {this.props.tone}</h2>
         <h2>ACCENT: {this.props.accent}</h2>
-        <MemoryUnit memory={this.props.memory} onChange={this.onChange} />
+                <span style={{float:"right", whiteSpace:"pre-wrap"}}>{"Bank:\n"}{this.props.bank}</span>
+        <MemoryUnit memory={this.props.memory} onChange={this.onChange} /><span style={{backgroundColor:"green", display:dotDisplay}}>***</span>
         <br/>
-        <h1 style={{color:"black", backgroundColor:"#AD60FF", whiteSpace:"pre-wrap"}}>{this.props.command}</h1>
+        <h1 style={{color:"black", backgroundColor:textPurple, whiteSpace:"pre-wrap"}}>{this.props.command}</h1>
         <h3>RAND: {this.props.random}</h3>
       </div>;
   }
@@ -987,7 +996,7 @@ class Menu extends React.Component {
   }
 
   render() {
-    return <div style={{backgroundColor:"black", zIndex:"3", padding:"3px 3px 3px 3px", position:"fixed", top:"0", right:"0"}}>{this.props.children}</div>;
+    return <div style={{backgroundColor:"black", zIndex:"3", padding:"3px 3px 3px 3px", position:"fixed", top:"0", right:"0", width:canvasDim}}>{this.props.children}</div>;
   }
 }
 
@@ -1014,7 +1023,8 @@ class App extends React.Component {
       selectedArr: "",
       prevSelectedArr: "",
       showCanvas:false,
-      showButtons:true,
+      showButtons:false,
+      count:0,
     };
 
     localStorage.setItem(localStorageProgramKey, JSON.stringify(data))
@@ -1083,8 +1093,8 @@ class App extends React.Component {
   }
 
   updateSpotlight(i,j, selectedArr, initModeJ) {
-    selectedArr[i][j] = true;
-    const unprocessedCommand = this.state.data[i][j];
+    selectedArr[i][j] = 2;
+    const unprocessedCommand = this.state.data[i][j].length > 0 ? this.state.data[i][j] : this.state.data[2][j];
     const retval = processCommand(this.state.data, unprocessedCommand, this.state.memory, selectedArr);
 
     // fields that are updated immediately based on selected command
@@ -1105,8 +1115,6 @@ class App extends React.Component {
       this.setState({nextAccent:retval[4]});
     }
 
-    console.log(selectedArr);
-
     this.setState({
       selectedI:i, 
       selectedJ:j, 
@@ -1121,14 +1129,43 @@ class App extends React.Component {
     });
   }
 
+  componentDidMount() {
+    this.timerID = setInterval(
+      () => this.tick(),
+      1000
+    );
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerID);
+  }
+
+  tick() {
+    var count = this.state.count;
+    if (count > 0) {
+      count--;
+      this.setState({count: count});
+    }
+  }
+
   onCellEvent(e,i,j) {
     if (this.state.editing) {
       var data = this.state.data;
-      data[i][j] = e.target.value;
-      this.setState({data:data});
+      // run processing on e.target.value
+      const idx = e.target.value.toLowerCase().indexOf('ext(');
+      if (idx >= 0) {
+        const str1 = e.target.value.substr(0,idx);
+        const str2 = e.target.value.substr(idx+4, e.target.value.length-(idx+4));
+        data[i][j] = str1 + 'EXTRAPOLATE_FROM(' + str2;
+      } else {
+        data[i][j] = e.target.value;
+      }
+      this.setState({data:data, showCanvas:false, modeRemoveWarning:false, inputRemoveWarning:false});
       localStorage.setItem(localStorageProgramKey, JSON.stringify(data));
     } else {
       // also update the map
+      // if e.value is empty
+      this.setState({count:2});
       this.updateSpotlight(i,j,this.state.selectedArr);
     }
   }
@@ -1159,7 +1196,7 @@ class App extends React.Component {
       oldSelectedArr[i-1] = lineToMove;
       oldSelectedArr[i] = lineToSwap;
     }
-    this.setState({data:oldData, prevSelectedArr:oldPrevSelected, selectedArr:oldSelectedArr});
+    this.setState({data:oldData, prevSelectedArr:oldPrevSelected, selectedArr:oldSelectedArr, showCanvas:false, modeRemoveWarning:false, inputRemoveWarning:false});
   }
 
   movedown(i) {
@@ -1182,7 +1219,7 @@ class App extends React.Component {
       oldSelectedArr[i+1] = lineToMove;
       oldSelectedArr[i] = lineToSwap;
     }
-    this.setState({data:oldData, prevSelectedArr:oldPrevSelected, selectedArr:oldSelectedArr});
+    this.setState({data:oldData, prevSelectedArr:oldPrevSelected, selectedArr:oldSelectedArr, showCanvas:false, modeRemoveWarning:false, inputRemoveWarning:false});
   }
 
   onRowAdd(e) {
@@ -1190,7 +1227,23 @@ class App extends React.Component {
     var lastRow = newData[newData.length-1].slice();
     lastRow[0] = "NEW INPUT";
     newData.push(lastRow);
-    this.setState({data: newData, prevSelectedArr:"", selectedArr:""});
+    var oldPrevSelected = this.state.prevSelectedArr;
+    if (oldPrevSelected !== "") {
+      var newRow = []
+      for (var idx in lastRow) {
+        newRow.push(1);
+      }
+      oldPrevSelected.push(newRow);
+    }
+    var oldSelectedArr = this.state.selectedArr;
+    if (oldSelectedArr !== "") {
+      var newRow = []
+      for (var idx in lastRow) {
+        newRow.push(1);
+      }
+      oldSelectedArr.push(newRow);
+    }
+    this.setState({data: newData, prevSelectedArr:oldPrevSelected, selectedArr:oldSelectedArr, showCanvas:false, modeRemoveWarning:false, inputRemoveWarning:false});
     localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
   }
 
@@ -1198,7 +1251,15 @@ class App extends React.Component {
     if (this.state.inputRemoveWarning) {
       var oldData = this.state.data
       var newData = oldData.slice(0,-1);
-      this.setState({data: newData, prevSelectedArr:"", selectedArr:""});
+      var oldPrevSelected = this.state.prevSelectedArr;
+      if (oldPrevSelected !== "") {
+        oldPrevSelected = oldPrevSelected.slice(0,-1);
+      }
+      var oldSelectedArr = this.state.selectedArr;
+      if (oldSelectedArr !== "") {
+        oldSelectedArr = oldSelectedArr.slice(0,-1);
+      }
+      this.setState({data: newData, prevSelectedArr:oldPrevSelected, selectedArr:oldSelectedArr, showCanvas:false, modeRemoveWarning:false});
       localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
     }
     this.setState({inputRemoveWarning:!this.state.inputRemoveWarning});
@@ -1213,7 +1274,19 @@ class App extends React.Component {
         newData[i].push("NEW STATE");
       }
     }
-    this.setState({data: newData, prevSelectedArr:"", selectedArr:""});
+    var oldPrevSelected = this.state.prevSelectedArr;
+    if (oldPrevSelected !== "") {
+      for (var row of oldPrevSelected) {
+        row.push(1);
+      }
+    }
+    var oldSelectedArr = this.state.selectedArr;
+    if (oldSelectedArr !== "") {
+      for (var row of oldSelectedArr) {
+        row.push(1);
+      }
+    }
+    this.setState({data: newData, prevSelectedArr:oldPrevSelected, selectedArr:oldSelectedArr, showCanvas:false, modeRemoveWarning:false, inputRemoveWarning:false});
     localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
   }
 
@@ -1223,7 +1296,19 @@ class App extends React.Component {
       for (var i=0; i<newData.length; i++) {
         newData[i] = newData[i].slice(0,-1);
       }
-      this.setState({data: newData, prevSelectedArr:"", selectedArr:""});
+      var oldPrevSelected = this.state.prevSelectedArr;
+      if (oldPrevSelected !== "") {
+        for (var i=0; i<oldPrevSelected.length; i++) {
+          oldPrevSelected[i] = oldPrevSelected[i].slice(0,-1);
+        }
+      }
+      var oldSelectedArr = this.state.selectedArr;
+      if (oldSelectedArr !== "") {
+        for (var i=0; i<oldSelectedArr.length; i++) {
+          oldSelectedArr[i] = oldSelectedArr[i].slice(0,-1);
+        }
+      }
+      this.setState({data: newData, prevSelectedArr:oldPrevSelected, selectedArr:oldSelectedArr, showCanvas:false, inputRemoveWarning:false});
       localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
     }
     this.setState({modeRemoveWarning:!this.state.modeRemoveWarning});
@@ -1294,7 +1379,6 @@ class App extends React.Component {
     for (var i=1; i<this.state.data[0].length; i++) {
       modesArr.push(this.state.data[0][i]);
     }
-    console.log(modesArr);
 
     // each element is a pair: mode to next mode
     var arrowsArray = [];
@@ -1317,7 +1401,6 @@ class App extends React.Component {
       }
     }
     arrowsArray = arrowsArray.sort();
-    console.log(arrowsArray);
 
     drawGraph(ctx, modesArr, arrowsArray);
 
@@ -1330,7 +1413,7 @@ class App extends React.Component {
     
     ctx.beginPath();
     ctx.rect(0, 0, canvasDim, canvasDim);
-    ctx.fillStyle = "white";
+    ctx.fillStyle = textOnBackgroundGray;
     ctx.fill();
 
     this.setState({showCanvas:false});
@@ -1345,9 +1428,9 @@ class App extends React.Component {
     const buttonDisplayStyle = !this.state.editing || !this.state.showButtons ? "none" : "inline-block";
     const toggleButtonText = this.state.editing ? 'Go To Viewing' : 'Go To Editing';
     const clearUsageButtonStyle = !this.state.editing || !this.state.selectedArr || !this.state.showButtons ? "none" : "inline-block";
-    const canvasViz = this.state.showCanvas ? "block" : "none";
-    const hideCanvas = this.state.showCanvas && this.state.showButtons ? <button onClick={this.hideCanvas} >Hide Mode Graph</button> : null;
-    const showCanvas = !this.state.showCanvas && this.state.showButtons ? <button style={{display:buttonDisplayStyle}} onClick={this.showGraph}>Show Mode Graph</button> : null;
+    const canvasViz = this.state.showCanvas ? "inline-block" : "none";
+    const hideCanvas = this.state.showCanvas && this.state.showButtons ? <button onClick={this.hideCanvas} >Hide Mode Diagram</button> : null;
+    const showCanvas = !this.state.showCanvas && this.state.showButtons ? <button style={{display:buttonDisplayStyle}} onClick={this.showGraph}>Generate Mode Diagram</button> : null;
     const showUsageButtonStyle = !this.state.editing || !this.state.prevSelectedArr || !this.state.showButtons ? "none" : "inline-block";
     const editModeBreak = this.state.editing && this.state.showButtons ? <br/> : null;
     const buttonToggleDisplay = this.state.editing ? "inline" : "none";
@@ -1355,40 +1438,43 @@ class App extends React.Component {
       <div>
         <Menu>
           <button style={{float:"right"}} onClick={this.onToggle}>{toggleButtonText}</button>
-          <button style={{float:"right", display:buttonToggleDisplay}} onClick={this.showHideButtons}>{this.state.showButtons ? "Hide Buttons" : "Show Buttons"}</button>
+          <button style={{float:"right", display:buttonToggleDisplay}} onClick={this.showHideButtons}>{this.state.showButtons ? "Close Settings" : "Open Settings"}</button>
           {editModeBreak}
           {editModeBreak}
           {showCanvas}
           {hideCanvas}
-          <button style={{display:clearUsageButtonStyle}} onClick={this.clearUsageHighlights}>Clear Last Round Utilization</button>
-          <button style={{display:showUsageButtonStyle}} onClick={this.showPrevUtilization}>Show Last Round Utilization</button>
+          <button style={{display:clearUsageButtonStyle}} onClick={this.clearUsageHighlights}>Hide Code Utilization</button>
+          <button style={{display:showUsageButtonStyle}} onClick={this.showPrevUtilization}>Reveal Code Utilization</button>
           {editModeBreak}
           {editModeBreak}
           <button style={{display:buttonDisplayStyle}} onClick={this.loadData1}>Load Default</button>
           <button style={{display:buttonDisplayStyle}} onClick={this.loadData2}>Load #2</button>
           <button style={{display:buttonDisplayStyle}} onClick={this.loadData3}>Load #3</button>
           {editModeBreak}
-          <button style={{display:buttonDisplayStyle}} onClick={this.clearStorage}>Clear Saved Code (refresh after clicking)</button>
+          <button style={{display:buttonDisplayStyle}} onClick={this.clearStorage}>Clear Saved Code (refresh browser)</button>
         </Menu>
         <div>
           <div>
             <Table modeJ={this.state.modeJ} selectedArr={this.state.selectedArr} moveup={this.moveup} movedown={this.movedown} editing={this.state.editing} onCellEvent={this.onCellEvent} data={this.state.data} selectedI={this.state.selectedI} selectedJ={this.state.selectedJ}>
-              <input type='text' placeholder="Bank"></input>
-              <br/>
-              <textarea rows={7} onChange={this.bankUpdate} value={this.state.bank}></textarea>
+              <div>
+                <span style={{color:textPurple}}>Bank</span>
+                <br/>
+                <textarea style={{backgroundColor:textOnBackgroundGray}} spellcheck={false} rows={7} onChange={this.bankUpdate} value={this.state.bank}></textarea>
+              </div>
+              <div style={{display:"inline-block"}}>
+                <button style={this.state.editing ? {display:"block", fontSize:20, color:utilYes, backgroundColor:"transparent", backgroundRepeat:"no-repeat", border:"none", overflow:"hidden", outline:"none"} : {display:"none"}} onClick={this.onColumnAdd}>+</button>
+                <br/>
+                <button style={this.state.editing ? {display:"block", fontSize:20, color:textOnBackgroundGray, backgroundColor:"transparent", backgroundRepeat:"no-repeat", border:"none", overflow:"hidden", outline:"none"} : {display:"none"}} onClick={this.onColumnRemove}>{this.state.modeRemoveWarning ? "-?" : "-"}</button>
+              </div>
+              <button style={this.state.editing ? {display:"inline", fontSize:20, color:utilYes, backgroundColor:"transparent", backgroundRepeat:"no-repeat", border:"none", overflow:"hidden", outline:"none"} : {display:"none"}} onClick={this.onRowAdd}>+</button>
+              <button style={this.state.editing ? {display:"inline", fontSize:20, marginLeft:"20px", color:textOnBackgroundGray, backgroundColor:"transparent", backgroundRepeat:"no-repeat", border:"none", overflow:"hidden", outline:"none"} : {display:"none"}} onClick={this.onRowRemove}>{this.state.inputRemoveWarning ? "-?" : "-"}</button>
             </Table>
-            <div style={{display:"inline-block"}}>
-              <button style={this.state.editing ? {display:"block", fontSize:"30"} : {display:"none"}} onClick={this.onColumnAdd}>+</button>
-              <br/>
-              <button style={this.state.editing ? {display:"block"} : {display:"none"}} onClick={this.onColumnRemove}>{this.state.modeRemoveWarning ? "ARE YOU SURE YOU WANT TO REMOVE?" : "-"}</button>
-            </div>
           </div>
-          <button style={this.state.editing ? {display:"inline", fontSize:"30"} : {display:"none"}} onClick={this.onRowAdd}>+</button>
-          <button style={this.state.editing ? {display:"inline", marginLeft:"20px"} : {display:"none"}} onClick={this.onRowRemove}>{this.state.inputRemoveWarning ? "ARE YOU SURE YOU WANT TO REMOVE?" : "-"}</button>
           <br/>
         </div>
-        <canvas id="canvas" width={canvasDim} height={canvasDim} style={{position:"fixed", right:"0", bottom:"0", backgroundColor:"white", display:canvasViz}}></canvas>
-        <Spotlight bank={this.state.bank} editing={this.state.editing} command={this.state.command} mode={this.state.mode} accent={this.state.accent} tone={this.state.tone} memory={this.state.memory} random={this.state.random} onChange={this.memoryUpdate} />
+        <div style={{position:"fixed", width:canvasDim-10, right:"0", bottom:canvasDim, backgroundColor:unmodifiedTextColor, display:canvasViz, padding:"5 5 5 5", color:textPurple}}>MODE DIAGRAM</div>
+        <canvas id="canvas" width={canvasDim} height={canvasDim} style={{position:"fixed", right:"0", bottom:"0", backgroundColor:textOnBackgroundGray, display:canvasViz}}></canvas>
+        <Spotlight count={this.state.count} bank={this.state.bank} editing={this.state.editing} command={this.state.command} mode={this.state.mode} accent={this.state.accent} tone={this.state.tone} memory={this.state.memory} random={this.state.random} onChange={this.memoryUpdate} />
       </div>
     );
   }
@@ -1404,32 +1490,26 @@ ReactDOM.render(
 //  color polish!
 //  new default code
 
-
 // light to dark stepping. web app color pickers. web apps that give me good 
     // #F0D60B - a good yellow HSB - hue saturation blackness. move the black
     // #35BD2D - green
     // #AD60FF - good purple
 
+// #D7D8D9 - text gray (lighter)
+// #2E3237 - background gray (darker)
+
 
 /* playtest */
 // App bugs:
 // - [BUG] improve error messages based on Bailey's feedback
-// - [BUG] moving up rows does not preserve the edited stuff (red and black color test)
-// - [BUG] don't let the buttons wrap
-// - [BUG] you should be able to click on a default converse for empty cells in order to aid utilization
-// - [BUG] adding an input crashed the program? I think because the utilization was on
-// - [BUG] Add the red background back for the unfilled cells
 // - [LOW] things at the window corners ? low pri
 // - [LOW] should adding a new mode try and autofill with an ACTIVATE?
 // App Features
-// - [EZ] A blinking light when the spotlight is updated 
 // - Upsell ppl to CB-IO Ad
-// - Detect activate with a space after it
-// - Highlight IF in spotlight. Highlight memory in spotlight
+// - Validation
+// - Highlight memory in spotlight
 // Unsorted
   // Mode cells could only allow one line and be larger
-  // Turn off spell check squiggles on our textfields
-  // Possibly want to be able to turn off the red text for the tutorial
   // Make a preshow checklist for programmers
 
 

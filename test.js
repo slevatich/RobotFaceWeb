@@ -12,13 +12,41 @@ var initialBank1 = ['"Lifetronics is the Future"'];
 
 var initialData1 = [["", "Make a good impression", "Sell Lifetronics' mission"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Gushing)\nSAY("Lifetronics is making the future possible!")'], ['IF [else]', 'CONVERSE()', 'CONVERSE()'], ['IF [asked about Lifetronics]', 'ACTIVATE(Sell Lifetronics\' mission)', 'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'], ['IF [asked if you like ice cream]', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")', ''], ['IF [asked for your name]', 'SAY("AI_NAME, whats yours?")', ''], ['IF [subject is changed]', '', 'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Make a good impression)']];
 
-var initialBank2 = ['"Lifetronics is the Future"'];
+var initialBank2 = ['"Mozart was a genius"'];
 
-var initialData2 = [["", "Make a good impression", "Sell Lifetronics' mission"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Gushing)\nSAY("Lifetronics is making the future possible!")'], ['IF [else]', 'CONVERSE()', 'CONVERSE()'], ['IF [they ask about Lifetronics]', 'ACTIVATE(Sell Lifetronics\' mission)', 'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'], ['IF [they ask if the AI likes ice cream]', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")', ''], ['IF [asked for your name]', 'SAY("AI_NAME, whats yours?")', ''], ['IF [subject is changed]', '', 'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Make a good impression)']];
+var initialData2 = [["", "Make a good impression", "Get them talking"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Peppy)\nSAY("I\'m more interested in what brings you here!")'], ['IF [else]', 'CONVERSE()', 'CONVERSE()'], ['IF [asked about backstory]', 'ACTIVATE(Sell Lifetronics\' mission)', 'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'], ['IF [asked if you like ice cream]', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")'], ['IF [asked for your name]', 'SAY("AI_NAME, whats yours?")', 'SAY("AI_NAME, whats yours?")'], ['IF [told something about human\'s personal life]', '', 'EXTRAPOLATE_FROM("Wow, cool! Sounds like you ...")\nACTIVATE(Make a good impression)'], ['IF [topics mentioned COMPETITION, STRATEGY]', '', '']];
 
-var initialBank3 = ['"Lifetronics is the Future"'];
+var initialBank3 = ['"Mozart was a genius"'];
 
-var initialData3 = [["", "Make a good impression", "Sell Lifetronics' mission"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Gushing)\nSAY("Lifetronics is making the future possible!")'], ['IF [else]', 'CONVERSE()', 'CONVERSE()'], ['IF [they ask about Lifetronics]', 'ACTIVATE(Sell Lifetronics\' mission)', 'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'], ['IF [they ask if the AI likes ice cream]', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")', ''], ['IF [asked for your name]', 'SAY("AI_NAME, whats yours?")', ''], ['IF [subject is changed]', '', 'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Make a good impression)']];
+var initialData3 = [["", "Make a good impression", "Get them talking"], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', 'SET_TONE(Peppy)\nSAY("I\'m more interested in what brings you here!")'], ['IF [else]', 'CONVERSE()', 'CONVERSE()'], ['IF [asked about backstory]', 'ACTIVATE(Sell Lifetronics\' mission)', 'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'], ['IF [asked if you like ice cream]', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")', 'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")'], ['IF [asked for your name]', 'SAY("AI_NAME, whats yours?")', 'SAY("AI_NAME, whats yours?")'], ['IF [told something about human\'s personal life]', '', 'EXTRAPOLATE_FROM("Wow, cool! Sounds like you ...")\nACTIVATE(Make a good impression)'], ['IF [topics mentioned COMPETITION, STRATEGY]', '', '']];
+
+// const initialBank3 = [
+//   '"Lifetronics is the Future"'
+// ]
+
+// const initialData3 = [
+//   ["", 
+//   "Make a good impression", 
+//   "Sell Lifetronics' mission"],
+//   ['ON_MODE_ENTER',
+//    'SET_TONE(Respectful and Polite)',
+//    'SET_TONE(Gushing)\nSAY("Lifetronics is making the future possible!")'],
+//   ['IF [else]',
+//    'CONVERSE()',
+//    'CONVERSE()'],
+//   ['IF [they ask about Lifetronics]',
+//    'ACTIVATE(Sell Lifetronics\' mission)',
+//    'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'],
+//   ['IF [they ask if the AI likes ice cream]',
+//    'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
+//    ''],
+//   ['IF [asked for your name]',
+//    'SAY("AI_NAME, whats yours?")',
+//    ''],
+//   ['IF [subject is changed]',
+//    '',
+//    'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Make a good impression)'],
+// ];
 
 // const initialBank1 = [
 //   "humankind", "future", "world", "singularity", "Lifetronics", "'good work'", "'advancing peace'"
@@ -838,12 +866,12 @@ var InputCell = function (_React$Component) {
       var error = errorStringForCellText(this.props.value, this.props.data, this.props.j);
       var errorComp = !(this.props.i == 0 || this.props.j == 0) && error ? React.createElement(
         'div',
-        { style: { fontSize: "10", backgroundColor: "red" } },
+        { style: { fontSize: "10", backgroundColor: "#AB1516" } },
         error
       ) : null;
-      var color = !this.state.modified ? "red" : "black";
+      var color = this.props.i == 0 || this.props.j == 0 ? "purple" : !this.state.modified ? "#555555" : "black";
       // white on edges, else we do green or red based on validity
-      var backgroundColor = this.props.i == 0 || this.props.j == 0 ? "white" : !errorComp ? "aquamarine" : "pink";
+      var backgroundColor = this.props.i == 0 || this.props.j == 0 ? "#E3E4E6" : !errorComp && this.props.value.length > 0 ? "#E3E4E6" : "pink";
       return [React.createElement('textarea', { style: { color: color, backgroundColor: backgroundColor },
         value: this.props.value,
         rows: lineCountForText(this.props.value) + 1 // lineCountForText(this.props.value)
@@ -912,7 +940,7 @@ var Cell = function (_React$Component3) {
     value: function render() {
       // in editing mode, we truncate all 
       var wasUsed = this.props.selectedArr ? this.props.selectedArr[this.props.i][this.props.j] : false;
-      var tdStyle = !this.props.editingMode || !this.props.selectedArr || this.props.i == 0 || this.props.j == 0 ? this.props.isHeader ? "blue" : "transparent" : wasUsed ? "gold" : "red";
+      var tdStyle = !this.props.editingMode || !this.props.selectedArr || this.props.i == 0 || this.props.j == 0 ? this.props.isHeader ? "#555555" : "transparent" : wasUsed ? "gold" : "red";
       if (this.props.isHeader) {
         var allowInput = this.props.isInteractable && this.props.editingMode;
         console.log(this.props.modeJ);
@@ -992,7 +1020,7 @@ var Row = function (_React$Component4) {
         if (this.props.children && j == 0 && this.props.editing) {
           arr.push(React.createElement(
             'th',
-            { style: { backgroundColor: "purple" } },
+            { style: { backgroundColor: "#555555" } },
             this.props.children
           ));
         } else {
@@ -1088,7 +1116,7 @@ var MemoryUnit = function (_React$Component6) {
         null,
         React.createElement(
           'span',
-          { style: { color: "black" } },
+          null,
           'MEMORY: '
         ),
         React.createElement('textarea', { value: this.props.memory, onChange: this.memoryUpdate })
@@ -1098,6 +1126,39 @@ var MemoryUnit = function (_React$Component6) {
 
   return MemoryUnit;
 }(React.Component);
+
+// class Clock extends React.Component {
+//   constructor(props) {
+//     super(props);
+//     this.state = {count: 0};
+//   }
+
+//   componentDidMount() {
+//     this.timerID = setInterval(
+//       () => this.tick(),
+//       1000
+//     );
+//   }
+
+//   componentWillUnmount() {
+//     clearInterval(this.timerID);
+//   }
+
+//   tick() {
+//     var count = this.state.count;
+//     if (count > 0) {
+//       count--;
+//       this.setState({count: count});
+//     }
+//   }
+
+//   render() {
+//     const display = this.state.count > 0 ? "block" : "none";
+//     return (
+//       <div style={{}}>New</div>
+//     );
+//   }
+// }
 
 var Spotlight = function (_React$Component7) {
   _inherits(Spotlight, _React$Component7);
@@ -1125,7 +1186,7 @@ var Spotlight = function (_React$Component7) {
 
       return React.createElement(
         'div',
-        { style: { display: "inline-block", padding: "10px 10px 10px 10px", backgroundColor: "gold" } },
+        { style: { display: "inline-block", padding: "10px 10px 10px 10px", backgroundColor: "2E3237" } },
         React.createElement(
           'span',
           { style: { color: "black", float: "right", whiteSpace: "pre-wrap" } },
@@ -1133,19 +1194,19 @@ var Spotlight = function (_React$Component7) {
         ),
         React.createElement(
           'h2',
-          { style: { color: "black" } },
+          null,
           'MODE: ',
           this.props.mode
         ),
         React.createElement(
           'h2',
-          { style: { color: "black" } },
+          null,
           'TONE: ',
           this.props.tone
         ),
         React.createElement(
           'h2',
-          { style: { color: "black" } },
+          null,
           'ACCENT: ',
           this.props.accent
         ),
@@ -1153,12 +1214,12 @@ var Spotlight = function (_React$Component7) {
         React.createElement('br', null),
         React.createElement(
           'h1',
-          { style: { color: "black", backgroundColor: "yellow", whiteSpace: "pre-wrap" } },
+          { style: { color: "black", backgroundColor: "#AD60FF", whiteSpace: "pre-wrap" } },
           this.props.command
         ),
         React.createElement(
           'h3',
-          { style: { color: "black" } },
+          null,
           'RAND: ',
           this.props.random
         )
@@ -1349,6 +1410,9 @@ var App = function (_React$Component9) {
       this.setState({ bank: e.target.value });
       localStorage.setItem(localStorageBankKey, e.target.value);
     }
+
+    // TODO: these also need to update the utilization map
+
   }, {
     key: 'moveup',
     value: function moveup(i) {
@@ -1357,7 +1421,21 @@ var App = function (_React$Component9) {
       var lineToSwap = oldData[i - 1];
       oldData[i - 1] = lineToMove;
       oldData[i] = lineToSwap;
-      this.setState({ data: oldData });
+      var oldPrevSelected = this.state.prevSelectedArr;
+      if (oldPrevSelected !== "") {
+        var lineToMove = oldPrevSelected[i];
+        var lineToSwap = oldPrevSelected[i - 1];
+        oldPrevSelected[i - 1] = lineToMove;
+        oldPrevSelected[i] = lineToSwap;
+      }
+      var oldSelectedArr = this.state.selectedArr;
+      if (oldSelectedArr !== "") {
+        var lineToMove = oldSelectedArr[i];
+        var lineToSwap = oldSelectedArr[i - 1];
+        oldSelectedArr[i - 1] = lineToMove;
+        oldSelectedArr[i] = lineToSwap;
+      }
+      this.setState({ data: oldData, prevSelectedArr: oldPrevSelected, selectedArr: oldSelectedArr });
     }
   }, {
     key: 'movedown',
@@ -1367,7 +1445,21 @@ var App = function (_React$Component9) {
       var lineToSwap = oldData[i + 1];
       oldData[i + 1] = lineToMove;
       oldData[i] = lineToSwap;
-      this.setState({ data: oldData });
+      var oldPrevSelected = this.state.prevSelectedArr;
+      if (oldPrevSelected !== "") {
+        var lineToMove = oldPrevSelected[i];
+        var lineToSwap = oldPrevSelected[i + 1];
+        oldPrevSelected[i + 1] = lineToMove;
+        oldPrevSelected[i] = lineToSwap;
+      }
+      var oldSelectedArr = this.state.selectedArr;
+      if (oldSelectedArr !== "") {
+        var lineToMove = oldSelectedArr[i];
+        var lineToSwap = oldSelectedArr[i + 1];
+        oldSelectedArr[i + 1] = lineToMove;
+        oldSelectedArr[i] = lineToSwap;
+      }
+      this.setState({ data: oldData, prevSelectedArr: oldPrevSelected, selectedArr: oldSelectedArr });
     }
   }, {
     key: 'onRowAdd',
@@ -1376,7 +1468,7 @@ var App = function (_React$Component9) {
       var lastRow = newData[newData.length - 1].slice();
       lastRow[0] = "NEW INPUT";
       newData.push(lastRow);
-      this.setState({ data: newData });
+      this.setState({ data: newData, prevSelectedArr: "", selectedArr: "" });
       localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
     }
   }, {
@@ -1385,7 +1477,7 @@ var App = function (_React$Component9) {
       if (this.state.inputRemoveWarning) {
         var oldData = this.state.data;
         var newData = oldData.slice(0, -1);
-        this.setState({ data: newData });
+        this.setState({ data: newData, prevSelectedArr: "", selectedArr: "" });
         localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
       }
       this.setState({ inputRemoveWarning: !this.state.inputRemoveWarning });
@@ -1401,7 +1493,7 @@ var App = function (_React$Component9) {
           newData[i].push("NEW STATE");
         }
       }
-      this.setState({ data: newData });
+      this.setState({ data: newData, prevSelectedArr: "", selectedArr: "" });
       localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
     }
   }, {
@@ -1412,7 +1504,7 @@ var App = function (_React$Component9) {
         for (var i = 0; i < newData.length; i++) {
           newData[i] = newData[i].slice(0, -1);
         }
-        this.setState({ data: newData });
+        this.setState({ data: newData, prevSelectedArr: "", selectedArr: "" });
         localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
       }
       this.setState({ modeRemoveWarning: !this.state.modeRemoveWarning });
@@ -1670,6 +1762,48 @@ var App = function (_React$Component9) {
 }(React.Component);
 
 ReactDOM.render(React.createElement(App, null), document.querySelector('#reactTable'));
+
+// v0.95
+//  color polish!
+//  new default code
+
+
+// light to dark stepping. web app color pickers. web apps that give me good 
+// #F0D60B - a good yellow HSB - hue saturation blackness. move the black
+// #35BD2D - green
+// #AD60FF - good purple
+
+
+/* playtest */
+// App bugs:
+// - [BUG] improve error messages based on Bailey's feedback
+// - [BUG] moving up rows does not preserve the edited stuff (red and black color test)
+// - [BUG] don't let the buttons wrap
+// - [BUG] you should be able to click on a default converse for empty cells in order to aid utilization
+// - [BUG] adding an input crashed the program? I think because the utilization was on
+// - [BUG] Add the red background back for the unfilled cells
+// - [LOW] things at the window corners ? low pri
+// - [LOW] should adding a new mode try and autofill with an ACTIVATE?
+// App Features
+// - [EZ] A blinking light when the spotlight is updated 
+// - Upsell ppl to CB-IO Ad
+// - Detect activate with a space after it
+// - Highlight IF in spotlight. Highlight memory in spotlight
+// Unsorted
+// Mode cells could only allow one line and be larger
+// Turn off spell check squiggles on our textfields
+// Possibly want to be able to turn off the red text for the tutorial
+// Make a preshow checklist for programmers
+
+
+/* thinking */
+// What are the fuzzy boundaries?
+// - Bank: EXACT (you get lightweight exact influence)
+// - Tone: does it influence words or just style?
+// - Converse: influenced by tone for sure
+// - Extrapolate from: influenced by bank only? maybe a little bit of tone coloring in word choice
+// - the random numbers can skew how influenced you are. you can word a little bit in the reverse. but do you always need to incorporate something they are telling you to do?
+
 
 /* Seek Feedback? */
 // [SMALL] toggle errors on and off as part of validation?

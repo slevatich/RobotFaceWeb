@@ -29,60 +29,94 @@ const initialData1 = [
 ];
 
 const initialBank2 = [
-  '"Lifetronics is the Future"'
+  '"Mozart was a genius"'
 ]
 
 const initialData2 = [
   ["", 
   "Make a good impression", 
-  "Sell Lifetronics' mission"],
+  "Get them talking"],
   ['ON_MODE_ENTER',
    'SET_TONE(Respectful and Polite)',
-   'SET_TONE(Gushing)\nSAY("Lifetronics is making the future possible!")'],
+   'SET_TONE(Peppy)\nSAY("I\'m more interested in what brings you here!")'],
   ['IF [else]',
    'CONVERSE()',
    'CONVERSE()'],
-  ['IF [they ask about Lifetronics]',
+  ['IF [asked about backstory]',
    'ACTIVATE(Sell Lifetronics\' mission)',
    'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'],
-  ['IF [they ask if the AI likes ice cream]',
+  ['IF [asked if you like ice cream]',
    'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
-   ''],
+   'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")'],
   ['IF [asked for your name]',
    'SAY("AI_NAME, whats yours?")',
-   ''],
-  ['IF [subject is changed]',
+   'SAY("AI_NAME, whats yours?")'],
+  ['IF [told something about human\'s personal life]',
    '',
-   'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Make a good impression)'],
+   'EXTRAPOLATE_FROM("Wow, cool! Sounds like you ...")\nACTIVATE(Make a good impression)'],
+  ['IF [topics mentioned COMPETITION, STRATEGY]',
+   '',
+   ''],
 ];
 
 const initialBank3 = [
-  '"Lifetronics is the Future"'
+  '"Mozart was a genius"'
 ]
 
 const initialData3 = [
   ["", 
   "Make a good impression", 
-  "Sell Lifetronics' mission"],
+  "Get them talking"],
   ['ON_MODE_ENTER',
    'SET_TONE(Respectful and Polite)',
-   'SET_TONE(Gushing)\nSAY("Lifetronics is making the future possible!")'],
+   'SET_TONE(Peppy)\nSAY("I\'m more interested in what brings you here!")'],
   ['IF [else]',
    'CONVERSE()',
    'CONVERSE()'],
-  ['IF [they ask about Lifetronics]',
+  ['IF [asked about backstory]',
    'ACTIVATE(Sell Lifetronics\' mission)',
    'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'],
-  ['IF [they ask if the AI likes ice cream]',
+  ['IF [asked if you like ice cream]',
    'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
-   ''],
+   'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")'],
   ['IF [asked for your name]',
    'SAY("AI_NAME, whats yours?")',
-   ''],
-  ['IF [subject is changed]',
+   'SAY("AI_NAME, whats yours?")'],
+  ['IF [told something about human\'s personal life]',
    '',
-   'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Make a good impression)'],
+   'EXTRAPOLATE_FROM("Wow, cool! Sounds like you ...")\nACTIVATE(Make a good impression)'],
+  ['IF [topics mentioned COMPETITION, STRATEGY]',
+   '',
+   ''],
 ];
+
+// const initialBank3 = [
+//   '"Lifetronics is the Future"'
+// ]
+
+// const initialData3 = [
+//   ["", 
+//   "Make a good impression", 
+//   "Sell Lifetronics' mission"],
+//   ['ON_MODE_ENTER',
+//    'SET_TONE(Respectful and Polite)',
+//    'SET_TONE(Gushing)\nSAY("Lifetronics is making the future possible!")'],
+//   ['IF [else]',
+//    'CONVERSE()',
+//    'CONVERSE()'],
+//   ['IF [they ask about Lifetronics]',
+//    'ACTIVATE(Sell Lifetronics\' mission)',
+//    'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'],
+//   ['IF [they ask if the AI likes ice cream]',
+//    'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
+//    ''],
+//   ['IF [asked for your name]',
+//    'SAY("AI_NAME, whats yours?")',
+//    ''],
+//   ['IF [subject is changed]',
+//    '',
+//    'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Make a good impression)'],
+// ];
 
 // const initialBank1 = [
 //   "humankind", "future", "world", "singularity", "Lifetronics", "'good work'", "'advancing peace'"
@@ -723,10 +757,10 @@ class InputCell extends React.Component {
   render() {
     // method that returns a string of whats wrong based on data and this.props.value
     const error = errorStringForCellText(this.props.value, this.props.data, this.props.j);
-    const errorComp = !(this.props.i == 0 || this.props.j == 0) && error ? <div style={{fontSize:"10", backgroundColor:"red"}}>{error}</div> : null;
-    const color = !this.state.modified ? "red" : "black";
+    const errorComp = !(this.props.i == 0 || this.props.j == 0) && error ? <div style={{fontSize:"10", backgroundColor:"#AB1516"}}>{error}</div> : null;
+    const color = (this.props.i == 0 || this.props.j == 0) ? "purple" : !this.state.modified ? "#555555" : "black";
     // white on edges, else we do green or red based on validity
-    const backgroundColor = (this.props.i == 0 || this.props.j == 0) ? "white" : !errorComp ? "aquamarine" : "pink";
+    const backgroundColor = (this.props.i == 0 || this.props.j == 0) ? "#E3E4E6" : (!errorComp && (this.props.value.length > 0)) ? "#E3E4E6" : "pink";
     return [<textarea style={{color:color, backgroundColor:backgroundColor}}
                       value={this.props.value} 
                       rows={lineCountForText(this.props.value) + 1} // lineCountForText(this.props.value)
@@ -770,7 +804,7 @@ class Cell extends React.Component {
   render() {
     // in editing mode, we truncate all 
     const wasUsed = this.props.selectedArr ? this.props.selectedArr[this.props.i][this.props.j] : false;
-    const tdStyle = !this.props.editingMode || !this.props.selectedArr || (this.props.i==0 || this.props.j==0) ? (this.props.isHeader ? "blue" : "transparent") : wasUsed ? "gold" : "red";
+    const tdStyle = !this.props.editingMode || !this.props.selectedArr || (this.props.i==0 || this.props.j==0) ? (this.props.isHeader ? "#555555" : "transparent") : wasUsed ? "gold" : "red";
     if (this.props.isHeader) {
       const allowInput = this.props.isInteractable && this.props.editingMode;
       console.log(this.props.modeJ);
@@ -825,7 +859,7 @@ class Row extends React.Component {
       const uninteractable = j==0 && this.props.i==1 || this.props.i==2 && j==0 || this.props.i==0 && j==0; // not interactable
       const isHeader = j==0 || this.props.i==0 || this.props.i==1; // non clickable in view mode, and bolder text
       if (this.props.children && j==0 && this.props.editing) {
-        arr.push(<th style={{backgroundColor:"purple"}}>{this.props.children}</th>)
+        arr.push(<th style={{backgroundColor:"#555555"}}>{this.props.children}</th>)
       } else {
         arr.push(<Cell modeJ={this.props.modeJ} selectedArr={this.props.selectedArr} isHeader={isHeader} isInteractable={!uninteractable} isSelected={j==this.props.selectedJ} editingMode={this.props.editing} text={this.props.data[this.props.i][j]} onCellEvent={this.onCellEvent} i={this.props.i} j={j} data={this.props.data} />)
       }
@@ -879,11 +913,44 @@ class MemoryUnit extends React.Component {
 
   render() {
     return <div>
-        <span style={{color:"black"}}>MEMORY: </span>
+        <span>MEMORY: </span>
         <textarea value={this.props.memory} onChange={this.memoryUpdate} />
       </div>;
   }
 }
+
+// class Clock extends React.Component {
+//   constructor(props) {
+//     super(props);
+//     this.state = {count: 0};
+//   }
+
+//   componentDidMount() {
+//     this.timerID = setInterval(
+//       () => this.tick(),
+//       1000
+//     );
+//   }
+
+//   componentWillUnmount() {
+//     clearInterval(this.timerID);
+//   }
+
+//   tick() {
+//     var count = this.state.count;
+//     if (count > 0) {
+//       count--;
+//       this.setState({count: count});
+//     }
+//   }
+
+//   render() {
+//     const display = this.state.count > 0 ? "block" : "none";
+//     return (
+//       <div style={{}}>New</div>
+//     );
+//   }
+// }
 
 class Spotlight extends React.Component {
   constructor(props) {
@@ -901,15 +968,15 @@ class Spotlight extends React.Component {
       return null;
     }
 
-    return <div style={{display:"inline-block", padding:"10px 10px 10px 10px", backgroundColor:"gold"}}>
+    return <div style={{display:"inline-block", padding:"10px 10px 10px 10px", backgroundColor:"2E3237"}}>
         <span style={{color:"black", float:"right", whiteSpace:"pre-wrap"}}>{this.props.bank}</span>
-        <h2 style={{color:"black"}}>MODE: {this.props.mode}</h2>
-        <h2 style={{color:"black"}}>TONE: {this.props.tone}</h2>
-        <h2 style={{color:"black"}}>ACCENT: {this.props.accent}</h2>
+        <h2>MODE: {this.props.mode}</h2>
+        <h2>TONE: {this.props.tone}</h2>
+        <h2>ACCENT: {this.props.accent}</h2>
         <MemoryUnit memory={this.props.memory} onChange={this.onChange} />
         <br/>
-        <h1 style={{color:"black", backgroundColor:"yellow", whiteSpace:"pre-wrap"}}>{this.props.command}</h1>
-        <h3 style={{color:"black"}}>RAND: {this.props.random}</h3>
+        <h1 style={{color:"black", backgroundColor:"#AD60FF", whiteSpace:"pre-wrap"}}>{this.props.command}</h1>
+        <h3>RAND: {this.props.random}</h3>
       </div>;
   }
 }
@@ -1071,13 +1138,28 @@ class App extends React.Component {
     localStorage.setItem(localStorageBankKey, e.target.value);
   }
 
+  // TODO: these also need to update the utilization map
   moveup(i) {
     var oldData = this.state.data;
     var lineToMove = oldData[i];
     var lineToSwap = oldData[i-1];
     oldData[i-1] = lineToMove;
     oldData[i] = lineToSwap;
-    this.setState({data:oldData});
+    var oldPrevSelected = this.state.prevSelectedArr;
+    if (oldPrevSelected !== "") {
+      var lineToMove = oldPrevSelected[i];
+      var lineToSwap = oldPrevSelected[i-1];
+      oldPrevSelected[i-1] = lineToMove;
+      oldPrevSelected[i] = lineToSwap;
+    }
+    var oldSelectedArr = this.state.selectedArr;
+    if (oldSelectedArr !== "") {
+      var lineToMove = oldSelectedArr[i];
+      var lineToSwap = oldSelectedArr[i-1];
+      oldSelectedArr[i-1] = lineToMove;
+      oldSelectedArr[i] = lineToSwap;
+    }
+    this.setState({data:oldData, prevSelectedArr:oldPrevSelected, selectedArr:oldSelectedArr});
   }
 
   movedown(i) {
@@ -1086,7 +1168,21 @@ class App extends React.Component {
     var lineToSwap = oldData[i+1];
     oldData[i+1] = lineToMove;
     oldData[i] = lineToSwap;
-    this.setState({data:oldData});
+    var oldPrevSelected = this.state.prevSelectedArr;
+    if (oldPrevSelected !== "") {
+      var lineToMove = oldPrevSelected[i];
+      var lineToSwap = oldPrevSelected[i+1];
+      oldPrevSelected[i+1] = lineToMove;
+      oldPrevSelected[i] = lineToSwap;
+    }
+    var oldSelectedArr = this.state.selectedArr;
+    if (oldSelectedArr !== "") {
+      var lineToMove = oldSelectedArr[i];
+      var lineToSwap = oldSelectedArr[i+1];
+      oldSelectedArr[i+1] = lineToMove;
+      oldSelectedArr[i] = lineToSwap;
+    }
+    this.setState({data:oldData, prevSelectedArr:oldPrevSelected, selectedArr:oldSelectedArr});
   }
 
   onRowAdd(e) {
@@ -1094,7 +1190,7 @@ class App extends React.Component {
     var lastRow = newData[newData.length-1].slice();
     lastRow[0] = "NEW INPUT";
     newData.push(lastRow);
-    this.setState({data: newData});
+    this.setState({data: newData, prevSelectedArr:"", selectedArr:""});
     localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
   }
 
@@ -1102,7 +1198,7 @@ class App extends React.Component {
     if (this.state.inputRemoveWarning) {
       var oldData = this.state.data
       var newData = oldData.slice(0,-1);
-      this.setState({data: newData});
+      this.setState({data: newData, prevSelectedArr:"", selectedArr:""});
       localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
     }
     this.setState({inputRemoveWarning:!this.state.inputRemoveWarning});
@@ -1117,7 +1213,7 @@ class App extends React.Component {
         newData[i].push("NEW STATE");
       }
     }
-    this.setState({data: newData});
+    this.setState({data: newData, prevSelectedArr:"", selectedArr:""});
     localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
   }
 
@@ -1127,7 +1223,7 @@ class App extends React.Component {
       for (var i=0; i<newData.length; i++) {
         newData[i] = newData[i].slice(0,-1);
       }
-      this.setState({data: newData});
+      this.setState({data: newData, prevSelectedArr:"", selectedArr:""});
       localStorage.setItem(localStorageProgramKey, JSON.stringify(newData));
     }
     this.setState({modeRemoveWarning:!this.state.modeRemoveWarning});
@@ -1302,6 +1398,52 @@ ReactDOM.render(
   <App />,
   document.querySelector('#reactTable')
 );
+
+
+// v0.95
+//  color polish!
+//  new default code
+
+
+// light to dark stepping. web app color pickers. web apps that give me good 
+    // #F0D60B - a good yellow HSB - hue saturation blackness. move the black
+    // #35BD2D - green
+    // #AD60FF - good purple
+
+
+/* playtest */
+// App bugs:
+// - [BUG] improve error messages based on Bailey's feedback
+// - [BUG] moving up rows does not preserve the edited stuff (red and black color test)
+// - [BUG] don't let the buttons wrap
+// - [BUG] you should be able to click on a default converse for empty cells in order to aid utilization
+// - [BUG] adding an input crashed the program? I think because the utilization was on
+// - [BUG] Add the red background back for the unfilled cells
+// - [LOW] things at the window corners ? low pri
+// - [LOW] should adding a new mode try and autofill with an ACTIVATE?
+// App Features
+// - [EZ] A blinking light when the spotlight is updated 
+// - Upsell ppl to CB-IO Ad
+// - Detect activate with a space after it
+// - Highlight IF in spotlight. Highlight memory in spotlight
+// Unsorted
+  // Mode cells could only allow one line and be larger
+  // Turn off spell check squiggles on our textfields
+  // Possibly want to be able to turn off the red text for the tutorial
+  // Make a preshow checklist for programmers
+
+
+/* thinking */
+// What are the fuzzy boundaries?
+// - Bank: EXACT (you get lightweight exact influence)
+// - Tone: does it influence words or just style?
+// - Converse: influenced by tone for sure
+// - Extrapolate from: influenced by bank only? maybe a little bit of tone coloring in word choice
+// - the random numbers can skew how influenced you are. you can word a little bit in the reverse. but do you always need to incorporate something they are telling you to do?
+
+
+
+
 
 
 /* Seek Feedback? */

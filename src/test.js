@@ -1,22 +1,22 @@
 'use strict';
 
 const initialBank1 = [
-  '"Lifetronics is the Future"'
+  '"Apex Dynamics is the Future"'
 ]
 
 const initialData1 = [
   ["", 
   "Make a good impression", 
-  "Sell Lifetronics' mission"],
+  "Sell Apex Dynamics' mission"],
   ['ON_MODE_ENTER',
    'SET_TONE(Respectful and Polite)',
-   'SET_TONE(Gushing)\nSAY("Lifetronics is making the future possible!")'],
+   'SET_TONE(Gushing)\nSAY("Apex Dynamics is making the future possible!")'],
   ['IF [else]',
    'CONVERSE()',
    'CONVERSE()'],
-  ['IF [asked about Lifetronics]',
-   'ACTIVATE(Sell Lifetronics\' mission)',
-   'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'],
+  ['IF [asked about Apex Dynamics]',
+   'ACTIVATE(Sell Apex Dynamics\' mission)',
+   'SAY("Apex Dynamics is an amazing company bringing the future of AI here today!)'],
   ['IF [asked if you like ice cream]',
    'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
    ''],
@@ -25,7 +25,7 @@ const initialData1 = [
    ''],
   ['IF [subject is changed]',
    '',
-   'SAY("Let me know if you want to talk about Lifetronics again.")\nACTIVATE(Make a good impression)'],
+   'SAY("Let me know if you want to talk about Apex Dynamics again.")\nACTIVATE(Make a good impression)'],
 ];
 
 const initialBank2 = [
@@ -44,7 +44,7 @@ const initialData2 = [
    'CONVERSE()'],
   ['IF [asked about backstory]',
    'ACTIVATE(2)',
-   'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'],
+   'SAY("Apex Dynamics is an amazing company bringing the future of AI here today!)'],
   ['IF [asked if you like ice cream]',
    'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
    'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")'],
@@ -75,7 +75,7 @@ const initialData3 = [
    'CONVERSE()'],
   ['IF [asked about backstory]',
    'ACTIVATE(2)',
-   'SAY("Lifetronics is an amazing company bringing the future of AI here today!)'],
+   'SAY("Apex Dynamics is an amazing company bringing the future of AI here today!)'],
   ['IF [asked if you like ice cream]',
    'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
    'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")'],

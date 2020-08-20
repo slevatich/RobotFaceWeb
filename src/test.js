@@ -1175,7 +1175,6 @@ class App extends React.Component {
     localStorage.setItem(localStorageBankKey, e.target.value);
   }
 
-  // TODO: these also need to update the utilization map
   moveup(i) {
     var oldData = this.state.data;
     var lineToMove = oldData[i];
@@ -1313,6 +1312,8 @@ class App extends React.Component {
     }
     this.setState({modeRemoveWarning:!this.state.modeRemoveWarning});
   }
+
+
 
   loadData1() {
     this.setState({bank:initialBank1.join('\n'), data:initialData1, selectedI: 0, selectedJ: 0, selectedArr:"", prevSelectedArr:""});

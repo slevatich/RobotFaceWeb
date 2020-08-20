@@ -1529,9 +1529,6 @@ var App = function (_React$Component9) {
       this.setState({ bank: e.target.value });
       localStorage.setItem(localStorageBankKey, e.target.value);
     }
-
-    // TODO: these also need to update the utilization map
-
   }, {
     key: 'moveup',
     value: function moveup(i) {

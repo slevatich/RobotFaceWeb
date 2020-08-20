@@ -253,7 +253,7 @@ const textPurple = "#b485e6";
 const brighterTextPurple = "#AD60FF";
 const unmodifiedTextColor = "#555555";
 const errorMessageRed = "#AB1516";
-
+//#F0D60B a good yellow
 
 /*
 Helper Functions
@@ -1487,33 +1487,6 @@ ReactDOM.render(
 );
 
 
-// v0.95
-//  color polish!
-//  new default code
-
-// light to dark stepping. web app color pickers. web apps that give me good 
-    // #F0D60B - a good yellow HSB - hue saturation blackness. move the black
-    // #35BD2D - green
-    // #AD60FF - good purple
-
-// #D7D8D9 - text gray (lighter)
-// #2E3237 - background gray (darker)
-
-
-/* playtest */
-// App bugs:
-// - [BUG] improve error messages based on Bailey's feedback
-// - [LOW] things at the window corners ? low pri
-// - [LOW] should adding a new mode try and autofill with an ACTIVATE?
-// App Features
-// - Upsell ppl to CB-IO Ad
-// - Validation
-// - Highlight memory in spotlight
-// Unsorted
-  // Mode cells could only allow one line and be larger
-  // Make a preshow checklist for programmers
-
-
 /* thinking */
 // What are the fuzzy boundaries?
 // - Bank: EXACT (you get lightweight exact influence)
@@ -1531,14 +1504,7 @@ ReactDOM.render(
 // [SMALL] toggle errors on and off as part of validation?
 // Should I prevent going to viewing mode with errors?
 // probably empty cells should still get red highlighting?
-
-/* Next Up */
-// Spotlight needs to be absolutely positioned. Improve layout here. Could it be long and flat? Audience may only need to see the command list
-// [MEDIUM] handle if statements in processing
-// [MEDIUM] highlight MEMORY in spotlight
-// [MEDIUM] highlight syntax in textareas
-// Work on readible layout and colors
-//    Improve Graph Display
+// SpeakEZ could also be a color hmmm....
 
 /* Media Testing */
 // empty livelab
@@ -1547,30 +1513,14 @@ ReactDOM.render(
 // I could make two versions of spotlight if helpful, and then only one could be screengrabbed for OBS
 // aiactors could zoom in the livelab tab to just focus on their part
 
-/* Midpir */
-// View mode force shrink the cells. truncate clickable cells? Could always just take first line of props
-// [SMALLISH] validate you can't have multiple modes with same name
-// [SMALLISH] validate no activate commands allowed in header cells
+/* Once its all over */
+// Try Redux
 // Update readme
-
-
-
 
 /* Security concerns */
 // can people see my url
 // is it at all a spoiler if people can go in and see default code and play around with it? 
 // is it ok if people play around with it after the show? this makes not being able to upload sort of a benefit lol
-
-/* Less Urgent */
-// [SMALLISH] validate a certain line length (figure out what spotlight likes). then I can make textfield optimizations
-//    improve the dynamic text operations. bank could have a limit EASILY
-// [MEDIUM] modes should be able to be numbers, or autofill or something
-// [MEDIUM] INPUT could be buttons that add text fields with pre-filled commands. 
-//   Or you can choose to do a custom command! Maybe color the commands. Instructions could be an easy version of this
-// [MEDIUM] INPUT set as a prefix could dynamically generate things in the text box 
-//   (process could return an arbitrary dictionary of variables)
-// is editable a concern? doesn't seem like it but I'd need to encode that in the defaults
-// get official colors and fonts eventually
 
 /* Server Backup Thoughts */
 // If not, then I'm dealing with broadcasting to some other website basically a POST request. 

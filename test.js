@@ -1086,7 +1086,7 @@ var Row = function (_React$Component4) {
     key: 'render',
     value: function render() {
       // add a cell with two buttons
-      var buttonStyle = { color: textOnBackgroundGray, fontSize: 20, backgroundColor: "transparent", backgroundRepeat: "no-repeat", border: "none", overflow: "hidden", outline: "none" };
+      var buttonStyle = { color: textOnBackgroundGray, fontSize: 15, backgroundColor: "transparent", backgroundRepeat: "no-repeat", border: "none", overflow: "hidden", outline: "none" };
       var upButton = this.props.i > 3 ? React.createElement(
         'button',
         { style: buttonStyle, onClick: this.moveup },
@@ -1297,7 +1297,7 @@ var Spotlight = function (_React$Component7) {
         React.createElement(
           'span',
           { style: { backgroundColor: "green", display: dotDisplay } },
-          '***'
+          '**********'
         ),
         React.createElement('br', null),
         React.createElement(
@@ -1947,7 +1947,7 @@ var App = function (_React$Component9) {
                 React.createElement('br', null),
                 React.createElement(
                   'button',
-                  { style: this.state.editing ? { display: "block", fontSize: 20, color: textOnBackgroundGray, backgroundColor: "transparent", backgroundRepeat: "no-repeat", border: "none", overflow: "hidden", outline: "none" } : { display: "none" }, onClick: this.onColumnRemove },
+                  { style: this.state.editing && widthFromDoubleArray(this.state.data) > 2 ? { display: "block", fontSize: 20, color: textOnBackgroundGray, backgroundColor: "transparent", backgroundRepeat: "no-repeat", border: "none", overflow: "hidden", outline: "none" } : { display: "none" }, onClick: this.onColumnRemove },
                   this.state.modeRemoveWarning ? "-?" : "-"
                 )
               ),
@@ -1958,7 +1958,7 @@ var App = function (_React$Component9) {
               ),
               React.createElement(
                 'button',
-                { style: this.state.editing ? { display: "inline", fontSize: 20, marginLeft: "20px", color: textOnBackgroundGray, backgroundColor: "transparent", backgroundRepeat: "no-repeat", border: "none", overflow: "hidden", outline: "none" } : { display: "none" }, onClick: this.onRowRemove },
+                { style: this.state.editing && heightFromDoubleArray(this.state.data) > 3 ? { display: "inline", fontSize: 20, marginLeft: "20px", color: textOnBackgroundGray, backgroundColor: "transparent", backgroundRepeat: "no-repeat", border: "none", overflow: "hidden", outline: "none" } : { display: "none" }, onClick: this.onRowRemove },
                 this.state.inputRemoveWarning ? "-?" : "-"
               )
             )

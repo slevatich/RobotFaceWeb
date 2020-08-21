@@ -881,7 +881,7 @@ class Row extends React.Component {
 
   render() {
     // add a cell with two buttons
-    const buttonStyle = {color:textOnBackgroundGray, fontSize:20, backgroundColor:"transparent", backgroundRepeat:"no-repeat", border:"none", overflow:"hidden", outline:"none"};
+    const buttonStyle = {color:textOnBackgroundGray, fontSize:15, backgroundColor:"transparent", backgroundRepeat:"no-repeat", border:"none", overflow:"hidden", outline:"none"};
     const upButton = this.props.i > 3 ? <button style={buttonStyle} onClick={this.moveup}>↑</button> : null;
     const downButton = this.props.i >= 3 && this.props.i < this.props.data.length - 1 ? <button style={buttonStyle} onClick={this.movedown}>↓</button> : null;
     const buttonCell = <td>
@@ -982,7 +982,7 @@ class Spotlight extends React.Component {
         <h2>TONE: {this.props.tone}</h2>
         <h2>ACCENT: {this.props.accent}</h2>
                 <span style={{float:"right", whiteSpace:"pre-wrap"}}>{"Bank:\n"}{this.props.bank}</span>
-        <MemoryUnit memory={this.props.memory} onChange={this.onChange} /><span style={{backgroundColor:"green", display:dotDisplay}}>***</span>
+        <MemoryUnit memory={this.props.memory} onChange={this.onChange} /><span style={{backgroundColor:"green", display:dotDisplay}}>**********</span>
         <br/>
         <h1 style={{color:"black", backgroundColor:textPurple, whiteSpace:"pre-wrap"}}>{this.props.command}</h1>
         <h3>RAND: {this.props.random}</h3>
@@ -1465,10 +1465,10 @@ class App extends React.Component {
               <div style={{display:"inline-block"}}>
                 <button style={this.state.editing ? {display:"block", fontSize:20, color:utilYes, backgroundColor:"transparent", backgroundRepeat:"no-repeat", border:"none", overflow:"hidden", outline:"none"} : {display:"none"}} onClick={this.onColumnAdd}>+</button>
                 <br/>
-                <button style={this.state.editing ? {display:"block", fontSize:20, color:textOnBackgroundGray, backgroundColor:"transparent", backgroundRepeat:"no-repeat", border:"none", overflow:"hidden", outline:"none"} : {display:"none"}} onClick={this.onColumnRemove}>{this.state.modeRemoveWarning ? "-?" : "-"}</button>
+                <button style={this.state.editing && widthFromDoubleArray(this.state.data) > 2 ? {display:"block", fontSize:20, color:textOnBackgroundGray, backgroundColor:"transparent", backgroundRepeat:"no-repeat", border:"none", overflow:"hidden", outline:"none"} : {display:"none"}} onClick={this.onColumnRemove}>{this.state.modeRemoveWarning ? "-?" : "-"}</button>
               </div>
               <button style={this.state.editing ? {display:"inline", fontSize:20, color:utilYes, backgroundColor:"transparent", backgroundRepeat:"no-repeat", border:"none", overflow:"hidden", outline:"none"} : {display:"none"}} onClick={this.onRowAdd}>+</button>
-              <button style={this.state.editing ? {display:"inline", fontSize:20, marginLeft:"20px", color:textOnBackgroundGray, backgroundColor:"transparent", backgroundRepeat:"no-repeat", border:"none", overflow:"hidden", outline:"none"} : {display:"none"}} onClick={this.onRowRemove}>{this.state.inputRemoveWarning ? "-?" : "-"}</button>
+              <button style={this.state.editing && heightFromDoubleArray(this.state.data) > 3 ? {display:"inline", fontSize:20, marginLeft:"20px", color:textOnBackgroundGray, backgroundColor:"transparent", backgroundRepeat:"no-repeat", border:"none", overflow:"hidden", outline:"none"} : {display:"none"}} onClick={this.onRowRemove}>{this.state.inputRemoveWarning ? "-?" : "-"}</button>
             </Table>
           </div>
           <br/>
@@ -1485,7 +1485,6 @@ ReactDOM.render(
   <App />,
   document.querySelector('#reactTable')
 );
-
 
 /* thinking */
 // What are the fuzzy boundaries?

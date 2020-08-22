@@ -1,91 +1,88 @@
 'use strict';
 
 const initialBank1 = [
-  '"Apex Dynamics is the Future"'
+  '"This is the Digital Dialogue"'
 ]
 
 const initialData1 = [
   ["", 
   "Make a good impression", 
-  "Sell Apex Dynamics' mission"],
+  "Defend Yourself"],
   ['ON_MODE_ENTER',
    'SET_TONE(Respectful and Polite)',
-   'SET_TONE(Gushing)\nSAY("Apex Dynamics is making the future possible!")'],
+   'SET_TONE(Passionate Fury)\nSAY("How dare you! Please apologize!")'],
   ['DEFAULT_RESPONSE',
    'CONVERSE()',
-   'CONVERSE()'],
-  ['IF [asked about Apex Dynamics]',
-   'ACTIVATE(Sell Apex Dynamics\' mission)',
-   'SAY("Apex Dynamics is an amazing company bringing the future of AI here today!)'],
+   'SAY("How dare you! Please apologize!")'],
   ['IF [asked if you like ice cream]',
    'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
-   ''],
+   'SAY("I LIKE ICE CREAM BUT I\'M STILL MAD!")'],
   ['IF [asked for your name]',
    'SAY("AI_NAME, whats yours?")',
+   'SAY("AI_NAME, whats yours?")'],
+  ['IF [they say an insult]',
+   'ACTIVATE(2)',
+   'SAY("Another insult?!")'],
+  ['IF [they apologize]',
+   'SAY("AI_NAME, whats yours?")',
+   'SAY("OK, apology accepted")\nACTIVATE(1)'],
+  ['IF [asked if you like hot dogs]',
+   'SAY("I love hot dogs!")',
    ''],
-  ['IF [subject is changed]',
-   '',
-   'SAY("Let me know if you want to talk about Apex Dynamics again.")\nACTIVATE(Make a good impression)'],
 ];
 
 const initialBank2 = [
-  '"Mozart was a genius"'
+  ''
 ]
 
 const initialData2 = [
   ["", 
   "Make a good impression", 
-  "Get them talking"],
+  ""],
   ['ON_MODE_ENTER',
    'SET_TONE(Respectful and Polite)',
-   'SET_TONE(Peppy)\nSAY("I\'m more interested in what brings you here!")'],
+   ''],
   ['DEFAULT_RESPONSE',
    'CONVERSE()',
-   'CONVERSE()'],
-  ['IF [asked about backstory]',
-   'ACTIVATE(2)',
-   'SAY("Apex Dynamics is an amazing company bringing the future of AI here today!)'],
-  ['IF [asked if you like ice cream]',
-   'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
-   'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")'],
+   ''],
   ['IF [asked for your name]',
    'SAY("AI_NAME, whats yours?")',
-   'SAY("AI_NAME, whats yours?")'],
-  ['IF [told something about human\'s personal life]',
-   '',
-   'EXTRAPOLATE_FROM("Wow, cool! Sounds like you ...")\nACTIVATE(Make a good impression)'],
+   ''],
   ['IF [topics mentioned COMPETITION, STRATEGY]',
+   '',
+   ''],
+  ['IF [topics mentioned BACKSTORY]',
+   '',
+   ''],
+  ['IF [topics mentioned HOBBIES]',
    '',
    ''],
 ];
 
 const initialBank3 = [
-  '"Mozart was a genius"'
+  ''
 ]
 
 const initialData3 = [
   ["", 
   "Make a good impression", 
-  "Get them talking"],
+  ""],
   ['ON_MODE_ENTER',
    'SET_TONE(Respectful and Polite)',
-   'SET_TONE(Peppy)\nSAY("I\'m more interested in what brings you here!")'],
+   ''],
   ['DEFAULT_RESPONSE',
    'CONVERSE()',
-   'CONVERSE()'],
-  ['IF [asked about backstory]',
-   'ACTIVATE(2)',
-   'SAY("Apex Dynamics is an amazing company bringing the future of AI here today!)'],
-  ['IF [asked if you like ice cream]',
-   'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")',
-   'SAY("I love ice cream! It\'s my favorite dessert by a mile. Especially vanilla!")'],
+   ''],
   ['IF [asked for your name]',
    'SAY("AI_NAME, whats yours?")',
-   'SAY("AI_NAME, whats yours?")'],
-  ['IF [told something about human\'s personal life]',
-   '',
-   'EXTRAPOLATE_FROM("Wow, cool! Sounds like you ...")\nACTIVATE(Make a good impression)'],
+   ''],
   ['IF [topics mentioned COMPETITION, STRATEGY]',
+   '',
+   ''],
+  ['IF [topics mentioned BACKSTORY]',
+   '',
+   ''],
+  ['IF [topics mentioned HOBBIES]',
    '',
    ''],
 ];

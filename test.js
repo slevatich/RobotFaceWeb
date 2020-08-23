@@ -14,11 +14,11 @@ var initialData1 = [["", "Make a good impression", "Defend Yourself"], ['ON_MODE
 
 var initialBank2 = [''];
 
-var initialData2 = [["", "Make a good impression", ""], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', ''], ['DEFAULT_RESPONSE', 'CONVERSE()', ''], ['IF [asked for your name]', 'SAY("AI_NAME, whats yours?")', ''], ['IF [topics mentioned COMPETITION, STRATEGY]', '', ''], ['IF [topics mentioned BACKSTORY]', '', ''], ['IF [topics mentioned HOBBIES]', '', '']];
+var initialData2 = [["", "Make a good impression", ""], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', ''], ['DEFAULT_RESPONSE', 'CONVERSE()', 'CONVERSE()'], ['IF [asked for your name]', 'SAY("AI_NAME, whats yours?")', ''], ['IF [topics mentioned COMPETITION, STRATEGY]', '', ''], ['IF [topics mentioned BACKSTORY]', '', ''], ['IF [topics mentioned HOBBIES]', '', '']];
 
 var initialBank3 = [''];
 
-var initialData3 = [["", "Make a good impression", ""], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', ''], ['DEFAULT_RESPONSE', 'CONVERSE()', ''], ['IF [asked for your name]', 'SAY("AI_NAME, whats yours?")', ''], ['IF [topics mentioned COMPETITION, STRATEGY]', '', ''], ['IF [topics mentioned BACKSTORY]', '', ''], ['IF [topics mentioned HOBBIES]', '', '']];
+var initialData3 = [["", "Make a good impression", ""], ['ON_MODE_ENTER', 'SET_TONE(Respectful and Polite)', ''], ['DEFAULT_RESPONSE', 'CONVERSE()', 'CONVERSE()'], ['IF [asked for your name]', 'SAY("AI_NAME, whats yours?")', ''], ['IF [topics mentioned COMPETITION, STRATEGY]', '', ''], ['IF [topics mentioned BACKSTORY]', '', ''], ['IF [topics mentioned HOBBIES]', '', '']];
 
 // const initialBank3 = [
 //   '"Lifetronics is the Future"'
@@ -1631,7 +1631,7 @@ var App = function (_React$Component9) {
         if (i) {
           newData[i].push(newData[i][newData[i].length - 1]);
         } else {
-          newData[i].push("NEW STATE");
+          newData[i].push("NEW MODE");
         }
       }
       var oldPrevSelected = this.state.prevSelectedArr;

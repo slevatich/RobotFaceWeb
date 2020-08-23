@@ -44,7 +44,7 @@ const initialData2 = [
    ''],
   ['DEFAULT_RESPONSE',
    'CONVERSE()',
-   ''],
+   'CONVERSE()'],
   ['IF [asked for your name]',
    'SAY("AI_NAME, whats yours?")',
    ''],
@@ -72,7 +72,7 @@ const initialData3 = [
    ''],
   ['DEFAULT_RESPONSE',
    'CONVERSE()',
-   ''],
+   'CONVERSE()'],
   ['IF [asked for your name]',
    'SAY("AI_NAME, whats yours?")',
    ''],
@@ -1267,7 +1267,7 @@ class App extends React.Component {
       if (i) {
         newData[i].push(newData[i][newData[i].length-1]);  
       } else {
-        newData[i].push("NEW STATE");
+        newData[i].push("NEW MODE");
       }
     }
     var oldPrevSelected = this.state.prevSelectedArr;

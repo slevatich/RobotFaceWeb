@@ -941,7 +941,7 @@ var InputCell = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      // if 
+      var activate = activateCommandFromCommandArray(commandsArrayForCell(this.props.value));
       // method that returns a string of whats wrong based on data and this.props.value
       var error = errorStringForCellText(this.props.value, this.props.data, this.props.j);
       var errorComp = !(this.props.i == 0 || this.props.j == 0) && error ? React.createElement(
@@ -951,14 +951,17 @@ var InputCell = function (_React$Component) {
       ) : null;
       var color = this.props.i == 0 || this.props.j == 0 ? "black" : !this.state.modified ? unmodifiedTextColor : "black";
       var backgroundColor = this.props.i == 0 || this.props.j == 0 ? textOnBackgroundGray : !errorComp && this.props.value.length > 0 || this.props.wasUsed ? cellTextFieldGray : cellTextFieldError;
+      var border = activate ? "3px solid " + textPurple : "1px solid black";
+      var padding = activate ? "2 2 2 2" : "4 4 4 4";
+      var rowsNum = Math.min(this.props.j == 0 ? lineCountForTextEdge(this.props.value) + 1 : lineCountForText(this.props.data, this.props.i) + 1, 5);
       return [this.props.i == 0 ? React.createElement(
         'h3',
         { style: { color: textPurple } },
         'Mode ',
         this.props.j
-      ) : null, React.createElement('textarea', { style: { color: color, backgroundColor: backgroundColor },
+      ) : null, React.createElement('textarea', { style: { color: color, backgroundColor: backgroundColor, border: border, padding: padding },
         value: this.props.value,
-        rows: this.props.j == 0 ? lineCountForTextEdge(this.props.value) + 1 : lineCountForText(this.props.data, this.props.i) + 1 // lineCountForText(this.props.value)
+        rows: rowsNum // lineCountForText(this.props.value)
         , cols: maxLineLenForInput // longestLineCountForText(this.props.value)
         , onChange: this.handleChange,
         spellcheck: false
@@ -1259,11 +1262,23 @@ var Spotlight = function (_React$Component7) {
         return null;
       }
 
-      var dotDisplay = this.props.count > 0 ? "inline" : "none";
+      var dotDisplay = "inline"; //this.props.count > 0 ? "inline" : "none"
+      var border = this.props.count > 0 ? "5px solid green" : "none";
+      var margin = this.props.count > 0 ? "10 10 10 10" : "15 15 15 15";
+
+      /*border: 1px solid gold;*/
+      //   Hide app title in view mode?
+      // Spotlight UI tweaks:
+      // - asterisks that don't move everything
+      // - bank no overflow
+      // Mini Spotlights. floating lower right. cap length of current spotlight
+      // - current Mode
+      // - current Tone
+      // - The Bank
 
       return React.createElement(
         'div',
-        { style: { display: "inline-block", padding: "10px 10px 10px 10px", backgroundColor: middleGray } },
+        { style: { display: "inline-block", backgroundColor: middleGray, border: border, padding: margin } },
         React.createElement(
           'span',
           { style: { fontSize: 25, fontWeight: "bold" } },
@@ -1296,8 +1311,8 @@ var Spotlight = function (_React$Component7) {
         React.createElement(MemoryUnit, { memory: this.props.memory, onChange: this.onChange }),
         React.createElement(
           'span',
-          { style: { backgroundColor: "green", display: dotDisplay } },
-          '**********'
+          { style: { color: utilYes, display: dotDisplay, fontSize: 20 } },
+          '***'
         ),
         React.createElement('br', null),
         React.createElement(
@@ -1507,14 +1522,46 @@ var App = function (_React$Component9) {
       if (this.state.editing) {
         var data = this.state.data;
         // run processing on e.target.value
+        var finalVal = e.target.value;
         var idx = e.target.value.toLowerCase().indexOf('ext(');
         if (idx >= 0) {
-          var str1 = e.target.value.substr(0, idx);
-          var str2 = e.target.value.substr(idx + 4, e.target.value.length - (idx + 4));
-          data[i][j] = str1 + 'EXTRAPOLATE_FROM(' + str2;
-        } else {
-          data[i][j] = e.target.value;
+          var str1 = finalVal.substr(0, idx);
+          var str2 = finalVal.substr(idx + 4, finalVal.length - (idx + 4));
+          finalVal = str1 + 'EXTRAPOLATE_FROM(' + str2;
         }
+        idx = e.target.value.toLowerCase().indexOf('act(');
+        if (idx >= 0) {
+          var _str = finalVal.substr(0, idx);
+          var _str2 = finalVal.substr(idx + 4, finalVal.length - (idx + 4));
+          finalVal = _str + 'ACTIVATE(' + _str2;
+        }
+        idx = e.target.value.toLowerCase().indexOf('con(');
+        if (idx >= 0) {
+          var _str3 = finalVal.substr(0, idx);
+          var _str4 = finalVal.substr(idx + 4, finalVal.length - (idx + 4));
+          finalVal = _str3 + 'CONVERSE(' + _str4;
+        }
+        idx = e.target.value.toLowerCase().indexOf('mem(');
+        if (idx >= 0) {
+          var _str5 = finalVal.substr(0, idx);
+          var _str6 = finalVal.substr(idx + 4, finalVal.length - (idx + 4));
+          finalVal = _str5 + 'SET_MEMORY(' + _str6;
+        }
+        idx = e.target.value.toLowerCase().indexOf('acc(');
+        if (idx >= 0) {
+          var _str7 = finalVal.substr(0, idx);
+          var _str8 = finalVal.substr(idx + 4, finalVal.length - (idx + 4));
+          finalVal = _str7 + 'SET_ACCENT(' + _str8;
+        }
+        idx = e.target.value.toLowerCase().indexOf('ton(');
+        if (idx >= 0) {
+          var _str9 = finalVal.substr(0, idx);
+          var _str10 = finalVal.substr(idx + 4, finalVal.length - (idx + 4));
+          finalVal = _str9 + 'SET_TONE(' + _str10;
+        }
+
+        data[i][j] = finalVal;
+
         this.setState({ data: data, showCanvas: false, modeRemoveWarning: false, inputRemoveWarning: false });
         localStorage.setItem(localStorageProgramKey, JSON.stringify(data));
       } else {

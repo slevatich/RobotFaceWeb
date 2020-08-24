@@ -783,16 +783,19 @@ class InputCell extends React.Component {
   }
 
   render() {
-    // if 
+    const activate = activateCommandFromCommandArray(commandsArrayForCell(this.props.value));
     // method that returns a string of whats wrong based on data and this.props.value
     const error = errorStringForCellText(this.props.value, this.props.data, this.props.j);
     const errorComp = !(this.props.i == 0 || this.props.j == 0) && error ? <div style={{fontSize:"10", backgroundColor:errorMessageRed, padding:"0 2 2 2", margin:"2 2 2 2"}}>{error}</div> : null;
     const color = (this.props.i == 0 || this.props.j == 0) ? "black" : !this.state.modified ? unmodifiedTextColor : "black";
     const backgroundColor = (this.props.i == 0 || this.props.j == 0) ? textOnBackgroundGray : (!errorComp && (this.props.value.length > 0)) || this.props.wasUsed ? cellTextFieldGray : cellTextFieldError;
+    const border = activate ? ("3px solid " + textPurple) : "1px solid black"
+    const padding = activate ? "2 2 2 2" : "4 4 4 4";
+    const rowsNum = Math.min(this.props.j==0 ? lineCountForTextEdge(this.props.value) + 1: lineCountForText(this.props.data, this.props.i) + 1, 5);
     return [this.props.i == 0 ? <h3 style={{color:textPurple}}>Mode {this.props.j}</h3> : null,
-            <textarea style={{color:color, backgroundColor:backgroundColor}}
+            <textarea style={{color:color, backgroundColor:backgroundColor, border:border, padding:padding}}
                       value={this.props.value} 
-                      rows={this.props.j==0 ? lineCountForTextEdge(this.props.value) + 1: lineCountForText(this.props.data, this.props.i) + 1} // lineCountForText(this.props.value)
+                      rows={rowsNum} // lineCountForText(this.props.value)
                       cols={maxLineLenForInput} // longestLineCountForText(this.props.value)
                       onChange={this.handleChange}
                       spellcheck={false}
@@ -971,15 +974,27 @@ class Spotlight extends React.Component {
       return null;
     }
 
-    const dotDisplay = this.props.count > 0 ? "inline" : "none"
+    const dotDisplay = "inline"//this.props.count > 0 ? "inline" : "none"
+    const border = this.props.count > 0 ? "5px solid green" : "none"
+    const margin = this.props.count > 0 ? "10 10 10 10": "15 15 15 15"
 
-    return <div style={{display:"inline-block", padding:"10px 10px 10px 10px", backgroundColor:middleGray}}>
+/*border: 1px solid gold;*/
+//   Hide app title in view mode?
+// Spotlight UI tweaks:
+// - asterisks that don't move everything
+// - bank no overflow
+// Mini Spotlights. floating lower right. cap length of current spotlight
+// - current Mode
+// - current Tone
+// - The Bank
+
+    return <div style={{display:"inline-block", backgroundColor:middleGray, border:border, padding:margin}}>
         <span style={{fontSize:25, fontWeight:"bold"}}>MODE: </span><span style={{fontSize:25, fontWeight:"bold",color:textPurple}}>{this.props.mode}</span>
         <br/>
         <h2>TONE: {this.props.tone}</h2>
         <h2>ACCENT: {this.props.accent}</h2>
                 <span style={{float:"right", whiteSpace:"pre-wrap"}}>{"Bank:\n"}{this.props.bank}</span>
-        <MemoryUnit memory={this.props.memory} onChange={this.onChange} /><span style={{backgroundColor:"green", display:dotDisplay}}>**********</span>
+        <MemoryUnit memory={this.props.memory} onChange={this.onChange} /><span style={{color:utilYes, display:dotDisplay, fontSize:20}}>***</span>
         <br/>
         <h1 style={{color:"black", backgroundColor:textPurple, whiteSpace:"pre-wrap"}}>{this.props.command}</h1>
         <h3>RAND: {this.props.random}</h3>
@@ -1149,14 +1164,46 @@ class App extends React.Component {
     if (this.state.editing) {
       var data = this.state.data;
       // run processing on e.target.value
-      const idx = e.target.value.toLowerCase().indexOf('ext(');
+      var finalVal = e.target.value;
+      var idx = e.target.value.toLowerCase().indexOf('ext(');
       if (idx >= 0) {
-        const str1 = e.target.value.substr(0,idx);
-        const str2 = e.target.value.substr(idx+4, e.target.value.length-(idx+4));
-        data[i][j] = str1 + 'EXTRAPOLATE_FROM(' + str2;
-      } else {
-        data[i][j] = e.target.value;
+        const str1 = finalVal.substr(0,idx);
+        const str2 = finalVal.substr(idx+4, finalVal.length-(idx+4));
+        finalVal = str1 + 'EXTRAPOLATE_FROM(' + str2;
       }
+      idx = e.target.value.toLowerCase().indexOf('act(');
+      if (idx >= 0) {
+        const str1 = finalVal.substr(0,idx);
+        const str2 = finalVal.substr(idx+4, finalVal.length-(idx+4));
+        finalVal = str1 + 'ACTIVATE(' + str2;
+      }
+      idx = e.target.value.toLowerCase().indexOf('con(');
+      if (idx >= 0) {
+        const str1 = finalVal.substr(0,idx);
+        const str2 = finalVal.substr(idx+4, finalVal.length-(idx+4));
+        finalVal = str1 + 'CONVERSE(' + str2;
+      }
+      idx = e.target.value.toLowerCase().indexOf('mem(');
+      if (idx >= 0) {
+        const str1 = finalVal.substr(0,idx);
+        const str2 = finalVal.substr(idx+4, finalVal.length-(idx+4));
+        finalVal = str1 + 'SET_MEMORY(' + str2;
+      }
+      idx = e.target.value.toLowerCase().indexOf('acc(');
+      if (idx >= 0) {
+        const str1 = finalVal.substr(0,idx);
+        const str2 = finalVal.substr(idx+4, finalVal.length-(idx+4));
+        finalVal = str1 + 'SET_ACCENT(' + str2;
+      }
+      idx = e.target.value.toLowerCase().indexOf('ton(');
+      if (idx >= 0) {
+        const str1 = finalVal.substr(0,idx);
+        const str2 = finalVal.substr(idx+4, finalVal.length-(idx+4));
+        finalVal = str1 + 'SET_TONE(' + str2;
+      }
+
+      data[i][j] = finalVal;
+      
       this.setState({data:data, showCanvas:false, modeRemoveWarning:false, inputRemoveWarning:false});
       localStorage.setItem(localStorageProgramKey, JSON.stringify(data));
     } else {

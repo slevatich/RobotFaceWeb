@@ -1265,6 +1265,7 @@ var Spotlight = function (_React$Component7) {
       var dotDisplay = "inline"; //this.props.count > 0 ? "inline" : "none"
       var border = this.props.count > 0 ? "5px solid green" : "none";
       var margin = this.props.count > 0 ? "10 10 10 10" : "15 15 15 15";
+      var color = this.props.count > 0 ? utilYes : middleGray;
 
       /*border: 1px solid gold;*/
       //   Hide app title in view mode?
@@ -1311,7 +1312,7 @@ var Spotlight = function (_React$Component7) {
         React.createElement(MemoryUnit, { memory: this.props.memory, onChange: this.onChange }),
         React.createElement(
           'span',
-          { style: { color: utilYes, display: dotDisplay, fontSize: 20 } },
+          { style: { color: color, display: dotDisplay, fontSize: 40 } },
           '***'
         ),
         React.createElement('br', null),

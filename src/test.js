@@ -977,6 +977,7 @@ class Spotlight extends React.Component {
     const dotDisplay = "inline"//this.props.count > 0 ? "inline" : "none"
     const border = this.props.count > 0 ? "5px solid green" : "none"
     const margin = this.props.count > 0 ? "10 10 10 10": "15 15 15 15"
+    const color = this.props.count > 0 ? utilYes : middleGray
 
 /*border: 1px solid gold;*/
 //   Hide app title in view mode?
@@ -994,7 +995,7 @@ class Spotlight extends React.Component {
         <h2>TONE: {this.props.tone}</h2>
         <h2>ACCENT: {this.props.accent}</h2>
                 <span style={{float:"right", whiteSpace:"pre-wrap"}}>{"Bank:\n"}{this.props.bank}</span>
-        <MemoryUnit memory={this.props.memory} onChange={this.onChange} /><span style={{color:utilYes, display:dotDisplay, fontSize:20}}>***</span>
+        <MemoryUnit memory={this.props.memory} onChange={this.onChange} /><span style={{color:color, display:dotDisplay, fontSize:40}}>***</span>
         <br/>
         <h1 style={{color:"black", backgroundColor:textPurple, whiteSpace:"pre-wrap"}}>{this.props.command}</h1>
         <h3>RAND: {this.props.random}</h3>

@@ -1230,7 +1230,7 @@ var MemoryUnit = function (_React$Component6) {
           null,
           'MEMORY: '
         ),
-        React.createElement('textarea', { style: { backgroundColor: textOnBackgroundGray }, spellcheck: false, value: this.props.memory, onChange: this.memoryUpdate })
+        React.createElement('textarea', { rows: 1, style: { verticalAlign: "top", backgroundColor: textOnBackgroundGray }, spellcheck: false, value: this.props.memory, onChange: this.memoryUpdate })
       );
     }
   }]);
@@ -1264,7 +1264,7 @@ var Spotlight = function (_React$Component7) {
 
       var dotDisplay = "inline"; //this.props.count > 0 ? "inline" : "none"
       var border = this.props.count > 0 ? "5px solid green" : "none";
-      var margin = this.props.count > 0 ? "10 10 10 10" : "15 15 15 15";
+      var padding = this.props.count > 0 ? "10 10 10 10" : "15 15 15 15";
       var color = this.props.count > 0 ? utilYes : middleGray;
 
       /*border: 1px solid gold;*/
@@ -1277,9 +1277,59 @@ var Spotlight = function (_React$Component7) {
       // - current Tone
       // - The Bank
 
-      return React.createElement(
+      return [React.createElement(
         'div',
-        { style: { display: "inline-block", backgroundColor: middleGray, border: border, padding: margin } },
+        { style: { display: "inline-block", backgroundColor: middleGray, width: "64%", border: border, padding: padding } },
+        React.createElement(
+          'span',
+          { style: { fontSize: 25, fontWeight: "bold" } },
+          'MODE: '
+        ),
+        React.createElement(
+          'span',
+          { style: { fontSize: 25, fontWeight: "bold", color: textPurple } },
+          this.props.mode
+        ),
+        React.createElement('br', null),
+        React.createElement(
+          'span',
+          { style: { float: "right", whiteSpace: "pre-wrap" } },
+          "Bank:\n",
+          this.props.bank
+        ),
+        React.createElement(
+          'h2',
+          null,
+          'TONE: ',
+          this.props.tone
+        ),
+        React.createElement(
+          'h2',
+          null,
+          'ACCENT: ',
+          this.props.accent
+        ),
+        React.createElement(MemoryUnit, { memory: this.props.memory, onChange: this.onChange }),
+        React.createElement(
+          'span',
+          { style: { display: "inline-block", padding: "20 20 20 0", verticalAlign: "top", fontSize: "20" } },
+          'RAND: ',
+          this.props.random
+        ),
+        React.createElement(
+          'span',
+          { style: { color: color, display: dotDisplay, fontSize: 60 } },
+          '***'
+        ),
+        React.createElement('br', null),
+        React.createElement(
+          'span',
+          { style: { color: "black", fontSize: "30", fontWeight: "bold", backgroundColor: textPurple, whiteSpace: "pre-wrap" } },
+          this.props.command
+        )
+      ), React.createElement(
+        'div',
+        { style: { display: "inline-block", verticalAlign: "top", backgroundColor: middleGray, width: "30%", border: border, padding: padding } },
         React.createElement(
           'span',
           { style: { fontSize: 25, fontWeight: "bold" } },
@@ -1298,36 +1348,12 @@ var Spotlight = function (_React$Component7) {
           this.props.tone
         ),
         React.createElement(
-          'h2',
-          null,
-          'ACCENT: ',
-          this.props.accent
-        ),
-        React.createElement(
           'span',
-          { style: { float: "right", whiteSpace: "pre-wrap" } },
+          { style: { whiteSpace: "pre-wrap" } },
           "Bank:\n",
           this.props.bank
-        ),
-        React.createElement(MemoryUnit, { memory: this.props.memory, onChange: this.onChange }),
-        React.createElement(
-          'span',
-          { style: { color: color, display: dotDisplay, fontSize: 40 } },
-          '***'
-        ),
-        React.createElement('br', null),
-        React.createElement(
-          'h1',
-          { style: { color: "black", backgroundColor: textPurple, whiteSpace: "pre-wrap" } },
-          this.props.command
-        ),
-        React.createElement(
-          'h3',
-          null,
-          'RAND: ',
-          this.props.random
         )
-      );
+      )];
     }
   }]);
 
@@ -1346,9 +1372,11 @@ var Menu = function (_React$Component8) {
   _createClass(Menu, [{
     key: 'render',
     value: function render() {
+      var width = this.props.editing ? canvasDim : "auto";
+      console.log(width);
       return React.createElement(
         'div',
-        { style: { backgroundColor: "black", zIndex: "3", padding: "3px 3px 3px 3px", position: "fixed", top: "0", right: "0", width: canvasDim } },
+        { style: { backgroundColor: "black", zIndex: "3", padding: "3px 3px 3px 3px", position: "fixed", top: "0", right: "0", width: width } },
         this.props.children
       );
     }
@@ -1910,12 +1938,37 @@ var App = function (_React$Component9) {
       var showUsageButtonStyle = !this.state.editing || !this.state.prevSelectedArr || !this.state.showButtons ? "none" : "inline-block";
       var editModeBreak = this.state.editing && this.state.showButtons ? React.createElement('br', null) : null;
       var buttonToggleDisplay = this.state.editing ? "inline" : "none";
-      return React.createElement(
+      return [React.createElement(
+        'div',
+        { style: { display: this.state.editing ? "block" : "none" } },
+        React.createElement(
+          'span',
+          { style: { fontSize: "60", fontWeight: "bold", color: "white" } },
+          'The_SpeakEZ'
+        ),
+        React.createElement(
+          'span',
+          null,
+          'v0.95'
+        ),
+        React.createElement(
+          'span',
+          { style: { marginLeft: "30" } },
+          'presented by '
+        ),
+        React.createElement(
+          'span',
+          { style: { fontStyle: "italic" } },
+          'APEX DYNAMICS'
+        ),
+        React.createElement('br', null),
+        React.createElement('br', null)
+      ), React.createElement(
         'div',
         null,
         React.createElement(
           Menu,
-          null,
+          { editing: this.state.editing },
           React.createElement(
             'button',
             { style: { float: "right" }, onClick: this.onToggle },
@@ -2020,7 +2073,7 @@ var App = function (_React$Component9) {
         ),
         React.createElement('canvas', { id: 'canvas', width: canvasDim, height: canvasDim, style: { position: "fixed", right: "0", bottom: "0", backgroundColor: textOnBackgroundGray, display: canvasViz } }),
         React.createElement(Spotlight, { count: this.state.count, bank: this.state.bank, editing: this.state.editing, command: this.state.command, mode: this.state.mode, accent: this.state.accent, tone: this.state.tone, memory: this.state.memory, random: this.state.random, onChange: this.memoryUpdate })
-      );
+      )];
     }
   }]);
 

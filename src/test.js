@@ -953,7 +953,7 @@ class MemoryUnit extends React.Component {
   render() {
     return <div>
         <span>MEMORY: </span>
-        <textarea style={{backgroundColor:textOnBackgroundGray}} spellcheck={false} value={this.props.memory} onChange={this.memoryUpdate} />
+        <textarea rows={1} style={{verticalAlign:"top", backgroundColor:textOnBackgroundGray}} spellcheck={false} value={this.props.memory} onChange={this.memoryUpdate} />
       </div>;
   }
 }
@@ -976,7 +976,7 @@ class Spotlight extends React.Component {
 
     const dotDisplay = "inline"//this.props.count > 0 ? "inline" : "none"
     const border = this.props.count > 0 ? "5px solid green" : "none"
-    const margin = this.props.count > 0 ? "10 10 10 10": "15 15 15 15"
+    const padding = this.props.count > 0 ? "10 10 10 10": "15 15 15 15"
     const color = this.props.count > 0 ? utilYes : middleGray
 
 /*border: 1px solid gold;*/
@@ -989,17 +989,22 @@ class Spotlight extends React.Component {
 // - current Tone
 // - The Bank
 
-    return <div style={{display:"inline-block", backgroundColor:middleGray, border:border, padding:margin}}>
+    return [<div style={{display:"inline-block", backgroundColor:middleGray, width:"64%", border:border, padding:padding}}>
+        <span style={{fontSize:25, fontWeight:"bold"}}>MODE: </span><span style={{fontSize:25, fontWeight:"bold",color:textPurple}}>{this.props.mode}</span>
+        <br/>
+        <span style={{float:"right", whiteSpace:"pre-wrap"}}>{"Bank:\n"}{this.props.bank}</span>
+        <h2>TONE: {this.props.tone}</h2>
+        <h2>ACCENT: {this.props.accent}</h2>
+        <MemoryUnit memory={this.props.memory} onChange={this.onChange} />
+        <span style={{display:"inline-block", padding:"20 20 20 0", verticalAlign:"top", fontSize:"20"}}>RAND: {this.props.random}</span><span style={{color:color, display:dotDisplay, fontSize:60}}>***</span>
+        <br/>
+        <span style={{color:"black", fontSize:"30", fontWeight:"bold", backgroundColor:textPurple, whiteSpace:"pre-wrap"}}>{this.props.command}</span>
+      </div>, <div style={{display:"inline-block", verticalAlign:"top", backgroundColor:middleGray, width:"30%", border:border, padding:padding}}>
         <span style={{fontSize:25, fontWeight:"bold"}}>MODE: </span><span style={{fontSize:25, fontWeight:"bold",color:textPurple}}>{this.props.mode}</span>
         <br/>
         <h2>TONE: {this.props.tone}</h2>
-        <h2>ACCENT: {this.props.accent}</h2>
-                <span style={{float:"right", whiteSpace:"pre-wrap"}}>{"Bank:\n"}{this.props.bank}</span>
-        <MemoryUnit memory={this.props.memory} onChange={this.onChange} /><span style={{color:color, display:dotDisplay, fontSize:40}}>***</span>
-        <br/>
-        <h1 style={{color:"black", backgroundColor:textPurple, whiteSpace:"pre-wrap"}}>{this.props.command}</h1>
-        <h3>RAND: {this.props.random}</h3>
-      </div>;
+        <span style={{whiteSpace:"pre-wrap"}}>{"Bank:\n"}{this.props.bank}</span>
+      </div>];
   }
 }
 
@@ -1009,7 +1014,9 @@ class Menu extends React.Component {
   }
 
   render() {
-    return <div style={{backgroundColor:"black", zIndex:"3", padding:"3px 3px 3px 3px", position:"fixed", top:"0", right:"0", width:canvasDim}}>{this.props.children}</div>;
+    const width = this.props.editing ? canvasDim : "auto"
+    console.log(width);
+    return <div style={{backgroundColor:"black", zIndex:"3", padding:"3px 3px 3px 3px", position:"fixed", top:"0", right:"0", width:width}}>{this.props.children}</div>;
   }
 }
 
@@ -1480,9 +1487,17 @@ class App extends React.Component {
     const showUsageButtonStyle = !this.state.editing || !this.state.prevSelectedArr || !this.state.showButtons ? "none" : "inline-block";
     const editModeBreak = this.state.editing && this.state.showButtons ? <br/> : null;
     const buttonToggleDisplay = this.state.editing ? "inline" : "none";
-    return (
+    return [
+    <div style={{display:(this.state.editing ? "block" : "none" )}}>
+    <span style={{fontSize:"60", fontWeight:"bold", color:"white"}}>The_SpeakEZ</span>
+    <span>v0.95</span>
+    <span style={{marginLeft: "30"}}>presented by </span>
+    <span style={{fontStyle: "italic"}}>APEX DYNAMICS</span>
+    <br/>
+    <br/>
+    </div>,
       <div>
-        <Menu>
+        <Menu editing={this.state.editing}>
           <button style={{float:"right"}} onClick={this.onToggle}>{toggleButtonText}</button>
           <button style={{float:"right", display:buttonToggleDisplay}} onClick={this.showHideButtons}>{this.state.showButtons ? "Close Settings" : "Open Settings"}</button>
           {editModeBreak}
@@ -1522,7 +1537,7 @@ class App extends React.Component {
         <canvas id="canvas" width={canvasDim} height={canvasDim} style={{position:"fixed", right:"0", bottom:"0", backgroundColor:textOnBackgroundGray, display:canvasViz}}></canvas>
         <Spotlight count={this.state.count} bank={this.state.bank} editing={this.state.editing} command={this.state.command} mode={this.state.mode} accent={this.state.accent} tone={this.state.tone} memory={this.state.memory} random={this.state.random} onChange={this.memoryUpdate} />
       </div>
-    );
+    ];
   }
 }
 

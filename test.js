@@ -1027,7 +1027,7 @@ var Cell = function (_React$Component3) {
   }, {
     key: 'render',
     value: function render() {
-      // in editing mode, we truncate all 
+      var viewText = this.props.truncate && this.props.i != 0 && this.props.j != 0 ? "Click Me!" : this.props.text;
       var wasUsed = this.props.selectedArr ? this.props.selectedArr[this.props.i][this.props.j] == 2 : false;
       var isNew = this.props.selectedArr ? this.props.selectedArr[this.props.i][this.props.j] == 1 : false;
       var tdStyle = !this.props.editingMode || !this.props.selectedArr || this.props.i == 0 || this.props.j == 0 ? this.props.isHeader ? middleGray : "transparent" : wasUsed ? utilYes : isNew ? "transparent" : utilNo;
@@ -1040,14 +1040,14 @@ var Cell = function (_React$Component3) {
           !allowInput ? React.createElement(
             'h3',
             { style: { color: textPurple, margin: "0 0 0 0" } },
-            this.props.text
+            viewText
           ) : React.createElement(InputCell, { value: this.props.text, onCellChange: this.onCellEvent, i: this.props.i, j: this.props.j, data: this.props.data })
         );
       } else {
         return React.createElement(
           'td',
           { style: { backgroundColor: tdStyle } },
-          !this.props.isInteractable ? this.props.text : !this.props.editingMode ? React.createElement(ReadOnlyCell, { value: this.props.text, onCellClick: this.onCellEvent, i: this.props.i, j: this.props.j, isSelected: this.props.isSelected, data: this.props.data }) : React.createElement(InputCell, { wasUsed: this.props.selectedArr, value: this.props.text, onCellChange: this.onCellEvent, i: this.props.i, j: this.props.j, data: this.props.data })
+          !this.props.isInteractable ? viewText : !this.props.editingMode ? React.createElement(ReadOnlyCell, { value: viewText, onCellClick: this.onCellEvent, i: this.props.i, j: this.props.j, isSelected: this.props.isSelected, data: this.props.data }) : React.createElement(InputCell, { wasUsed: this.props.selectedArr, value: this.props.text, onCellChange: this.onCellEvent, i: this.props.i, j: this.props.j, data: this.props.data })
         );
       }
     }
@@ -1086,6 +1086,13 @@ var Row = function (_React$Component4) {
       this.props.movedown(this.props.i);
     }
   }, {
+    key: 'alterTruncation',
+    value: function alterTruncation() {
+      this.setState(function (state, props) {
+        return { truncateMore: !state.truncateMore };
+      });
+    }
+  }, {
     key: 'render',
     value: function render() {
       // add a cell with two buttons
@@ -1111,14 +1118,28 @@ var Row = function (_React$Component4) {
       for (var j = 0; j < this.props.width; j++) {
         var uninteractable = j == 0 && this.props.i == 1 || this.props.i == 2 && j == 0 || this.props.i == 0 && j == 0; // not interactable
         var isHeader = j == 0 || this.props.i == 0 || this.props.i == 1; // non clickable in view mode, and bolder text
-        if (this.props.i == 0 && this.props.children[0] && j == 0 && this.props.editing) {
-          arr.push(React.createElement(
-            'th',
-            { style: { backgroundColor: middleGray } },
-            this.props.children[0]
-          ));
+        if (this.props.i == 0 && j == 0) {
+          if (this.props.editing && this.props.children[0]) {
+            // bank
+            arr.push(React.createElement(
+              'th',
+              { style: { backgroundColor: middleGray } },
+              this.props.children[0]
+            ));
+          } else {
+            // checkbox
+            arr.push(React.createElement(
+              'th',
+              { style: { backgroundColor: middleGray, color: textOnBackgroundGray } },
+              React.createElement(
+                'button',
+                { onClick: this.props.truncFunc },
+                this.props.truncate ? "Show Full Text" : "Shorten Text"
+              )
+            ));
+          }
         } else {
-          arr.push(React.createElement(Cell, { modeJ: this.props.modeJ, selectedArr: this.props.selectedArr, isHeader: isHeader, isInteractable: !uninteractable, isSelected: j == this.props.selectedJ, editingMode: this.props.editing, text: this.props.data[this.props.i][j], onCellEvent: this.onCellEvent, i: this.props.i, j: j, data: this.props.data }));
+          arr.push(React.createElement(Cell, { truncate: this.props.truncate, modeJ: this.props.modeJ, selectedArr: this.props.selectedArr, isHeader: isHeader, isInteractable: !uninteractable, isSelected: j == this.props.selectedJ, editingMode: this.props.editing, text: this.props.data[this.props.i][j], onCellEvent: this.onCellEvent, i: this.props.i, j: j, data: this.props.data }));
         }
       }
       if (this.props.i == 0) {
@@ -1147,11 +1168,12 @@ var Table = function (_React$Component5) {
 
     var _this5 = _possibleConstructorReturn(this, (Table.__proto__ || Object.getPrototypeOf(Table)).call(this, props));
 
-    _this5.state = { invalidState: null, modeRemoveWarning: false, inputRemoveWarning: false };
+    _this5.state = { truncateMore: false };
 
     _this5.onCellEvent = _this5.onCellEvent.bind(_this5);
     _this5.moveup = _this5.moveup.bind(_this5);
     _this5.movedown = _this5.movedown.bind(_this5);
+    _this5.alterTruncation = _this5.alterTruncation.bind(_this5);
     return _this5;
   }
 
@@ -1171,13 +1193,20 @@ var Table = function (_React$Component5) {
       this.props.movedown(i);
     }
   }, {
+    key: 'alterTruncation',
+    value: function alterTruncation() {
+      this.setState(function (state, props) {
+        return { truncateMore: !state.truncateMore };
+      });
+    }
+  }, {
     key: 'render',
     value: function render() {
       var arr = [];
       for (var i = 0; i < heightFromDoubleArray(this.props.data); i++) {
         arr.push(React.createElement(
           Row,
-          { modeJ: this.props.modeJ, selectedArr: this.props.selectedArr, moveup: this.moveup, movedown: this.movedown, editing: this.props.editing, width: widthFromDoubleArray(this.props.data), i: i, selectedJ: i == this.props.selectedI ? this.props.selectedJ : -1, onCellEvent: this.onCellEvent, data: this.props.data },
+          { truncate: this.state.truncateMore, truncFunc: this.alterTruncation, modeJ: this.props.modeJ, selectedArr: this.props.selectedArr, moveup: this.moveup, movedown: this.movedown, editing: this.props.editing, width: widthFromDoubleArray(this.props.data), i: i, selectedJ: i == this.props.selectedI ? this.props.selectedJ : -1, onCellEvent: this.onCellEvent, data: this.props.data },
           this.props.children
         ));
       }
@@ -1266,16 +1295,7 @@ var Spotlight = function (_React$Component7) {
       var border = this.props.count > 0 ? "5px solid green" : "none";
       var padding = this.props.count > 0 ? "10 10 10 10" : "15 15 15 15";
       var color = this.props.count > 0 ? utilYes : middleGray;
-
-      /*border: 1px solid gold;*/
-      //   Hide app title in view mode?
-      // Spotlight UI tweaks:
-      // - asterisks that don't move everything
-      // - bank no overflow
-      // Mini Spotlights. floating lower right. cap length of current spotlight
-      // - current Mode
-      // - current Tone
-      // - The Bank
+      var paddington = this.props.count > 0 ? "10" : "15";
 
       return [React.createElement(
         'div',
@@ -1329,7 +1349,7 @@ var Spotlight = function (_React$Component7) {
         )
       ), React.createElement(
         'div',
-        { style: { display: "inline-block", verticalAlign: "top", backgroundColor: middleGray, width: "30%", border: border, padding: padding } },
+        { style: { position: "relative", display: "inline-block", height: "300px", verticalAlign: "top", margin: "20 0 0 0", backgroundColor: middleGray, width: "30%", border: border, padding: padding } },
         React.createElement(
           'span',
           { style: { fontSize: 25, fontWeight: "bold" } },
@@ -1337,13 +1357,13 @@ var Spotlight = function (_React$Component7) {
         ),
         React.createElement(
           'span',
-          { style: { fontSize: 25, fontWeight: "bold", color: textPurple } },
+          { style: { fontSize: 25, fontWeight: "bold", color: textPurple, whiteSpace: "pre-wrap" } },
           this.props.mode
         ),
         React.createElement('br', null),
         React.createElement(
           'h2',
-          null,
+          { style: {} },
           'TONE: ',
           this.props.tone
         ),
@@ -1352,7 +1372,8 @@ var Spotlight = function (_React$Component7) {
           { style: { whiteSpace: "pre-wrap" } },
           "Bank:\n",
           this.props.bank
-        )
+        ),
+        React.createElement('img', { src: 'apex_logo.png', width: '150px', height: '75px', style: { position: "absolute", right: paddington, bottom: paddington } })
       )];
     }
   }]);
@@ -2017,6 +2038,7 @@ var App = function (_React$Component9) {
             'Clear Saved Code (refresh browser)'
           )
         ),
+        React.createElement(Spotlight, { count: this.state.count, bank: this.state.bank, editing: this.state.editing, command: this.state.command, mode: this.state.mode, accent: this.state.accent, tone: this.state.tone, memory: this.state.memory, random: this.state.random, onChange: this.memoryUpdate }),
         React.createElement(
           'div',
           null,
@@ -2071,8 +2093,7 @@ var App = function (_React$Component9) {
           { style: { position: "fixed", width: canvasDim - 10, right: "0", bottom: canvasDim, backgroundColor: unmodifiedTextColor, display: canvasViz, padding: "5 5 5 5", color: textPurple } },
           'MODE DIAGRAM'
         ),
-        React.createElement('canvas', { id: 'canvas', width: canvasDim, height: canvasDim, style: { position: "fixed", right: "0", bottom: "0", backgroundColor: textOnBackgroundGray, display: canvasViz } }),
-        React.createElement(Spotlight, { count: this.state.count, bank: this.state.bank, editing: this.state.editing, command: this.state.command, mode: this.state.mode, accent: this.state.accent, tone: this.state.tone, memory: this.state.memory, random: this.state.random, onChange: this.memoryUpdate })
+        React.createElement('canvas', { id: 'canvas', width: canvasDim, height: canvasDim, style: { position: "fixed", right: "0", bottom: "0", backgroundColor: textOnBackgroundGray, display: canvasViz } })
       )];
     }
   }]);

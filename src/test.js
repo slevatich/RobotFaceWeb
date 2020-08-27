@@ -836,7 +836,7 @@ class Cell extends React.Component {
   }
 
   render() {
-    // in editing mode, we truncate all 
+    const viewText = this.props.truncate && this.props.i != 0 && this.props.j != 0 ? "Click Me!" : this.props.text
     const wasUsed = this.props.selectedArr ? this.props.selectedArr[this.props.i][this.props.j] == 2 : false;
     const isNew = this.props.selectedArr ? this.props.selectedArr[this.props.i][this.props.j] == 1 : false;
     const tdStyle = !this.props.editingMode || !this.props.selectedArr || (this.props.i==0 || this.props.j==0) ? (this.props.isHeader ? middleGray : "transparent") : wasUsed ? utilYes : isNew ? "transparent" : utilNo;
@@ -844,14 +844,14 @@ class Cell extends React.Component {
       const allowInput = this.props.isInteractable && this.props.editingMode;
       const selectedHeader = !allowInput && this.props.i==0 && this.props.modeJ==this.props.j ? viewModeSelectionColor : tdStyle;
       return <th style={{backgroundColor:selectedHeader}}>
-        {!allowInput ? <h3 style={{color:textPurple, margin:"0 0 0 0"}}>{this.props.text}</h3> : <InputCell value={this.props.text} onCellChange={this.onCellEvent} i={this.props.i} j={this.props.j} data={this.props.data} />}
+        {!allowInput ? <h3 style={{color:textPurple, margin:"0 0 0 0"}}>{viewText}</h3> : <InputCell value={this.props.text} onCellChange={this.onCellEvent} i={this.props.i} j={this.props.j} data={this.props.data} />}
       </th>;
     } else {
       return <td style={{backgroundColor:tdStyle}}>
           {!this.props.isInteractable
-           ? this.props.text
+           ? viewText
            : (!this.props.editingMode
-              ? <ReadOnlyCell value={this.props.text} onCellClick={this.onCellEvent} i={this.props.i} j={this.props.j} isSelected={this.props.isSelected} data={this.props.data} />
+              ? <ReadOnlyCell value={viewText} onCellClick={this.onCellEvent} i={this.props.i} j={this.props.j} isSelected={this.props.isSelected} data={this.props.data} />
               : <InputCell wasUsed={this.props.selectedArr} value={this.props.text} onCellChange={this.onCellEvent} i={this.props.i} j={this.props.j} data={this.props.data} />)}
         </td>;
     }
@@ -861,6 +861,7 @@ class Cell extends React.Component {
 class Row extends React.Component {
   constructor(props) {
     super(props);
+
 
     this.onCellEvent = this.onCellEvent.bind(this);
     this.moveup = this.moveup.bind(this);
@@ -879,6 +880,10 @@ class Row extends React.Component {
     this.props.movedown(this.props.i);
   }
 
+  alterTruncation() {
+    this.setState((state, props) => ({truncateMore:!state.truncateMore}));
+  }
+
   render() {
     // add a cell with two buttons
     const buttonStyle = {color:textOnBackgroundGray, fontSize:15, backgroundColor:"transparent", backgroundRepeat:"no-repeat", border:"none", overflow:"hidden", outline:"none"};
@@ -893,10 +898,16 @@ class Row extends React.Component {
     for (var j = 0; j < this.props.width; j++) {
       const uninteractable = j==0 && this.props.i==1 || this.props.i==2 && j==0 || this.props.i==0 && j==0; // not interactable
       const isHeader = j==0 || this.props.i==0 || this.props.i==1; // non clickable in view mode, and bolder text
-      if (this.props.i==0 && this.props.children[0] && j==0 && this.props.editing) {
-        arr.push(<th style={{backgroundColor:middleGray}}>{this.props.children[0]}</th>)
+      if (this.props.i==0 && j==0) {
+        if (this.props.editing && this.props.children[0]) {
+          // bank
+          arr.push(<th style={{backgroundColor:middleGray}}>{this.props.children[0]}</th>)
+        } else {
+          // checkbox
+          arr.push(<th style={{backgroundColor:middleGray, color:textOnBackgroundGray}}><button onClick={this.props.truncFunc}>{this.props.truncate ? "Show Full Text" : "Shorten Text"}</button></th>);
+        }
       } else {
-        arr.push(<Cell modeJ={this.props.modeJ} selectedArr={this.props.selectedArr} isHeader={isHeader} isInteractable={!uninteractable} isSelected={j==this.props.selectedJ} editingMode={this.props.editing} text={this.props.data[this.props.i][j]} onCellEvent={this.onCellEvent} i={this.props.i} j={j} data={this.props.data} />)
+        arr.push(<Cell truncate={this.props.truncate} modeJ={this.props.modeJ} selectedArr={this.props.selectedArr} isHeader={isHeader} isInteractable={!uninteractable} isSelected={j==this.props.selectedJ} editingMode={this.props.editing} text={this.props.data[this.props.i][j]} onCellEvent={this.onCellEvent} i={this.props.i} j={j} data={this.props.data} />)
       }
     }
     if (this.props.i==0) {
@@ -910,11 +921,12 @@ class Table extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {invalidState:null, modeRemoveWarning:false, inputRemoveWarning:false}
+    this.state = {truncateMore:false};
 
     this.onCellEvent = this.onCellEvent.bind(this);
     this.moveup = this.moveup.bind(this);
     this.movedown = this.movedown.bind(this);
+    this.alterTruncation = this.alterTruncation.bind(this);
   }
 
   onCellEvent(e, i, j) {
@@ -929,10 +941,14 @@ class Table extends React.Component {
     this.props.movedown(i);
   }
 
+  alterTruncation() {
+    this.setState((state, props) => ({truncateMore:!state.truncateMore}));
+  }
+
   render() {
     var arr = [];
     for (var i = 0; i < heightFromDoubleArray(this.props.data); i++) {
-      arr.push(<Row modeJ={this.props.modeJ} selectedArr={this.props.selectedArr} moveup={this.moveup} movedown={this.movedown} editing={this.props.editing} width={widthFromDoubleArray(this.props.data)} i={i} selectedJ={i == this.props.selectedI ? this.props.selectedJ : -1} onCellEvent={this.onCellEvent} data={this.props.data}>{this.props.children}</Row>)
+      arr.push(<Row truncate={this.state.truncateMore} truncFunc={this.alterTruncation} modeJ={this.props.modeJ} selectedArr={this.props.selectedArr} moveup={this.moveup} movedown={this.movedown} editing={this.props.editing} width={widthFromDoubleArray(this.props.data)} i={i} selectedJ={i == this.props.selectedI ? this.props.selectedJ : -1} onCellEvent={this.onCellEvent} data={this.props.data}>{this.props.children}</Row>)
     }
     arr.push(<tr><td></td><td>{this.props.children.slice(2,4)}</td></tr>)
     return <table style={{display:"inline-block"}}>{arr}</table>;
@@ -978,16 +994,7 @@ class Spotlight extends React.Component {
     const border = this.props.count > 0 ? "5px solid green" : "none"
     const padding = this.props.count > 0 ? "10 10 10 10": "15 15 15 15"
     const color = this.props.count > 0 ? utilYes : middleGray
-
-/*border: 1px solid gold;*/
-//   Hide app title in view mode?
-// Spotlight UI tweaks:
-// - asterisks that don't move everything
-// - bank no overflow
-// Mini Spotlights. floating lower right. cap length of current spotlight
-// - current Mode
-// - current Tone
-// - The Bank
+    const paddington = this.props.count > 0 ? "10": "15"
 
     return [<div style={{display:"inline-block", backgroundColor:middleGray, width:"64%", border:border, padding:padding}}>
         <span style={{fontSize:25, fontWeight:"bold"}}>MODE: </span><span style={{fontSize:25, fontWeight:"bold",color:textPurple}}>{this.props.mode}</span>
@@ -999,11 +1006,13 @@ class Spotlight extends React.Component {
         <span style={{display:"inline-block", padding:"20 20 20 0", verticalAlign:"top", fontSize:"20"}}>RAND: {this.props.random}</span><span style={{color:color, display:dotDisplay, fontSize:60}}>***</span>
         <br/>
         <span style={{color:"black", fontSize:"30", fontWeight:"bold", backgroundColor:textPurple, whiteSpace:"pre-wrap"}}>{this.props.command}</span>
-      </div>, <div style={{display:"inline-block", verticalAlign:"top", backgroundColor:middleGray, width:"30%", border:border, padding:padding}}>
-        <span style={{fontSize:25, fontWeight:"bold"}}>MODE: </span><span style={{fontSize:25, fontWeight:"bold",color:textPurple}}>{this.props.mode}</span>
+      </div>, 
+      <div style={{position:"relative", display:"inline-block", height:"300px", verticalAlign:"top", margin:"20 0 0 0", backgroundColor:middleGray, width:"30%", border:border, padding:padding}}>
+        <span style={{fontSize:25, fontWeight:"bold"}}>MODE: </span><span style={{fontSize:25, fontWeight:"bold",color:textPurple, whiteSpace:"pre-wrap"}}>{this.props.mode}</span>
         <br/>
-        <h2>TONE: {this.props.tone}</h2>
+        <h2 style={{}}>TONE: {this.props.tone}</h2>
         <span style={{whiteSpace:"pre-wrap"}}>{"Bank:\n"}{this.props.bank}</span>
+        <img src="apex_logo.png" width="150px" height="75px" style={{position:"absolute", right:paddington, bottom:paddington}}/>
       </div>];
   }
 }
@@ -1514,6 +1523,7 @@ class App extends React.Component {
           {editModeBreak}
           <button style={{display:buttonDisplayStyle}} onClick={this.clearStorage}>Clear Saved Code (refresh browser)</button>
         </Menu>
+        <Spotlight count={this.state.count} bank={this.state.bank} editing={this.state.editing} command={this.state.command} mode={this.state.mode} accent={this.state.accent} tone={this.state.tone} memory={this.state.memory} random={this.state.random} onChange={this.memoryUpdate} />
         <div>
           <div>
             <Table modeJ={this.state.modeJ} selectedArr={this.state.selectedArr} moveup={this.moveup} movedown={this.movedown} editing={this.state.editing} onCellEvent={this.onCellEvent} data={this.state.data} selectedI={this.state.selectedI} selectedJ={this.state.selectedJ}>
@@ -1535,7 +1545,6 @@ class App extends React.Component {
         </div>
         <div style={{position:"fixed", width:canvasDim-10, right:"0", bottom:canvasDim, backgroundColor:unmodifiedTextColor, display:canvasViz, padding:"5 5 5 5", color:textPurple}}>MODE DIAGRAM</div>
         <canvas id="canvas" width={canvasDim} height={canvasDim} style={{position:"fixed", right:"0", bottom:"0", backgroundColor:textOnBackgroundGray, display:canvasViz}}></canvas>
-        <Spotlight count={this.state.count} bank={this.state.bank} editing={this.state.editing} command={this.state.command} mode={this.state.mode} accent={this.state.accent} tone={this.state.tone} memory={this.state.memory} random={this.state.random} onChange={this.memoryUpdate} />
       </div>
     ];
   }

@@ -1023,9 +1023,10 @@ class Menu extends React.Component {
   }
 
   render() {
-    const width = this.props.editing ? canvasDim : "auto"
+    const width = this.props.editing && this.props.up ? canvasDim : "auto"
     console.log(width);
-    return <div style={{backgroundColor:"black", zIndex:"3", padding:"3px 3px 3px 3px", position:"fixed", top:"0", right:"0", width:width}}>{this.props.children}</div>;
+    return this.props.up ? <div style={{backgroundColor:"black", zIndex:"3", padding:"3px 3px 3px 3px", position:"fixed", top:"0", right:"0", width:width}}>{this.props.children}</div>
+    : <div style={{backgroundColor:middleGray, zIndex:"0", padding:"3px 3px 3px 3px", position:"fixed", bottom:"0", right:"0", width:width}}>{this.props.children}</div> ;
   }
 }
 
@@ -1054,6 +1055,7 @@ class App extends React.Component {
       showCanvas:false,
       showButtons:false,
       count:0,
+      showLegend:true,
     };
 
     localStorage.setItem(localStorageProgramKey, JSON.stringify(data))
@@ -1079,6 +1081,7 @@ class App extends React.Component {
     this.showGraph = this.showGraph.bind(this);
     this.hideCanvas = this.hideCanvas.bind(this);
     this.showHideButtons = this.showHideButtons.bind(this);
+    this.showHideLegend = this.showHideLegend.bind(this);
   }
 
   onToggle(e) {
@@ -1482,12 +1485,16 @@ class App extends React.Component {
   }
 
   showHideButtons(e) {
-    // this.setState((state, props) => {showButtons:!state.showButtons});
     this.setState({showButtons:!this.state.showButtons})
+  }
+
+  showHideLegend(e) {
+    this.setState({showLegend:!this.state.showLegend})
   }
 
   render() {
     const buttonDisplayStyle = !this.state.editing || !this.state.showButtons ? "none" : "inline-block";
+    const buttonDisplayStyle2 = !this.state.editing || !this.state.showLegend ? "none" : "inline";
     const toggleButtonText = this.state.editing ? 'Go To Viewing' : 'Go To Editing';
     const clearUsageButtonStyle = !this.state.editing || !this.state.selectedArr || !this.state.showButtons ? "none" : "inline-block";
     const canvasViz = this.state.showCanvas ? "inline-block" : "none";
@@ -1496,17 +1503,23 @@ class App extends React.Component {
     const showUsageButtonStyle = !this.state.editing || !this.state.prevSelectedArr || !this.state.showButtons ? "none" : "inline-block";
     const editModeBreak = this.state.editing && this.state.showButtons ? <br/> : null;
     const buttonToggleDisplay = this.state.editing ? "inline" : "none";
+
+    const but1 = !this.state.editing || !this.state.showLegend ? null : [<span style={{color:textOnBackgroundGray, margin:"0 0 0 20", display:buttonDisplayStyle2}}>CON(</span>,<br/>,<br/>]
+    const but2 = !this.state.editing || !this.state.showLegend ? null : [<span style={{color:textOnBackgroundGray, margin:"0 0 0 20", display:buttonDisplayStyle2}}>TON(</span>,<br/>,<br/>]
+    const but3 = !this.state.editing || !this.state.showLegend ? null : [<span style={{color:textOnBackgroundGray, margin:"0 0 0 20", display:buttonDisplayStyle2}}>EXT(</span>,<br/>,<br/>]
+    const but4 = !this.state.editing || !this.state.showLegend ? null : [<span style={{color:textOnBackgroundGray, margin:"0 0 0 20", display:buttonDisplayStyle2}}>ACT(</span>,<br/>,<br/>]
+
     return [
     <div style={{display:(this.state.editing ? "block" : "none" )}}>
     <span style={{fontSize:"60", fontWeight:"bold", color:"white"}}>The_SpeakEZ</span>
-    <span>v0.95</span>
+    <span>v0.97</span>
     <span style={{marginLeft: "30"}}>presented by </span>
     <span style={{fontStyle: "italic"}}>APEX DYNAMICS</span>
     <br/>
     <br/>
     </div>,
       <div>
-        <Menu editing={this.state.editing}>
+        <Menu editing={this.state.editing} up={true}>
           <button style={{float:"right"}} onClick={this.onToggle}>{toggleButtonText}</button>
           <button style={{float:"right", display:buttonToggleDisplay}} onClick={this.showHideButtons}>{this.state.showButtons ? "Close Settings" : "Open Settings"}</button>
           {editModeBreak}
@@ -1544,7 +1557,14 @@ class App extends React.Component {
           <br/>
         </div>
         <div style={{position:"fixed", width:canvasDim-10, right:"0", bottom:canvasDim, backgroundColor:unmodifiedTextColor, display:canvasViz, padding:"5 5 5 5", color:textPurple}}>MODE DIAGRAM</div>
-        <canvas id="canvas" width={canvasDim} height={canvasDim} style={{position:"fixed", right:"0", bottom:"0", backgroundColor:textOnBackgroundGray, display:canvasViz}}></canvas>
+        <canvas id="canvas" width={canvasDim} height={canvasDim} style={{zindex:"2", position:"fixed", right:"0", bottom:"0", backgroundColor:textOnBackgroundGray, display:canvasViz}}></canvas>
+        <Menu editing={this.state.editing} up={false}>
+          {but1}
+          {but2}
+          {but3}
+          {but4}
+          <button style={{float:"right", display:buttonToggleDisplay}} onClick={this.showHideLegend}>{this.state.showLegend ? "Hide Legend" : "Show Legend"}</button>
+        </Menu>
       </div>
     ];
   }

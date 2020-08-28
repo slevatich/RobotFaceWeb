@@ -1393,11 +1393,15 @@ var Menu = function (_React$Component8) {
   _createClass(Menu, [{
     key: 'render',
     value: function render() {
-      var width = this.props.editing ? canvasDim : "auto";
+      var width = this.props.editing && this.props.up ? canvasDim : "auto";
       console.log(width);
-      return React.createElement(
+      return this.props.up ? React.createElement(
         'div',
         { style: { backgroundColor: "black", zIndex: "3", padding: "3px 3px 3px 3px", position: "fixed", top: "0", right: "0", width: width } },
+        this.props.children
+      ) : React.createElement(
+        'div',
+        { style: { backgroundColor: middleGray, zIndex: "0", padding: "3px 3px 3px 3px", position: "fixed", bottom: "0", right: "0", width: width } },
         this.props.children
       );
     }
@@ -1434,7 +1438,8 @@ var App = function (_React$Component9) {
       prevSelectedArr: "",
       showCanvas: false,
       showButtons: false,
-      count: 0
+      count: 0,
+      showLegend: true
     };
 
     localStorage.setItem(localStorageProgramKey, JSON.stringify(data));
@@ -1460,6 +1465,7 @@ var App = function (_React$Component9) {
     _this9.showGraph = _this9.showGraph.bind(_this9);
     _this9.hideCanvas = _this9.hideCanvas.bind(_this9);
     _this9.showHideButtons = _this9.showHideButtons.bind(_this9);
+    _this9.showHideLegend = _this9.showHideLegend.bind(_this9);
     return _this9;
   }
 
@@ -1936,13 +1942,18 @@ var App = function (_React$Component9) {
   }, {
     key: 'showHideButtons',
     value: function showHideButtons(e) {
-      // this.setState((state, props) => {showButtons:!state.showButtons});
       this.setState({ showButtons: !this.state.showButtons });
+    }
+  }, {
+    key: 'showHideLegend',
+    value: function showHideLegend(e) {
+      this.setState({ showLegend: !this.state.showLegend });
     }
   }, {
     key: 'render',
     value: function render() {
       var buttonDisplayStyle = !this.state.editing || !this.state.showButtons ? "none" : "inline-block";
+      var buttonDisplayStyle2 = !this.state.editing || !this.state.showLegend ? "none" : "inline";
       var toggleButtonText = this.state.editing ? 'Go To Viewing' : 'Go To Editing';
       var clearUsageButtonStyle = !this.state.editing || !this.state.selectedArr || !this.state.showButtons ? "none" : "inline-block";
       var canvasViz = this.state.showCanvas ? "inline-block" : "none";
@@ -1959,6 +1970,28 @@ var App = function (_React$Component9) {
       var showUsageButtonStyle = !this.state.editing || !this.state.prevSelectedArr || !this.state.showButtons ? "none" : "inline-block";
       var editModeBreak = this.state.editing && this.state.showButtons ? React.createElement('br', null) : null;
       var buttonToggleDisplay = this.state.editing ? "inline" : "none";
+
+      var but1 = !this.state.editing || !this.state.showLegend ? null : [React.createElement(
+        'span',
+        { style: { color: textOnBackgroundGray, margin: "0 0 0 20", display: buttonDisplayStyle2 } },
+        'CON('
+      ), React.createElement('br', null), React.createElement('br', null)];
+      var but2 = !this.state.editing || !this.state.showLegend ? null : [React.createElement(
+        'span',
+        { style: { color: textOnBackgroundGray, margin: "0 0 0 20", display: buttonDisplayStyle2 } },
+        'TON('
+      ), React.createElement('br', null), React.createElement('br', null)];
+      var but3 = !this.state.editing || !this.state.showLegend ? null : [React.createElement(
+        'span',
+        { style: { color: textOnBackgroundGray, margin: "0 0 0 20", display: buttonDisplayStyle2 } },
+        'EXT('
+      ), React.createElement('br', null), React.createElement('br', null)];
+      var but4 = !this.state.editing || !this.state.showLegend ? null : [React.createElement(
+        'span',
+        { style: { color: textOnBackgroundGray, margin: "0 0 0 20", display: buttonDisplayStyle2 } },
+        'ACT('
+      ), React.createElement('br', null), React.createElement('br', null)];
+
       return [React.createElement(
         'div',
         { style: { display: this.state.editing ? "block" : "none" } },
@@ -1970,7 +2003,7 @@ var App = function (_React$Component9) {
         React.createElement(
           'span',
           null,
-          'v0.95'
+          'v0.97'
         ),
         React.createElement(
           'span',
@@ -1989,7 +2022,7 @@ var App = function (_React$Component9) {
         null,
         React.createElement(
           Menu,
-          { editing: this.state.editing },
+          { editing: this.state.editing, up: true },
           React.createElement(
             'button',
             { style: { float: "right" }, onClick: this.onToggle },
@@ -2093,7 +2126,20 @@ var App = function (_React$Component9) {
           { style: { position: "fixed", width: canvasDim - 10, right: "0", bottom: canvasDim, backgroundColor: unmodifiedTextColor, display: canvasViz, padding: "5 5 5 5", color: textPurple } },
           'MODE DIAGRAM'
         ),
-        React.createElement('canvas', { id: 'canvas', width: canvasDim, height: canvasDim, style: { position: "fixed", right: "0", bottom: "0", backgroundColor: textOnBackgroundGray, display: canvasViz } })
+        React.createElement('canvas', { id: 'canvas', width: canvasDim, height: canvasDim, style: { zindex: "2", position: "fixed", right: "0", bottom: "0", backgroundColor: textOnBackgroundGray, display: canvasViz } }),
+        React.createElement(
+          Menu,
+          { editing: this.state.editing, up: false },
+          but1,
+          but2,
+          but3,
+          but4,
+          React.createElement(
+            'button',
+            { style: { float: "right", display: buttonToggleDisplay }, onClick: this.showHideLegend },
+            this.state.showLegend ? "Hide Legend" : "Show Legend"
+          )
+        )
       )];
     }
   }]);

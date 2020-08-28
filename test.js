@@ -2126,7 +2126,7 @@ var App = function (_React$Component9) {
           { style: { position: "fixed", width: canvasDim - 10, right: "0", bottom: canvasDim, backgroundColor: unmodifiedTextColor, display: canvasViz, padding: "5 5 5 5", color: textPurple } },
           'MODE DIAGRAM'
         ),
-        React.createElement('canvas', { id: 'canvas', width: canvasDim, height: canvasDim, style: { zindex: "2", position: "fixed", right: "0", bottom: "0", backgroundColor: textOnBackgroundGray, display: canvasViz } }),
+        React.createElement('canvas', { id: 'canvas', width: canvasDim, height: canvasDim, style: { zIndex: "2", position: "fixed", right: "0", bottom: "0", backgroundColor: textOnBackgroundGray, display: canvasViz } }),
         React.createElement(
           Menu,
           { editing: this.state.editing, up: false },

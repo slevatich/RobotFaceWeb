@@ -512,6 +512,20 @@ function cellInvalidStateForActivate(arr, text, modeIdx) {
   return null;
 }
 
+
+function activateMispellings(text) {
+  var commandsArr = commandsArrayForCell(text);
+  for (var command of commandsArr) {
+    if (command[0] === "activte" ||
+        command[0] === "activat" ||
+        command[0] === "actvate" ||
+        command[0] === "actiate") {
+      return "! Possible Activate Typo?"
+    }
+  }
+  return null;
+}
+
 function replaceMemoryZones(str, memory) {
   const idx = str.toLowerCase().indexOf("[memory]");
   var output = str;
@@ -621,6 +635,16 @@ function textIsValidCommand(text) {
   return true;
 }
 
+function textHasEmptyLine(text) {
+  var strArr = text.split("\n");
+  for (var str of strArr) {
+    if (str.length == 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function textOnlyHasOneOfEachBracketPerLine(text) {
   var strArr = text.split("\n");
   for (var str of strArr) {
@@ -675,8 +699,15 @@ function errorStringForCellText(text, data, modeIdx) {
   if (text.length == 0) {
     return null;
   }
+  if (textHasEmptyLine(text)) {
+    return "! Empty line detected"
+  }
   if (!textIsValidCommand(text)) {
     return "! Every line needs text and ()"
+  }
+  const actText = activateMispellings(text);
+  if (actText) {
+    return actText;
   }
   const badMode = cellInvalidStateForActivate(data, text, modeIdx);
   if (badMode) {
@@ -991,15 +1022,16 @@ class Spotlight extends React.Component {
     }
 
     const dotDisplay = "inline"//this.props.count > 0 ? "inline" : "none"
-    const border = this.props.count > 0 ? "5px solid green" : "none"
-    const padding = this.props.count > 0 ? "10 10 10 10": "15 15 15 15"
+    const border = this.props.count > 0 ? "8px solid green" : "none"
+    const padding = this.props.count > 0 ? "7 7 7 7": "15 15 15 15"
     const color = this.props.count > 0 ? utilYes : middleGray
-    const paddington = this.props.count > 0 ? "10": "15"
+    const paddington = this.props.count > 0 ? "7": "15"
+    const bank = this.props.bank.length > 0 ? this.props.bank : "[empty]";
 
     return [<div style={{display:"inline-block", backgroundColor:middleGray, width:"64%", border:border, padding:padding}}>
         <span style={{fontSize:25, fontWeight:"bold"}}>MODE: </span><span style={{fontSize:25, fontWeight:"bold",color:textPurple}}>{this.props.mode}</span>
         <br/>
-        <span style={{float:"right", whiteSpace:"pre-wrap"}}>{"Bank:\n"}{this.props.bank}</span>
+        <span style={{float:"right", whiteSpace:"pre-wrap", fontSize:18}}>{"Bank:\n"}{bank}</span>
         <h2>TONE: {this.props.tone}</h2>
         <h2>ACCENT: {this.props.accent}</h2>
         <MemoryUnit memory={this.props.memory} onChange={this.onChange} />
@@ -1011,7 +1043,7 @@ class Spotlight extends React.Component {
         <span style={{fontSize:25, fontWeight:"bold"}}>MODE: </span><span style={{fontSize:25, fontWeight:"bold",color:textPurple, whiteSpace:"pre-wrap"}}>{this.props.mode}</span>
         <br/>
         <h2 style={{}}>TONE: {this.props.tone}</h2>
-        <span style={{whiteSpace:"pre-wrap"}}>{"Bank:\n"}{this.props.bank}</span>
+        <span style={{whiteSpace:"pre-wrap", fontSize:18}}>{"Bank:\n"}{bank}</span>
         <img src="apex_logo.png" width="150px" height="75px" style={{position:"absolute", right:paddington, bottom:paddington}}/>
       </div>];
   }
@@ -1380,17 +1412,17 @@ class App extends React.Component {
 
 
   loadData1() {
-    this.setState({bank:initialBank1.join('\n'), data:initialData1, selectedI: 0, selectedJ: 0, selectedArr:"", prevSelectedArr:""});
+    this.setState({bank:initialBank1.join('\n'), data:initialData1, selectedI: 0, selectedJ: 0, selectedArr:"", prevSelectedArr:"", showButtons:false});
     localStorage.setItem(localStorageProgramKey, JSON.stringify(initialData1));
     localStorage.setItem(localStorageBankKey, initialBank1.join('\n'));
   }
   loadData2() {
-    this.setState({bank:initialBank2.join('\n'), data:initialData2, selectedI: 0, selectedJ: 0, selectedArr:"", prevSelectedArr:""});
+    this.setState({bank:initialBank2.join('\n'), data:initialData2, selectedI: 0, selectedJ: 0, selectedArr:"", prevSelectedArr:"", showButtons:false});
     localStorage.setItem(localStorageProgramKey, JSON.stringify(initialData2));
     localStorage.setItem(localStorageBankKey, initialBank2.join('\n'));
   }
   loadData3() {
-    this.setState({bank:initialBank3.join('\n'), data:initialData3, selectedI: 0, selectedJ: 0, selectedArr:"", prevSelectedArr:""});
+    this.setState({bank:initialBank3.join('\n'), data:initialData3, selectedI: 0, selectedJ: 0, selectedArr:"", prevSelectedArr:"", showButtons:false});
     localStorage.setItem(localStorageProgramKey, JSON.stringify(initialData3));
     localStorage.setItem(localStorageBankKey, initialBank3.join('\n'));
   }
@@ -1512,7 +1544,7 @@ class App extends React.Component {
     return [
     <div style={{display:(this.state.editing ? "block" : "none" )}}>
     <span style={{fontSize:"60", fontWeight:"bold", color:"white"}}>The_SpeakEZ</span>
-    <span>v0.97</span>
+    <span>v1.0</span>
     <span style={{marginLeft: "30"}}>presented by </span>
     <span style={{fontStyle: "italic"}}>APEX DYNAMICS</span>
     <br/>
@@ -1582,11 +1614,6 @@ ReactDOM.render(
 // - Converse: influenced by tone for sure
 // - Extrapolate from: influenced by bank only? maybe a little bit of tone coloring in word choice
 // - the random numbers can skew how influenced you are. you can word a little bit in the reverse. but do you always need to incorporate something they are telling you to do?
-
-
-
-
-
 
 /* Seek Feedback? */
 // [SMALL] toggle errors on and off as part of validation?

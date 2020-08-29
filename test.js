@@ -514,6 +514,38 @@ function cellInvalidStateForActivate(arr, text, modeIdx) {
   return null;
 }
 
+function activateMispellings(text) {
+  var commandsArr = commandsArrayForCell(text);
+  var _iteratorNormalCompletion6 = true;
+  var _didIteratorError6 = false;
+  var _iteratorError6 = undefined;
+
+  try {
+    for (var _iterator6 = commandsArr[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+      var command = _step6.value;
+
+      if (command[0] === "activte" || command[0] === "activat" || command[0] === "actvate" || command[0] === "actiate") {
+        return "! Possible Activate Typo?";
+      }
+    }
+  } catch (err) {
+    _didIteratorError6 = true;
+    _iteratorError6 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion6 && _iterator6.return) {
+        _iterator6.return();
+      }
+    } finally {
+      if (_didIteratorError6) {
+        throw _iteratorError6;
+      }
+    }
+  }
+
+  return null;
+}
+
 function replaceMemoryZones(str, memory) {
   var idx = str.toLowerCase().indexOf("[memory]");
   var output = str;
@@ -547,27 +579,27 @@ function processCommand(data, command, initialMemory, selectedArr) {
           selectedArr[1][modeJ] = 2;
           // recursively evaluate outputArr[1]
           var retval = processCommand(data, data[1][modeJ], memory, []);
-          var _iteratorNormalCompletion6 = true;
-          var _didIteratorError6 = false;
-          var _iteratorError6 = undefined;
+          var _iteratorNormalCompletion7 = true;
+          var _didIteratorError7 = false;
+          var _iteratorError7 = undefined;
 
           try {
-            for (var _iterator6 = retval[0][Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-              command = _step6.value;
+            for (var _iterator7 = retval[0][Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+              command = _step7.value;
 
               outputArr.push(replaceMemoryZones(command, memory));
             }
           } catch (err) {
-            _didIteratorError6 = true;
-            _iteratorError6 = err;
+            _didIteratorError7 = true;
+            _iteratorError7 = err;
           } finally {
             try {
-              if (!_iteratorNormalCompletion6 && _iterator6.return) {
-                _iterator6.return();
+              if (!_iteratorNormalCompletion7 && _iterator7.return) {
+                _iterator7.return();
               }
             } finally {
-              if (_didIteratorError6) {
-                throw _iteratorError6;
+              if (_didIteratorError7) {
+                throw _iteratorError7;
               }
             }
           }
@@ -613,40 +645,6 @@ function processCommand(data, command, initialMemory, selectedArr) {
 // Ensures every line has opening followed by closing paren
 function textIsValidCommand(text) {
   var strArr = text.split("\n");
-  var _iteratorNormalCompletion7 = true;
-  var _didIteratorError7 = false;
-  var _iteratorError7 = undefined;
-
-  try {
-    for (var _iterator7 = strArr[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
-      var str = _step7.value;
-
-      var idx = str.indexOf('(');
-      var idx2 = str.indexOf(')');
-      if (!(idx > 0 && idx2 > idx)) {
-        return false;
-      }
-    }
-  } catch (err) {
-    _didIteratorError7 = true;
-    _iteratorError7 = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion7 && _iterator7.return) {
-        _iterator7.return();
-      }
-    } finally {
-      if (_didIteratorError7) {
-        throw _iteratorError7;
-      }
-    }
-  }
-
-  return true;
-}
-
-function textOnlyHasOneOfEachBracketPerLine(text) {
-  var strArr = text.split("\n");
   var _iteratorNormalCompletion8 = true;
   var _didIteratorError8 = false;
   var _iteratorError8 = undefined;
@@ -655,19 +653,10 @@ function textOnlyHasOneOfEachBracketPerLine(text) {
     for (var _iterator8 = strArr[Symbol.iterator](), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
       var str = _step8.value;
 
-      var idx = str.indexOf('[');
-      if (idx > 0) {
-        var subidx = str.substr(idx + 1, str.length - idx - 1).indexOf('[');
-        if (subidx >= 0) {
-          return false;
-        }
-      }
-      var idx2 = str.indexOf(']');
-      if (idx2 > 0) {
-        var subidx2 = str.substr(idx2 + 1, str.length - idx2 - 1).indexOf(']');
-        if (subidx2 >= 0) {
-          return false;
-        }
+      var idx = str.indexOf('(');
+      var idx2 = str.indexOf(')');
+      if (!(idx > 0 && idx2 > idx)) {
+        return false;
       }
     }
   } catch (err) {
@@ -688,7 +677,7 @@ function textOnlyHasOneOfEachBracketPerLine(text) {
   return true;
 }
 
-function textHasValidSubCommand(text) {
+function textHasEmptyLine(text) {
   var strArr = text.split("\n");
   var _iteratorNormalCompletion9 = true;
   var _didIteratorError9 = false;
@@ -698,10 +687,8 @@ function textHasValidSubCommand(text) {
     for (var _iterator9 = strArr[Symbol.iterator](), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
       var str = _step9.value;
 
-      var idx = str.indexOf('[');
-      var idx2 = str.indexOf(']');
-      if (idx > 0 && idx2 < idx || idx2 > 0 && idx < 0) {
-        return false;
+      if (str.length == 0) {
+        return true;
       }
     }
   } catch (err) {
@@ -719,10 +706,10 @@ function textHasValidSubCommand(text) {
     }
   }
 
-  return true;
+  return false;
 }
 
-function textHasMemoryBetweenBrackets(text) {
+function textOnlyHasOneOfEachBracketPerLine(text) {
   var strArr = text.split("\n");
   var _iteratorNormalCompletion10 = true;
   var _didIteratorError10 = false;
@@ -733,12 +720,17 @@ function textHasMemoryBetweenBrackets(text) {
       var str = _step10.value;
 
       var idx = str.indexOf('[');
+      if (idx > 0) {
+        var subidx = str.substr(idx + 1, str.length - idx - 1).indexOf('[');
+        if (subidx >= 0) {
+          return false;
+        }
+      }
       var idx2 = str.indexOf(']');
-      if (idx >= 0) {
-        var betweenBrackets = str.substr(idx, idx2 - idx);
-        var betweenBrackets2 = betweenBrackets.substr(1, betweenBrackets.length - 1);
-        if (betweenBrackets2.toLowerCase() !== "memory") {
-          return betweenBrackets2 ? betweenBrackets2 : "[empty]";
+      if (idx2 > 0) {
+        var subidx2 = str.substr(idx2 + 1, str.length - idx2 - 1).indexOf(']');
+        if (subidx2 >= 0) {
+          return false;
         }
       }
     }
@@ -757,6 +749,78 @@ function textHasMemoryBetweenBrackets(text) {
     }
   }
 
+  return true;
+}
+
+function textHasValidSubCommand(text) {
+  var strArr = text.split("\n");
+  var _iteratorNormalCompletion11 = true;
+  var _didIteratorError11 = false;
+  var _iteratorError11 = undefined;
+
+  try {
+    for (var _iterator11 = strArr[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
+      var str = _step11.value;
+
+      var idx = str.indexOf('[');
+      var idx2 = str.indexOf(']');
+      if (idx > 0 && idx2 < idx || idx2 > 0 && idx < 0) {
+        return false;
+      }
+    }
+  } catch (err) {
+    _didIteratorError11 = true;
+    _iteratorError11 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion11 && _iterator11.return) {
+        _iterator11.return();
+      }
+    } finally {
+      if (_didIteratorError11) {
+        throw _iteratorError11;
+      }
+    }
+  }
+
+  return true;
+}
+
+function textHasMemoryBetweenBrackets(text) {
+  var strArr = text.split("\n");
+  var _iteratorNormalCompletion12 = true;
+  var _didIteratorError12 = false;
+  var _iteratorError12 = undefined;
+
+  try {
+    for (var _iterator12 = strArr[Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
+      var str = _step12.value;
+
+      var idx = str.indexOf('[');
+      var idx2 = str.indexOf(']');
+      if (idx >= 0) {
+        var betweenBrackets = str.substr(idx, idx2 - idx);
+        var betweenBrackets2 = betweenBrackets.substr(1, betweenBrackets.length - 1);
+        if (betweenBrackets2.toLowerCase() !== "memory") {
+          return betweenBrackets2 ? betweenBrackets2 : "[empty]";
+        }
+      }
+    }
+  } catch (err) {
+    _didIteratorError12 = true;
+    _iteratorError12 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion12 && _iterator12.return) {
+        _iterator12.return();
+      }
+    } finally {
+      if (_didIteratorError12) {
+        throw _iteratorError12;
+      }
+    }
+  }
+
   return null;
 }
 
@@ -764,8 +828,15 @@ function errorStringForCellText(text, data, modeIdx) {
   if (text.length == 0) {
     return null;
   }
+  if (textHasEmptyLine(text)) {
+    return "! Empty line detected";
+  }
   if (!textIsValidCommand(text)) {
     return "! Every line needs text and ()";
+  }
+  var actText = activateMispellings(text);
+  if (actText) {
+    return actText;
   }
   var badMode = cellInvalidStateForActivate(data, text, modeIdx);
   if (badMode) {
@@ -788,13 +859,13 @@ function errorStringForCellText(text, data, modeIdx) {
 function longestLineCountForText(text) {
   var strArr = text.split("\n");
   var count = 0;
-  var _iteratorNormalCompletion11 = true;
-  var _didIteratorError11 = false;
-  var _iteratorError11 = undefined;
+  var _iteratorNormalCompletion13 = true;
+  var _didIteratorError13 = false;
+  var _iteratorError13 = undefined;
 
   try {
-    for (var _iterator11 = strArr[Symbol.iterator](), _step11; !(_iteratorNormalCompletion11 = (_step11 = _iterator11.next()).done); _iteratorNormalCompletion11 = true) {
-      var str = _step11.value;
+    for (var _iterator13 = strArr[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
+      var str = _step13.value;
 
       var lineLen = str.length;
       if (lineLen > count) {
@@ -802,16 +873,16 @@ function longestLineCountForText(text) {
       }
     }
   } catch (err) {
-    _didIteratorError11 = true;
-    _iteratorError11 = err;
+    _didIteratorError13 = true;
+    _iteratorError13 = err;
   } finally {
     try {
-      if (!_iteratorNormalCompletion11 && _iterator11.return) {
-        _iterator11.return();
+      if (!_iteratorNormalCompletion13 && _iterator13.return) {
+        _iterator13.return();
       }
     } finally {
-      if (_didIteratorError11) {
-        throw _iteratorError11;
+      if (_didIteratorError13) {
+        throw _iteratorError13;
       }
     }
   }
@@ -823,38 +894,38 @@ var maxLineLenForInput = 25;
 
 function lineCountForText(data, i) {
   var count = 0;
-  var _iteratorNormalCompletion12 = true;
-  var _didIteratorError12 = false;
-  var _iteratorError12 = undefined;
+  var _iteratorNormalCompletion14 = true;
+  var _didIteratorError14 = false;
+  var _iteratorError14 = undefined;
 
   try {
-    for (var _iterator12 = data[i][Symbol.iterator](), _step12; !(_iteratorNormalCompletion12 = (_step12 = _iterator12.next()).done); _iteratorNormalCompletion12 = true) {
-      var text = _step12.value;
+    for (var _iterator14 = data[i][Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
+      var text = _step14.value;
 
       var strArr = text.split("\n");
       var tempCount = 0;
-      var _iteratorNormalCompletion13 = true;
-      var _didIteratorError13 = false;
-      var _iteratorError13 = undefined;
+      var _iteratorNormalCompletion15 = true;
+      var _didIteratorError15 = false;
+      var _iteratorError15 = undefined;
 
       try {
-        for (var _iterator13 = strArr[Symbol.iterator](), _step13; !(_iteratorNormalCompletion13 = (_step13 = _iterator13.next()).done); _iteratorNormalCompletion13 = true) {
-          var str = _step13.value;
+        for (var _iterator15 = strArr[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
+          var str = _step15.value;
 
           // NOTE: this doesn't work
           tempCount += 1 + str.length / maxLineLenForInput;
         }
       } catch (err) {
-        _didIteratorError13 = true;
-        _iteratorError13 = err;
+        _didIteratorError15 = true;
+        _iteratorError15 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion13 && _iterator13.return) {
-            _iterator13.return();
+          if (!_iteratorNormalCompletion15 && _iterator15.return) {
+            _iterator15.return();
           }
         } finally {
-          if (_didIteratorError13) {
-            throw _iteratorError13;
+          if (_didIteratorError15) {
+            throw _iteratorError15;
           }
         }
       }
@@ -862,38 +933,6 @@ function lineCountForText(data, i) {
       if (tempCount > count) {
         count = tempCount;
       }
-    }
-  } catch (err) {
-    _didIteratorError12 = true;
-    _iteratorError12 = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion12 && _iterator12.return) {
-        _iterator12.return();
-      }
-    } finally {
-      if (_didIteratorError12) {
-        throw _iteratorError12;
-      }
-    }
-  }
-
-  return count;
-}
-
-function lineCountForTextEdge(text) {
-  var strArr = text.split("\n");
-  var count = 0;
-  var _iteratorNormalCompletion14 = true;
-  var _didIteratorError14 = false;
-  var _iteratorError14 = undefined;
-
-  try {
-    for (var _iterator14 = strArr[Symbol.iterator](), _step14; !(_iteratorNormalCompletion14 = (_step14 = _iterator14.next()).done); _iteratorNormalCompletion14 = true) {
-      var str = _step14.value;
-
-      // NOTE: this doesn't work
-      count += 1 + str.length / maxLineLenForInput;
     }
   } catch (err) {
     _didIteratorError14 = true;
@@ -906,6 +945,38 @@ function lineCountForTextEdge(text) {
     } finally {
       if (_didIteratorError14) {
         throw _iteratorError14;
+      }
+    }
+  }
+
+  return count;
+}
+
+function lineCountForTextEdge(text) {
+  var strArr = text.split("\n");
+  var count = 0;
+  var _iteratorNormalCompletion16 = true;
+  var _didIteratorError16 = false;
+  var _iteratorError16 = undefined;
+
+  try {
+    for (var _iterator16 = strArr[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
+      var str = _step16.value;
+
+      // NOTE: this doesn't work
+      count += 1 + str.length / maxLineLenForInput;
+    }
+  } catch (err) {
+    _didIteratorError16 = true;
+    _iteratorError16 = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion16 && _iterator16.return) {
+        _iterator16.return();
+      }
+    } finally {
+      if (_didIteratorError16) {
+        throw _iteratorError16;
       }
     }
   }
@@ -1292,10 +1363,11 @@ var Spotlight = function (_React$Component7) {
       }
 
       var dotDisplay = "inline"; //this.props.count > 0 ? "inline" : "none"
-      var border = this.props.count > 0 ? "5px solid green" : "none";
-      var padding = this.props.count > 0 ? "10 10 10 10" : "15 15 15 15";
+      var border = this.props.count > 0 ? "8px solid green" : "none";
+      var padding = this.props.count > 0 ? "7 7 7 7" : "15 15 15 15";
       var color = this.props.count > 0 ? utilYes : middleGray;
-      var paddington = this.props.count > 0 ? "10" : "15";
+      var paddington = this.props.count > 0 ? "7" : "15";
+      var bank = this.props.bank.length > 0 ? this.props.bank : "[empty]";
 
       return [React.createElement(
         'div',
@@ -1313,9 +1385,9 @@ var Spotlight = function (_React$Component7) {
         React.createElement('br', null),
         React.createElement(
           'span',
-          { style: { float: "right", whiteSpace: "pre-wrap" } },
+          { style: { float: "right", whiteSpace: "pre-wrap", fontSize: 18 } },
           "Bank:\n",
-          this.props.bank
+          bank
         ),
         React.createElement(
           'h2',
@@ -1369,9 +1441,9 @@ var Spotlight = function (_React$Component7) {
         ),
         React.createElement(
           'span',
-          { style: { whiteSpace: "pre-wrap" } },
+          { style: { whiteSpace: "pre-wrap", fontSize: 18 } },
           "Bank:\n",
-          this.props.bank
+          bank
         ),
         React.createElement('img', { src: 'apex_logo.png', width: '150px', height: '75px', style: { position: "absolute", right: paddington, bottom: paddington } })
       )];
@@ -1739,54 +1811,54 @@ var App = function (_React$Component9) {
       }
       var oldPrevSelected = this.state.prevSelectedArr;
       if (oldPrevSelected !== "") {
-        var _iteratorNormalCompletion15 = true;
-        var _didIteratorError15 = false;
-        var _iteratorError15 = undefined;
+        var _iteratorNormalCompletion17 = true;
+        var _didIteratorError17 = false;
+        var _iteratorError17 = undefined;
 
         try {
-          for (var _iterator15 = oldPrevSelected[Symbol.iterator](), _step15; !(_iteratorNormalCompletion15 = (_step15 = _iterator15.next()).done); _iteratorNormalCompletion15 = true) {
-            var row = _step15.value;
+          for (var _iterator17 = oldPrevSelected[Symbol.iterator](), _step17; !(_iteratorNormalCompletion17 = (_step17 = _iterator17.next()).done); _iteratorNormalCompletion17 = true) {
+            var row = _step17.value;
 
             row.push(1);
           }
         } catch (err) {
-          _didIteratorError15 = true;
-          _iteratorError15 = err;
+          _didIteratorError17 = true;
+          _iteratorError17 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion15 && _iterator15.return) {
-              _iterator15.return();
+            if (!_iteratorNormalCompletion17 && _iterator17.return) {
+              _iterator17.return();
             }
           } finally {
-            if (_didIteratorError15) {
-              throw _iteratorError15;
+            if (_didIteratorError17) {
+              throw _iteratorError17;
             }
           }
         }
       }
       var oldSelectedArr = this.state.selectedArr;
       if (oldSelectedArr !== "") {
-        var _iteratorNormalCompletion16 = true;
-        var _didIteratorError16 = false;
-        var _iteratorError16 = undefined;
+        var _iteratorNormalCompletion18 = true;
+        var _didIteratorError18 = false;
+        var _iteratorError18 = undefined;
 
         try {
-          for (var _iterator16 = oldSelectedArr[Symbol.iterator](), _step16; !(_iteratorNormalCompletion16 = (_step16 = _iterator16.next()).done); _iteratorNormalCompletion16 = true) {
-            var row = _step16.value;
+          for (var _iterator18 = oldSelectedArr[Symbol.iterator](), _step18; !(_iteratorNormalCompletion18 = (_step18 = _iterator18.next()).done); _iteratorNormalCompletion18 = true) {
+            var row = _step18.value;
 
             row.push(1);
           }
         } catch (err) {
-          _didIteratorError16 = true;
-          _iteratorError16 = err;
+          _didIteratorError18 = true;
+          _iteratorError18 = err;
         } finally {
           try {
-            if (!_iteratorNormalCompletion16 && _iterator16.return) {
-              _iterator16.return();
+            if (!_iteratorNormalCompletion18 && _iterator18.return) {
+              _iterator18.return();
             }
           } finally {
-            if (_didIteratorError16) {
-              throw _iteratorError16;
+            if (_didIteratorError18) {
+              throw _iteratorError18;
             }
           }
         }
@@ -1822,21 +1894,21 @@ var App = function (_React$Component9) {
   }, {
     key: 'loadData1',
     value: function loadData1() {
-      this.setState({ bank: initialBank1.join('\n'), data: initialData1, selectedI: 0, selectedJ: 0, selectedArr: "", prevSelectedArr: "" });
+      this.setState({ bank: initialBank1.join('\n'), data: initialData1, selectedI: 0, selectedJ: 0, selectedArr: "", prevSelectedArr: "", showButtons: false });
       localStorage.setItem(localStorageProgramKey, JSON.stringify(initialData1));
       localStorage.setItem(localStorageBankKey, initialBank1.join('\n'));
     }
   }, {
     key: 'loadData2',
     value: function loadData2() {
-      this.setState({ bank: initialBank2.join('\n'), data: initialData2, selectedI: 0, selectedJ: 0, selectedArr: "", prevSelectedArr: "" });
+      this.setState({ bank: initialBank2.join('\n'), data: initialData2, selectedI: 0, selectedJ: 0, selectedArr: "", prevSelectedArr: "", showButtons: false });
       localStorage.setItem(localStorageProgramKey, JSON.stringify(initialData2));
       localStorage.setItem(localStorageBankKey, initialBank2.join('\n'));
     }
   }, {
     key: 'loadData3',
     value: function loadData3() {
-      this.setState({ bank: initialBank3.join('\n'), data: initialData3, selectedI: 0, selectedJ: 0, selectedArr: "", prevSelectedArr: "" });
+      this.setState({ bank: initialBank3.join('\n'), data: initialData3, selectedI: 0, selectedJ: 0, selectedArr: "", prevSelectedArr: "", showButtons: false });
       localStorage.setItem(localStorageProgramKey, JSON.stringify(initialData3));
       localStorage.setItem(localStorageBankKey, initialBank3.join('\n'));
     }
@@ -2003,7 +2075,7 @@ var App = function (_React$Component9) {
         React.createElement(
           'span',
           null,
-          'v0.97'
+          'v1.0'
         ),
         React.createElement(
           'span',
@@ -2156,7 +2228,6 @@ ReactDOM.render(React.createElement(App, null), document.querySelector('#reactTa
 // - Converse: influenced by tone for sure
 // - Extrapolate from: influenced by bank only? maybe a little bit of tone coloring in word choice
 // - the random numbers can skew how influenced you are. you can word a little bit in the reverse. but do you always need to incorporate something they are telling you to do?
-
 
 /* Seek Feedback? */
 // [SMALL] toggle errors on and off as part of validation?

@@ -1387,7 +1387,7 @@ var Spotlight = function (_React$Component7) {
           'span',
           { style: { float: "right", whiteSpace: "pre-wrap", fontSize: 18 } },
           "Bank:\n",
-          bank
+          this.props.bank
         ),
         React.createElement(
           'h2',
@@ -2234,6 +2234,7 @@ ReactDOM.render(React.createElement(App, null), document.querySelector('#reactTa
 // Should I prevent going to viewing mode with errors?
 // probably empty cells should still get red highlighting?
 // SpeakEZ could also be a color hmmm....
+// tiny bug where refreshing on an empty bank will replace with digital dialogue message
 
 /* Media Testing */
 // empty livelab

@@ -1031,7 +1031,7 @@ class Spotlight extends React.Component {
     return [<div style={{display:"inline-block", backgroundColor:middleGray, width:"64%", border:border, padding:padding}}>
         <span style={{fontSize:25, fontWeight:"bold"}}>MODE: </span><span style={{fontSize:25, fontWeight:"bold",color:textPurple}}>{this.props.mode}</span>
         <br/>
-        <span style={{float:"right", whiteSpace:"pre-wrap", fontSize:18}}>{"Bank:\n"}{bank}</span>
+        <span style={{float:"right", whiteSpace:"pre-wrap", fontSize:18}}>{"Bank:\n"}{this.props.bank}</span>
         <h2>TONE: {this.props.tone}</h2>
         <h2>ACCENT: {this.props.accent}</h2>
         <MemoryUnit memory={this.props.memory} onChange={this.onChange} />
@@ -1620,6 +1620,7 @@ ReactDOM.render(
 // Should I prevent going to viewing mode with errors?
 // probably empty cells should still get red highlighting?
 // SpeakEZ could also be a color hmmm....
+// tiny bug where refreshing on an empty bank will replace with digital dialogue message
 
 /* Media Testing */
 // empty livelab

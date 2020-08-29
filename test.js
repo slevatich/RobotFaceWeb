@@ -1338,6 +1338,14 @@ var MemoryUnit = function (_React$Component6) {
   return MemoryUnit;
 }(React.Component);
 
+function sortBank(bank) {
+  var bankArr = bank.split('\n');
+  bankArr.sort(function (first, next) {
+    return first.length < next.length;
+  });
+  return bankArr.join('\n');
+}
+
 var Spotlight = function (_React$Component7) {
   _inherits(Spotlight, _React$Component7);
 
@@ -1367,7 +1375,7 @@ var Spotlight = function (_React$Component7) {
       var padding = this.props.count > 0 ? "7 7 7 7" : "15 15 15 15";
       var color = this.props.count > 0 ? utilYes : middleGray;
       var paddington = this.props.count > 0 ? "7" : "15";
-      var bank = this.props.bank.length > 0 ? this.props.bank : "[empty]";
+      var bank = this.props.bank.length > 0 ? sortBank(this.props.bank) : "[empty]";
 
       return [React.createElement(
         'div',
@@ -1441,7 +1449,7 @@ var Spotlight = function (_React$Component7) {
         ),
         React.createElement(
           'span',
-          { style: { whiteSpace: "pre-wrap", fontSize: 18 } },
+          { style: { position: "relative", zIndex: 2, whiteSpace: "pre-wrap", fontSize: 18 } },
           "Bank:\n",
           bank
         ),
@@ -2075,7 +2083,7 @@ var App = function (_React$Component9) {
         React.createElement(
           'span',
           null,
-          'v1.0'
+          'v1.01'
         ),
         React.createElement(
           'span',

@@ -1005,6 +1005,14 @@ class MemoryUnit extends React.Component {
   }
 }
 
+function sortBank(bank) {
+  var bankArr = bank.split('\n');
+  bankArr.sort(function (first, next) {
+    return first.length < next.length;
+  });
+  return bankArr.join('\n');
+}
+
 class Spotlight extends React.Component {
   constructor(props) {
     super(props);
@@ -1026,7 +1034,7 @@ class Spotlight extends React.Component {
     const padding = this.props.count > 0 ? "7 7 7 7": "15 15 15 15"
     const color = this.props.count > 0 ? utilYes : middleGray
     const paddington = this.props.count > 0 ? "7": "15"
-    const bank = this.props.bank.length > 0 ? this.props.bank : "[empty]";
+    const bank = this.props.bank.length > 0 ? sortBank(this.props.bank) : "[empty]";
 
     return [<div style={{display:"inline-block", backgroundColor:middleGray, width:"64%", border:border, padding:padding}}>
         <span style={{fontSize:25, fontWeight:"bold"}}>MODE: </span><span style={{fontSize:25, fontWeight:"bold",color:textPurple}}>{this.props.mode}</span>
@@ -1043,7 +1051,7 @@ class Spotlight extends React.Component {
         <span style={{fontSize:25, fontWeight:"bold"}}>MODE: </span><span style={{fontSize:25, fontWeight:"bold",color:textPurple, whiteSpace:"pre-wrap"}}>{this.props.mode}</span>
         <br/>
         <h2 style={{}}>TONE: {this.props.tone}</h2>
-        <span style={{whiteSpace:"pre-wrap", fontSize:18}}>{"Bank:\n"}{bank}</span>
+        <span style={{position:"relative", zIndex:2, whiteSpace:"pre-wrap", fontSize:18}}>{"Bank:\n"}{bank}</span>
         <img src="apex_logo.png" width="150px" height="75px" style={{position:"absolute", right:paddington, bottom:paddington}}/>
       </div>];
   }
@@ -1544,7 +1552,7 @@ class App extends React.Component {
     return [
     <div style={{display:(this.state.editing ? "block" : "none" )}}>
     <span style={{fontSize:"60", fontWeight:"bold", color:"white"}}>The_SpeakEZ</span>
-    <span>v1.0</span>
+    <span>v1.01</span>
     <span style={{marginLeft: "30"}}>presented by </span>
     <span style={{fontStyle: "italic"}}>APEX DYNAMICS</span>
     <br/>

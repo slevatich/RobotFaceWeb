@@ -1007,8 +1007,8 @@ class MemoryUnit extends React.Component {
 
 function sortBank(bank) {
   var bankArr = bank.split('\n');
-  bankArr.sort(function (first, next) {
-    return first.length < next.length;
+  bankArr.sort(function (next, first) {
+    return first.length - next.length;
   });
   return bankArr.join('\n');
 }
@@ -1552,7 +1552,7 @@ class App extends React.Component {
     return [
     <div style={{display:(this.state.editing ? "block" : "none" )}}>
     <span style={{fontSize:"60", fontWeight:"bold", color:"white"}}>The_SpeakEZ</span>
-    <span>v1.01</span>
+    <span>v1.02</span>
     <span style={{marginLeft: "30"}}>presented by </span>
     <span style={{fontStyle: "italic"}}>APEX DYNAMICS</span>
     <br/>

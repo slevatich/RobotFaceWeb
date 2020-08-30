@@ -1340,8 +1340,8 @@ var MemoryUnit = function (_React$Component6) {
 
 function sortBank(bank) {
   var bankArr = bank.split('\n');
-  bankArr.sort(function (first, next) {
-    return first.length < next.length;
+  bankArr.sort(function (next, first) {
+    return first.length - next.length;
   });
   return bankArr.join('\n');
 }
@@ -2083,7 +2083,7 @@ var App = function (_React$Component9) {
         React.createElement(
           'span',
           null,
-          'v1.01'
+          'v1.02'
         ),
         React.createElement(
           'span',

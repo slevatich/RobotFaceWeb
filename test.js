@@ -158,7 +158,7 @@ var backgroundGray = "#2E3237";
 var middleGray = "#555555";
 var textOnBackgroundGray = "#D7D8D9";
 var cellTextFieldGray = "#E3E4E6";
-var cellTextFieldError = "pink";
+var cellTextFieldError = "#eebcab";
 var utilYes = "#35BD2D";
 var utilNo = "#E3E4E6"; //#AB1516";
 var utilUnknown = "transparent";
@@ -2083,7 +2083,7 @@ var App = function (_React$Component9) {
         React.createElement(
           'span',
           null,
-          'v1.02'
+          'v1.03'
         ),
         React.createElement(
           'span',

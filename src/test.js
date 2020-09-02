@@ -242,7 +242,7 @@ const backgroundGray = "#2E3237";
 const middleGray = "#555555";
 const textOnBackgroundGray = "#D7D8D9";
 const cellTextFieldGray = "#E3E4E6"
-const cellTextFieldError = "pink"
+const cellTextFieldError = "#eebcab";
 const utilYes = "#35BD2D";
 const utilNo = "#E3E4E6"//#AB1516";
 const utilUnknown = "transparent";
@@ -1552,7 +1552,7 @@ class App extends React.Component {
     return [
     <div style={{display:(this.state.editing ? "block" : "none" )}}>
     <span style={{fontSize:"60", fontWeight:"bold", color:"white"}}>The_SpeakEZ</span>
-    <span>v1.02</span>
+    <span>v1.03</span>
     <span style={{marginLeft: "30"}}>presented by </span>
     <span style={{fontStyle: "italic"}}>APEX DYNAMICS</span>
     <br/>

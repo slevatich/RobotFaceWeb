@@ -12,3 +12,4 @@ https://www.timeout.com/newyork/news/this-interactive-show-lets-you-be-part-of-a
 
 *Fun fact I'm also a Dacha company member (2018 onward) and have done acting in their devised shows in the past! Check out their website at https://www.dachatheatre.com/about.html
 
+![screenshot of app](robotFaceScreenshot.png)
